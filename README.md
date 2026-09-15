@@ -5,9 +5,7 @@ règles, lancez le tirage. Aucune donnée ne quitte votre navigateur.
 
 _[English version](README.en.md)_
 
-<!-- 👉 Remplacer le # ci-dessous par l'URL publique une fois le site déployé. -->
-
-### [→ Visiter "Les Petits Papiers"](#)
+### [→ Visiter "Les Petits Papiers"](https://lespetitspapiers.up.railway.app/)
 
 ---
 
