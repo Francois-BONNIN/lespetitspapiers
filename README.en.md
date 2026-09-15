@@ -5,9 +5,7 @@ draw. No data ever leaves your browser.
 
 _[Version française](README.md)_
 
-<!-- 👉 Replace the # below with the public URL once the site is deployed. -->
-
-### [→ Visit "Les Petits Papiers"](#)
+### [→ Visit "Les Petits Papiers"](https://lespetitspapiers.up.railway.app/)
 
 ---
 
