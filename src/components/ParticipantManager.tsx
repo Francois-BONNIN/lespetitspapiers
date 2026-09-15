@@ -9,10 +9,12 @@ import {
   Users,
 } from "lucide-react";
 import { Participant } from "../lib/database";
-import { getGroupColor, getInitials } from "../lib/familyColors";
+import { getGroupColor } from "../lib/familyColors";
+import { buildHomonymHints } from "../lib/homonyms";
 import { useRecentlyAdded } from "../lib/useRecentlyAdded";
 import { SectionCard } from "./ui/SectionCard";
 import { EmptyState } from "./ui/EmptyState";
+import { ParticipantAvatar } from "./ui/ParticipantAvatar";
 import { useI18n } from "./ui/language-context";
 
 interface ParticipantManagerProps {
@@ -41,6 +43,11 @@ export function ParticipantManager({
   const fileInputRef = useRef<HTMLInputElement>(null);
   const nameInputRef = useRef<HTMLInputElement>(null);
   const recentlyAdded = useRecentlyAdded(participants.map((p) => p.id));
+
+  const homonymHints = useMemo(
+    () => buildHomonymHints(participants),
+    [participants]
+  );
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -269,12 +276,11 @@ export function ParticipantManager({
                         colors.surface
                       } ${recentlyAdded.has(participant.id) ? "item-added" : ""}`}
                     >
-                      <span
-                        className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-xs font-bold ${colors.avatar}`}
-                        aria-hidden
-                      >
-                        {getInitials(participant.name)}
-                      </span>
+                      <ParticipantAvatar
+                        name={participant.name}
+                        group={participant.family}
+                        index={homonymHints.get(participant.id)?.index}
+                      />
                       <div className="min-w-0 flex-1">
                         <p className="truncate text-sm font-semibold text-ink-900 dark:text-white">
                           {participant.name}

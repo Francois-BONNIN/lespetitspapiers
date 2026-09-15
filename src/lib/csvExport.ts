@@ -1,13 +1,18 @@
 import { Participant, Exclusion, Inclusion, Draw } from "./database";
 import type { Translation } from "./i18n";
+import { buildHomonymHints, labelWithHint } from "./homonyms";
 
 export function exportDrawsToCSV(
   draws: Draw[],
   participants: Participant[],
   t: Translation,
 ): string {
-  const getParticipantName = (id: string) =>
-    participants.find((p) => p.id === id)?.name || t.common.unknown;
+  const hints = buildHomonymHints(participants);
+  const getParticipantName = (id: string) => {
+    const participant = participants.find((p) => p.id === id);
+    if (!participant) return t.common.unknown;
+    return labelWithHint(participant.name, hints.get(id));
+  };
 
   const header = `${t.csv.drawsHeader}\n`;
   const rows = draws.map(

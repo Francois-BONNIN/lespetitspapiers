@@ -17,9 +17,10 @@ import {
   downloadCSV,
   generateMessageForDraw,
 } from "../lib/csvExport";
-import { getInitials } from "../lib/familyColors";
+import { buildHomonymHints, labelWithHint } from "../lib/homonyms";
 import { SectionCard } from "./ui/SectionCard";
 import { EmptyState } from "./ui/EmptyState";
+import { ParticipantAvatar } from "./ui/ParticipantAvatar";
 import { useToast } from "./ui/toast-context";
 import { useI18n } from "./ui/language-context";
 
@@ -45,6 +46,14 @@ export function DrawManager({
 
   const getParticipantName = (id: string) =>
     participants.find((p) => p.id === id)?.name ?? t.common.unknown;
+
+  const homonymHints = useMemo(
+    () => buildHomonymHints(participants),
+    [participants]
+  );
+
+  const getParticipantLabel = (id: string) =>
+    labelWithHint(getParticipantName(id), homonymHints.get(id));
 
   const hasDraws = draws.length > 0;
   const allRevealed = hasDraws && revealedIds.size === draws.length;
@@ -93,8 +102,8 @@ export function DrawManager({
 
   const handleCopyMessage = (draw: Draw) => {
     const message = generateMessageForDraw(
-      getParticipantName(draw.drawer_id),
-      getParticipantName(draw.drawn_id),
+      getParticipantLabel(draw.drawer_id),
+      getParticipantLabel(draw.drawn_id),
       t
     );
     copyText(message, () => {
@@ -107,8 +116,8 @@ export function DrawManager({
     const all = sortedDraws
       .map((draw) =>
         generateMessageForDraw(
-          getParticipantName(draw.drawer_id),
-          getParticipantName(draw.drawn_id),
+          getParticipantLabel(draw.drawer_id),
+          getParticipantLabel(draw.drawn_id),
           t
         )
       )
@@ -215,8 +224,14 @@ export function DrawManager({
 
           <ul className="grid gap-2.5 lg:grid-cols-2">
             {sortedDraws.map((draw, index) => {
-              const drawerName = getParticipantName(draw.drawer_id);
-              const drawnName = getParticipantName(draw.drawn_id);
+              const drawer = participants.find(
+                (p) => p.id === draw.drawer_id
+              );
+              const drawn = participants.find((p) => p.id === draw.drawn_id);
+              const drawerName = drawer?.name ?? t.common.unknown;
+              const drawnName = drawn?.name ?? t.common.unknown;
+              const drawerHint = homonymHints.get(draw.drawer_id);
+              const drawnHint = homonymHints.get(draw.drawn_id);
               const isRevealed = revealedIds.has(draw.id);
               const isCopied = copiedId === draw.id;
 
@@ -226,14 +241,13 @@ export function DrawManager({
                   className="flex animate-draw-in items-center gap-3 rounded-xl border border-ink-200 bg-white p-3 transition-shadow hover:shadow-card dark:border-white/10 dark:bg-white/[0.03]"
                   style={{ animationDelay: `${Math.min(index, 14) * 55}ms` }}
                 >
-                  <span
-                    className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-brand-100 text-xs font-bold text-brand-700 dark:bg-brand-500/20 dark:text-brand-300"
-                    aria-hidden
-                  >
-                    {getInitials(drawerName)}
-                  </span>
+                  <ParticipantAvatar
+                    name={drawerName}
+                    group={drawer?.family}
+                    index={drawerHint?.index}
+                  />
 
-                  <div className="flex min-w-0 flex-1 items-center gap-2 text-sm">
+                  <div className="flex min-w-0 flex-1 flex-wrap items-center gap-x-2 gap-y-1 text-sm">
                     <span className="truncate font-semibold text-ink-900 dark:text-white">
                       {drawerName}
                     </span>
@@ -242,11 +256,19 @@ export function DrawManager({
                       className="shrink-0 text-ink-400"
                       aria-hidden
                     />
+                    {isRevealed && (
+                      <ParticipantAvatar
+                        name={drawnName}
+                        group={drawn?.family}
+                        index={drawnHint?.index}
+                        size="sm"
+                      />
+                    )}
                     <button
                       onClick={() => toggleReveal(draw.id)}
                       className={`min-w-0 truncate rounded-md px-1.5 py-0.5 text-left font-semibold transition-all ${
                         isRevealed
-                          ? "text-brand-700 dark:text-brand-300"
+                          ? "text-ink-900 dark:text-white"
                           : "select-none bg-ink-100 text-transparent blur-[5px] dark:bg-white/10"
                       }`}
                       aria-label={

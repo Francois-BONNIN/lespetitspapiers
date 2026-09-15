@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { Info, Plus, Target, Trash2, UserCheck } from "lucide-react";
 import { Participant, Inclusion } from "../lib/database";
 import { useRecentlyAdded } from "../lib/useRecentlyAdded";
+import { buildHomonymHints, labelWithHint } from "../lib/homonyms";
 import { EmptyState } from "./ui/EmptyState";
 import { useI18n } from "./ui/language-context";
 
@@ -32,8 +33,16 @@ export function InclusionManager({
     }
   };
 
+  const homonymHints = useMemo(
+    () => buildHomonymHints(participants),
+    [participants]
+  );
+
   const getParticipantName = (id: string) =>
     participants.find((p) => p.id === id)?.name ?? t.common.unknown;
+
+  const getOptionLabel = (participant: Participant) =>
+    labelWithHint(participant.name, homonymHints.get(participant.id));
 
   return (
     <>
@@ -62,7 +71,7 @@ export function InclusionManager({
                 <option value="">{t.common.select}</option>
                 {participants.map((p) => (
                   <option key={p.id} value={p.id}>
-                    {p.name}
+                    {getOptionLabel(p)}
                   </option>
                 ))}
               </select>
@@ -83,7 +92,7 @@ export function InclusionManager({
                   .filter((p) => p.id !== participantId)
                   .map((p) => (
                     <option key={p.id} value={p.id}>
-                      {p.name}
+                      {getOptionLabel(p)}
                     </option>
                   ))}
               </select>
