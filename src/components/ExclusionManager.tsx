@@ -1,6 +1,9 @@
 import { useState } from "react";
-import { Ban, Trash2, Users } from "lucide-react";
+import { ArrowRight, Ban, Plus, Trash2, Users } from "lucide-react";
 import { Participant, Exclusion } from "../lib/database";
+import { useRecentlyAdded } from "../lib/useRecentlyAdded";
+import { EmptyState } from "./ui/EmptyState";
+import { useI18n } from "./ui/language-context";
 
 interface ExclusionManagerProps {
   participants: Participant[];
@@ -19,8 +22,10 @@ export function ExclusionManager({
   excludeSameFamily,
   onToggleExcludeSameFamily,
 }: ExclusionManagerProps) {
+  const { t } = useI18n();
   const [participantId, setParticipantId] = useState("");
   const [excludedId, setExcludedId] = useState("");
+  const recentlyAdded = useRecentlyAdded(exclusions.map((e) => e.id));
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -31,54 +36,52 @@ export function ExclusionManager({
     }
   };
 
-  const getParticipantName = (id: string) => {
-    return participants.find((p) => p.id === id)?.name || "Inconnu";
-  };
+  const getParticipantName = (id: string) =>
+    participants.find((p) => p.id === id)?.name ?? t.common.unknown;
 
   return (
-    <div className="bg-white rounded-lg shadow-md p-6">
-      <h2 className="text-2xl font-bold text-gray-800 mb-4">Exclusions</h2>
-      <p className="text-sm text-gray-600 mb-4">
-        Définissez qui ne peut pas tirer qui (ex: couples, membres d'une même
-        famille)
+    <>
+      <p className="mb-4 text-[13px] leading-relaxed text-ink-500 dark:text-ink-400">
+        {t.exclusions.description}
       </p>
 
-      <div className="mb-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
-        <label className="flex items-center gap-3 cursor-pointer">
-          <input
-            type="checkbox"
-            checked={excludeSameFamily}
-            onChange={onToggleExcludeSameFamily}
-            className="w-5 h-5 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
-          />
-          <div className="flex items-center gap-2">
-            <Users size={20} className="text-blue-600" />
-            <span className="font-medium text-gray-800">
-              Exclure automatiquement les membres de la même famille
-            </span>
-          </div>
-        </label>
-        <p className="text-sm text-gray-600 mt-2 ml-8">
-          Les participants avec le même nom de famille ne pourront pas se tirer
-          entre eux
-        </p>
-      </div>
+      <label className="card-inset mb-5 flex cursor-pointer items-start gap-3 p-4 transition-colors hover:bg-ink-100/60 dark:hover:bg-white/[0.06]">
+        <input
+          type="checkbox"
+          checked={excludeSameFamily}
+          onChange={onToggleExcludeSameFamily}
+          className="mt-0.5 h-5 w-5 shrink-0 cursor-pointer rounded border-ink-300 text-brand-600 focus:ring-2 focus:ring-brand-500/40 dark:border-white/20 dark:bg-white/10"
+        />
+        <span className="min-w-0">
+          <span className="flex items-center gap-2 text-sm font-semibold text-ink-900 dark:text-white">
+            <Users size={15} className="text-ink-400" />
+            {t.exclusions.sameGroupLabel}
+          </span>
+          <span className="mt-1 block text-[13px] leading-relaxed text-ink-500 dark:text-ink-400">
+            {t.exclusions.sameGroupDescription}
+          </span>
+        </span>
+      </label>
 
       {participants.length < 2 ? (
-        <p className="text-gray-500 text-center py-8">
-          Ajoutez au moins 2 participants pour créer des exclusions
-        </p>
+        <EmptyState
+          icon={Ban}
+          compact
+          title={t.exclusions.notEnoughTitle}
+          description={t.exclusions.notEnoughDescription}
+        />
       ) : (
         <>
-          <form onSubmit={handleSubmit} className="mb-6">
-            <div className="flex gap-3 items-center">
+          <form onSubmit={handleSubmit} className="card-inset mb-4 p-4">
+            <div className="grid items-center gap-2 sm:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)]">
               <select
                 value={participantId}
                 onChange={(e) => setParticipantId(e.target.value)}
-                className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="field w-full min-w-0"
+                aria-label={t.exclusions.drawerLabel}
                 required
               >
-                <option value="">Sélectionner...</option>
+                <option value="">{t.common.select}</option>
                 {participants.map((p) => (
                   <option key={p.id} value={p.id}>
                     {p.name}
@@ -86,17 +89,18 @@ export function ExclusionManager({
                 ))}
               </select>
 
-              <span className="text-gray-600 font-medium">
-                ne peut pas tirer
+              <span className="text-center text-xs font-semibold uppercase tracking-wider text-ink-500 dark:text-ink-400">
+                {t.exclusions.connector}
               </span>
 
               <select
                 value={excludedId}
                 onChange={(e) => setExcludedId(e.target.value)}
-                className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="field w-full min-w-0"
+                aria-label={t.exclusions.excludedLabel}
                 required
               >
-                <option value="">Sélectionner...</option>
+                <option value="">{t.common.select}</option>
                 {participants
                   .filter((p) => p.id !== participantId)
                   .map((p) => (
@@ -106,48 +110,60 @@ export function ExclusionManager({
                   ))}
               </select>
 
+            </div>
+            <div className="mt-3 flex justify-end">
               <button
                 type="submit"
-                className="px-6 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors flex items-center gap-2"
+                className="btn btn-md btn-primary"
+                disabled={!participantId || !excludedId}
               >
-                <Ban size={20} />
-                Ajouter
+                <Plus size={16} />
+                {t.common.add}
               </button>
             </div>
           </form>
 
-          <div className="space-y-2">
-            {exclusions.length === 0 ? (
-              <p className="text-gray-500 text-center py-4">
-                Aucune exclusion définie
-              </p>
-            ) : (
-              exclusions.map((exclusion) => (
-                <div
+          {exclusions.length === 0 ? (
+            <EmptyState
+              icon={Ban}
+              compact
+              title={t.exclusions.emptyTitle}
+              description={t.exclusions.emptyDescription}
+            />
+          ) : (
+            <ul className="space-y-2">
+              {exclusions.map((exclusion) => (
+                <li
                   key={exclusion.id}
-                  className="flex items-center justify-between p-3 bg-orange-50 rounded-lg"
+                  className={`group flex items-center justify-between gap-3 rounded-xl border border-rose-200 bg-rose-50/70 p-3 dark:border-rose-500/20 dark:bg-rose-500/[0.08] ${
+                    recentlyAdded.has(exclusion.id) ? "item-added" : ""
+                  }`}
                 >
-                  <div className="flex items-center gap-3 text-gray-800">
-                    <span className="font-medium">
+                  <div className="flex min-w-0 flex-1 items-center gap-2.5 text-sm">
+                    <span className="truncate font-semibold text-ink-900 dark:text-white">
                       {getParticipantName(exclusion.participant_id)}
                     </span>
-                    <Ban size={16} className="text-orange-600" />
-                    <span className="font-medium">
+                    <span className="flex shrink-0 items-center gap-1 text-rose-600 dark:text-rose-400">
+                      <ArrowRight size={14} />
+                      <Ban size={14} />
+                    </span>
+                    <span className="truncate font-semibold text-ink-900 dark:text-white">
                       {getParticipantName(exclusion.excluded_participant_id)}
                     </span>
                   </div>
                   <button
                     onClick={() => onDeleteExclusion(exclusion.id)}
-                    className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                    className="btn btn-danger-ghost btn-icon shrink-0 transition-opacity sm:opacity-0 sm:focus-visible:opacity-100 sm:group-hover:opacity-100"
+                    aria-label={t.exclusions.deleteLabel}
                   >
-                    <Trash2 size={18} />
+                    <Trash2 size={15} />
                   </button>
-                </div>
-              ))
-            )}
-          </div>
+                </li>
+              ))}
+            </ul>
+          )}
         </>
       )}
-    </div>
+    </>
   );
 }

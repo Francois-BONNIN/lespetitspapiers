@@ -1,6 +1,19 @@
-import { useState, useRef } from "react";
-import { UserPlus, Trash2, Download, Upload } from "lucide-react";
+import { useMemo, useRef, useState } from "react";
+import {
+  Download,
+  Mail,
+  Search,
+  Trash2,
+  Upload,
+  UserPlus,
+  Users,
+} from "lucide-react";
 import { Participant } from "../lib/database";
+import { getGroupColor, getInitials } from "../lib/familyColors";
+import { useRecentlyAdded } from "../lib/useRecentlyAdded";
+import { SectionCard } from "./ui/SectionCard";
+import { EmptyState } from "./ui/EmptyState";
+import { useI18n } from "./ui/language-context";
 
 interface ParticipantManagerProps {
   participants: Participant[];
@@ -10,6 +23,8 @@ interface ParticipantManagerProps {
   onImportData: (file: File) => void;
 }
 
+const UNGROUPED = "";
+
 export function ParticipantManager({
   participants,
   onAddParticipant,
@@ -17,23 +32,23 @@ export function ParticipantManager({
   onExportData,
   onImportData,
 }: ParticipantManagerProps) {
+  const { t } = useI18n();
+  const locale = t.meta.locale;
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [family, setFamily] = useState("");
+  const [query, setQuery] = useState("");
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const nameInputRef = useRef<HTMLInputElement>(null);
+  const recentlyAdded = useRecentlyAdded(participants.map((p) => p.id));
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (name.trim()) {
-      onAddParticipant(name.trim(), email.trim(), family.trim());
-      setName("");
-      setEmail("");
-      setFamily("");
-    }
-  };
-
-  const handleImportClick = () => {
-    fileInputRef.current?.click();
+    if (!name.trim()) return;
+    onAddParticipant(name.trim(), email.trim(), family.trim());
+    setName("");
+    setEmail("");
+    nameInputRef.current?.focus();
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -44,101 +59,81 @@ export function ParticipantManager({
     }
   };
 
-  // Grouper les participants par famille
-  const participantsByFamily = participants.reduce((acc, participant) => {
-    const familyName = participant.family || "";
-    if (!acc[familyName]) {
-      acc[familyName] = [];
-    }
-    acc[familyName].push(participant);
-    return acc;
-  }, {} as Record<string, Participant[]>);
+  const knownGroups = useMemo(
+    () =>
+      Array.from(
+        new Set(
+          participants
+            .map((p) => p.family?.trim())
+            .filter((g): g is string => Boolean(g))
+        )
+      ).sort((a, b) => a.localeCompare(b, locale)),
+    [participants, locale]
+  );
 
-  // Générer une couleur pour chaque famille
-  const getFamilyColor = (familyName: string, index: number) => {
-    const colors = [
-      {
-        bg: "bg-blue-50",
-        border: "border-blue-200",
-        text: "text-blue-700",
-        badge: "bg-blue-100",
-      },
-      {
-        bg: "bg-green-50",
-        border: "border-green-200",
-        text: "text-green-700",
-        badge: "bg-green-100",
-      },
-      {
-        bg: "bg-purple-50",
-        border: "border-purple-200",
-        text: "text-purple-700",
-        badge: "bg-purple-100",
-      },
-      {
-        bg: "bg-orange-50",
-        border: "border-orange-200",
-        text: "text-orange-700",
-        badge: "bg-orange-100",
-      },
-      {
-        bg: "bg-pink-50",
-        border: "border-pink-200",
-        text: "text-pink-700",
-        badge: "bg-pink-100",
-      },
-      {
-        bg: "bg-indigo-50",
-        border: "border-indigo-200",
-        text: "text-indigo-700",
-        badge: "bg-indigo-100",
-      },
-      {
-        bg: "bg-teal-50",
-        border: "border-teal-200",
-        text: "text-teal-700",
-        badge: "bg-teal-100",
-      },
-      {
-        bg: "bg-cyan-50",
-        border: "border-cyan-200",
-        text: "text-cyan-700",
-        badge: "bg-cyan-100",
-      },
-    ];
+  const filtered = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    if (!q) return participants;
+    return participants.filter((p) =>
+      [p.name, p.email, p.family]
+        .filter(Boolean)
+        .some((value) => value!.toLowerCase().includes(q))
+    );
+  }, [participants, query]);
 
-    if (familyName === "Seul") {
-      return {
-        bg: "bg-gray-50",
-        border: "border-gray-200",
-        text: "text-gray-700",
-        badge: "bg-gray-100",
-      };
-    }
+  const groups = useMemo(() => {
+    const map = new Map<string, Participant[]>();
+    filtered.forEach((participant) => {
+      const key = participant.family?.trim() || UNGROUPED;
+      const bucket = map.get(key);
+      if (bucket) bucket.push(participant);
+      else map.set(key, [participant]);
+    });
 
-    return colors[index % colors.length];
-  };
+    return Array.from(map.entries()).sort(([a], [b]) => {
+      if (a === UNGROUPED) return 1;
+      if (b === UNGROUPED) return -1;
+      return a.localeCompare(b, locale);
+    });
+  }, [filtered, locale]);
+
+  const hasNamedGroup = groups.some(([key]) => key !== UNGROUPED);
 
   return (
-    <div className="bg-white rounded-lg shadow-md p-6">
-      <div className="flex items-center justify-between mb-4">
-        <h2 className="text-2xl font-bold text-gray-800">Participants</h2>
-        <div className="flex gap-2">
+    <SectionCard
+      icon={Users}
+      title={t.participants.title}
+      description={t.participants.description}
+      accent="brand"
+      badge={
+        participants.length > 0 ? (
+          <span className="chip bg-brand-100 text-brand-700 dark:bg-brand-500/15 dark:text-brand-300">
+            {participants.length}
+          </span>
+        ) : null
+      }
+      actions={
+        <>
           <button
             onClick={onExportData}
-            className="px-3 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors flex items-center gap-2 text-sm"
-            title="Exporter les participants et contraintes"
+            className="btn btn-sm btn-secondary"
+            disabled={participants.length === 0}
+            title={t.participants.exportTitle}
           >
-            <Download size={16} />
-            Export
+            <Download size={15} />
+            <span className="hidden sm:inline">
+              {t.participants.exportAction}
+            </span>
           </button>
           <button
-            onClick={handleImportClick}
-            className="px-3 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors flex items-center gap-2 text-sm"
-            title="Importer les participants et contraintes"
+            onClick={() => fileInputRef.current?.click()}
+            className="btn btn-sm btn-secondary"
+            title={t.participants.importTitle}
           >
-            <Upload size={16} />
-            Import
+            <Upload size={15} />
+            <span className="hidden sm:inline">
+              {t.participants.importAction}
+            </span>
           </button>
           <input
             ref={fileInputRef}
@@ -147,127 +142,168 @@ export function ParticipantManager({
             onChange={handleFileChange}
             className="hidden"
           />
+        </>
+      }
+    >
+      <form onSubmit={handleSubmit} className="card-inset mb-5 p-4">
+        <div className="grid gap-3 sm:grid-cols-2">
+          <div>
+            <label className="label" htmlFor="participant-name">
+              {t.participants.nameLabel}
+            </label>
+            <input
+              id="participant-name"
+              ref={nameInputRef}
+              type="text"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder={t.participants.namePlaceholder}
+              className="field"
+              required
+            />
+          </div>
+          <div>
+            <label className="label" htmlFor="participant-email">
+              {t.participants.emailLabel}{" "}
+              <span className="normal-case text-ink-400">
+                {t.common.optional}
+              </span>
+            </label>
+            <input
+              id="participant-email"
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder={t.participants.emailPlaceholder}
+              className="field"
+            />
+          </div>
         </div>
-      </div>
-
-      <form onSubmit={handleSubmit} className="mb-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
-          <input
-            type="text"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            placeholder="Nom du participant"
-            className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            required
-          />
-          <input
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            placeholder="Email (optionnel)"
-            className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          />
-        </div>
-        <div className="flex gap-3">
-          <input
-            type="text"
-            value={family}
-            onChange={(e) => setFamily(e.target.value)}
-            placeholder="Famille (optionnel)"
-            className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          />
-          <button
-            type="submit"
-            className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2"
-          >
-            <UserPlus size={20} />
-            Ajouter
+        <div className="mt-3 flex flex-col gap-3 sm:flex-row sm:items-end">
+          <div className="flex-1">
+            <label className="label" htmlFor="participant-group">
+              {t.participants.groupLabel}{" "}
+              <span className="normal-case text-ink-400">
+                {t.common.optional}
+              </span>
+            </label>
+            <input
+              id="participant-group"
+              type="text"
+              value={family}
+              onChange={(e) => setFamily(e.target.value)}
+              placeholder={t.participants.groupPlaceholder}
+              className="field"
+              list="known-groups"
+              autoComplete="off"
+            />
+            <datalist id="known-groups">
+              {knownGroups.map((group) => (
+                <option key={group} value={group} />
+              ))}
+            </datalist>
+          </div>
+          <button type="submit" className="btn btn-md btn-primary sm:w-auto">
+            <UserPlus size={17} />
+            {t.common.add}
           </button>
         </div>
       </form>
 
-      <div className="space-y-4">
-        {participants.length === 0 ? (
-          <p className="text-gray-500 text-center py-8">
-            Aucun participant pour le moment
-          </p>
-        ) : (
-          (() => {
-            // Vérifier s'il y a au moins une famille définie
-            const hasFamilies = Object.keys(participantsByFamily).some(
-              (key) => key !== ""
-            );
+      {participants.length > 3 && (
+        <div className="relative mb-4">
+          <Search
+            size={16}
+            className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-ink-400"
+          />
+          <input
+            type="search"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder={t.participants.searchPlaceholder}
+            className="field pl-10"
+            aria-label={t.participants.searchLabel}
+          />
+        </div>
+      )}
 
-            return Object.entries(participantsByFamily).map(
-              ([familyName, familyMembers], familyIndex) => {
-                const colors = getFamilyColor(familyName, familyIndex);
-                // Afficher "Autre Famille" uniquement si familyName est vide ET qu'il y a d'autres familles
-                const shouldShowOtherFamily = familyName === "" && hasFamilies;
+      {participants.length === 0 ? (
+        <EmptyState
+          icon={Users}
+          title={t.participants.emptyTitle}
+          description={t.participants.emptyDescription}
+        />
+      ) : filtered.length === 0 ? (
+        <EmptyState
+          icon={Search}
+          compact
+          title={t.participants.noResultTitle}
+          description={t.participants.noResultDescription(query)}
+        />
+      ) : (
+        <div className="space-y-5">
+          {groups.map(([groupName, members]) => {
+            const colors = getGroupColor(groupName);
+            const isUngrouped = groupName === UNGROUPED;
 
-                return (
-                  <div key={familyName} className="space-y-2">
-                    {familyName !== "" && (
-                      <div className="flex items-center gap-2">
-                        <h3
-                          className={`text-sm font-semibold ${colors.text} uppercase tracking-wide`}
-                        >
-                          Famille {familyName}
-                        </h3>
-                        <span
-                          className={`${colors.badge} ${colors.text} text-xs px-2 py-1 rounded-full font-medium`}
-                        >
-                          {familyMembers.length}{" "}
-                          {familyMembers.length > 1 ? "membres" : "membre"}
-                        </span>
-                      </div>
-                    )}
-                    {shouldShowOtherFamily && (
-                      <div className="flex items-center gap-2">
-                        <h3
-                          className={`text-sm font-semibold ${colors.text} uppercase tracking-wide`}
-                        >
-                          Autre Famille
-                        </h3>
-                        <span
-                          className={`${colors.badge} ${colors.text} text-xs px-2 py-1 rounded-full font-medium`}
-                        >
-                          {familyMembers.length}{" "}
-                          {familyMembers.length > 1 ? "membres" : "membre"}
-                        </span>
-                      </div>
-                    )}
-                    <div className="flex flex-wrap gap-2">
-                      {familyMembers.map((participant) => (
-                        <div
-                          key={participant.id}
-                          className={`flex items-center justify-between p-3 ${colors.bg} border ${colors.border} rounded-lg hover:shadow-md transition-all min-w-[250px] flex-1`}
-                        >
-                          <div className="flex-1">
-                            <p className="font-medium text-gray-800">
-                              {participant.name}
-                            </p>
-                            {participant.email && (
-                              <p className="text-xs text-gray-500 mt-1">
-                                {participant.email}
-                              </p>
-                            )}
-                          </div>
-                          <button
-                            onClick={() => onDeleteParticipant(participant.id)}
-                            className="p-2 text-red-600 hover:bg-red-100 rounded-lg transition-colors ml-2"
-                          >
-                            <Trash2 size={16} />
-                          </button>
-                        </div>
-                      ))}
-                    </div>
+            return (
+              <div key={groupName || "__ungrouped__"}>
+                {(!isUngrouped || hasNamedGroup) && (
+                  <div className="mb-2 flex items-center gap-2">
+                    <span className={`h-2 w-2 rounded-full ${colors.dot}`} />
+                    <h3
+                      className={`text-xs font-bold uppercase tracking-wider ${colors.label}`}
+                    >
+                      {isUngrouped ? t.participants.ungrouped : groupName}
+                    </h3>
+                    <span className={`chip ${colors.badge}`}>
+                      {members.length}
+                    </span>
                   </div>
-                );
-              }
+                )}
+                <ul className="grid gap-2 sm:grid-cols-2 xl:grid-cols-3">
+                  {members.map((participant) => (
+                    <li
+                      key={participant.id}
+                      className={`group flex items-center gap-3 rounded-xl border p-2.5 transition-all hover:shadow-card ${
+                        colors.surface
+                      } ${recentlyAdded.has(participant.id) ? "item-added" : ""}`}
+                    >
+                      <span
+                        className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-xs font-bold ${colors.avatar}`}
+                        aria-hidden
+                      >
+                        {getInitials(participant.name)}
+                      </span>
+                      <div className="min-w-0 flex-1">
+                        <p className="truncate text-sm font-semibold text-ink-900 dark:text-white">
+                          {participant.name}
+                        </p>
+                        {participant.email && (
+                          <p className="mt-0.5 flex items-center gap-1 truncate text-xs text-ink-500 dark:text-ink-400">
+                            <Mail size={11} className="shrink-0" />
+                            <span className="truncate">
+                              {participant.email}
+                            </span>
+                          </p>
+                        )}
+                      </div>
+                      <button
+                        onClick={() => onDeleteParticipant(participant.id)}
+                        className="btn btn-danger-ghost btn-icon opacity-0 transition-opacity focus-visible:opacity-100 group-hover:opacity-100"
+                        aria-label={t.participants.deleteLabel(participant.name)}
+                        title={t.participants.deleteLabel(participant.name)}
+                      >
+                        <Trash2 size={15} />
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              </div>
             );
-          })()
-        )}
-      </div>
-    </div>
+          })}
+        </div>
+      )}
+    </SectionCard>
   );
 }

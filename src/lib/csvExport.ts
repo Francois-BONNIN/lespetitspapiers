@@ -1,19 +1,20 @@
 import { Participant, Exclusion, Inclusion, Draw } from "./database";
+import type { Translation } from "./i18n";
 
-// Export functions
 export function exportDrawsToCSV(
   draws: Draw[],
-  participants: Participant[]
+  participants: Participant[],
+  t: Translation,
 ): string {
   const getParticipantName = (id: string) =>
-    participants.find((p) => p.id === id)?.name || "Inconnu";
+    participants.find((p) => p.id === id)?.name || t.common.unknown;
 
-  const header = "Tireur,Tiré\n";
+  const header = `${t.csv.drawsHeader}\n`;
   const rows = draws.map(
     (draw) =>
       `"${getParticipantName(draw.drawer_id)}","${getParticipantName(
-        draw.drawn_id
-      )}"`
+        draw.drawn_id,
+      )}"`,
   );
 
   return header + rows.join("\n");
@@ -22,12 +23,13 @@ export function exportDrawsToCSV(
 export function exportParticipantsToCSV(
   participants: Participant[],
   exclusions: Exclusion[],
-  inclusions: Inclusion[]
+  inclusions: Inclusion[],
+  t: Translation,
 ): string {
   const getParticipantName = (id: string) =>
     participants.find((p) => p.id === id)?.name || "";
 
-  const header = "Nom,Email,Famille,Exclusions,Inclusions\n";
+  const header = `${t.csv.participantsHeader}\n`;
   const rows = participants.map((participant) => {
     const participantExclusions = exclusions
       .filter((e) => e.participant_id === participant.id)
@@ -59,9 +61,9 @@ export function downloadCSV(content: string, filename: string): void {
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);
+  URL.revokeObjectURL(url);
 }
 
-// Import functions
 export interface ImportResult {
   participants: Array<{
     name: string;
@@ -112,26 +114,29 @@ export function parseCSV(csvContent: string): string[][] {
 }
 
 export function importParticipantsFromCSV(
-  csvContent: string
+  csvContent: string,
 ): ImportResult | null {
   try {
     const rows = parseCSV(csvContent);
 
     if (rows.length < 2) {
       throw new Error(
-        "Le fichier CSV doit contenir au moins un en-tête et une ligne de données"
+        "The CSV file needs at least a header row and one data row",
       );
     }
 
     const header = rows[0].map((h) => h.toLowerCase());
-    const nameIndex = header.findIndex((h) => h.includes("nom"));
-    const emailIndex = header.findIndex((h) => h.includes("email"));
-    const familyIndex = header.findIndex((h) => h.includes("famille"));
-    const exclusionsIndex = header.findIndex((h) => h.includes("exclusion"));
-    const inclusionsIndex = header.findIndex((h) => h.includes("inclusion"));
+    const findColumn = (...aliases: string[]) =>
+      header.findIndex((h) => aliases.some((alias) => h.includes(alias)));
+
+    const nameIndex = findColumn("nom", "name");
+    const emailIndex = findColumn("email", "e-mail", "mail");
+    const familyIndex = findColumn("famille", "groupe", "group");
+    const exclusionsIndex = findColumn("exclusion");
+    const inclusionsIndex = findColumn("inclusion");
 
     if (nameIndex === -1) {
-      throw new Error("La colonne 'Nom' est requise");
+      throw new Error("Missing required column: 'Nom' / 'Name'");
     }
 
     const participants: ImportResult["participants"] = [];
@@ -186,13 +191,8 @@ export function importParticipantsFromCSV(
 
 export function generateMessageForDraw(
   drawerName: string,
-  drawnName: string
+  drawnName: string,
+  t: Translation,
 ): string {
-  return `Bonjour ${drawerName} !
-
-Pour le Secret Santa, tu dois offrir un cadeau à : ${drawnName}
-
-N'oublie pas de garder le secret ! 🎁🎄
-
-Joyeux Noël !`;
+  return t.csv.message(drawerName, drawnName);
 }

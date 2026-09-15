@@ -25,8 +25,6 @@ function canDraw(
   if (drawer.id === candidate.id) return false;
   if (alreadyDrawn.has(candidate.id)) return false;
 
-  // Check inclusions - if the candidate has inclusions defined,
-  // only the specified drawers can draw them
   const candidateInclusions = inclusions.filter(
     (inc) => inc.participant_id === candidate.id
   );
@@ -38,7 +36,6 @@ function canDraw(
     if (!isIncluded) return false;
   }
 
-  // Check for same family exclusion
   if (
     excludeSameFamily &&
     drawer.family &&

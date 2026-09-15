@@ -1,6 +1,9 @@
 import { useState } from "react";
-import { UserCheck, Trash2 } from "lucide-react";
+import { Info, Plus, Target, Trash2, UserCheck } from "lucide-react";
 import { Participant, Inclusion } from "../lib/database";
+import { useRecentlyAdded } from "../lib/useRecentlyAdded";
+import { EmptyState } from "./ui/EmptyState";
+import { useI18n } from "./ui/language-context";
 
 interface InclusionManagerProps {
   participants: Participant[];
@@ -15,8 +18,10 @@ export function InclusionManager({
   onAddInclusion,
   onDeleteInclusion,
 }: InclusionManagerProps) {
+  const { t } = useI18n();
   const [participantId, setParticipantId] = useState("");
   const [includedId, setIncludedId] = useState("");
+  const recentlyAdded = useRecentlyAdded(inclusions.map((i) => i.id));
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -27,33 +32,34 @@ export function InclusionManager({
     }
   };
 
-  const getParticipantName = (id: string) => {
-    return participants.find((p) => p.id === id)?.name || "Inconnu";
-  };
+  const getParticipantName = (id: string) =>
+    participants.find((p) => p.id === id)?.name ?? t.common.unknown;
 
   return (
-    <div className="bg-white rounded-lg shadow-md p-6">
-      <h2 className="text-2xl font-bold text-gray-800 mb-4">Tirages Limités</h2>
-      <p className="text-sm text-gray-600 mb-4">
-        Définissez qui peut exclusivement tirer qui (restriction de tireurs
-        possibles)
+    <>
+      <p className="mb-4 text-[13px] leading-relaxed text-ink-500 dark:text-ink-400">
+        {t.inclusions.description}
       </p>
 
       {participants.length < 2 ? (
-        <p className="text-gray-500 text-center py-8">
-          Ajoutez au moins 2 participants pour créer des restrictions
-        </p>
+        <EmptyState
+          icon={Target}
+          compact
+          title={t.inclusions.notEnoughTitle}
+          description={t.inclusions.notEnoughDescription}
+        />
       ) : (
         <>
-          <form onSubmit={handleSubmit} className="mb-6">
-            <div className="flex gap-3 items-center">
+          <form onSubmit={handleSubmit} className="card-inset mb-4 p-4">
+            <div className="grid items-center gap-2 sm:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)]">
               <select
                 value={participantId}
                 onChange={(e) => setParticipantId(e.target.value)}
-                className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                className="field w-full min-w-0"
+                aria-label={t.inclusions.drawnLabel}
                 required
               >
-                <option value="">Sélectionner...</option>
+                <option value="">{t.common.select}</option>
                 {participants.map((p) => (
                   <option key={p.id} value={p.id}>
                     {p.name}
@@ -61,17 +67,18 @@ export function InclusionManager({
                 ))}
               </select>
 
-              <span className="text-gray-600 font-medium">
-                peut être tiré par
+              <span className="text-center text-xs font-semibold uppercase tracking-wider text-ink-500 dark:text-ink-400">
+                {t.inclusions.connector}
               </span>
 
               <select
                 value={includedId}
                 onChange={(e) => setIncludedId(e.target.value)}
-                className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                className="field w-full min-w-0"
+                aria-label={t.inclusions.drawerLabel}
                 required
               >
-                <option value="">Sélectionner...</option>
+                <option value="">{t.common.select}</option>
                 {participants
                   .filter((p) => p.id !== participantId)
                   .map((p) => (
@@ -81,59 +88,67 @@ export function InclusionManager({
                   ))}
               </select>
 
+            </div>
+            <div className="mt-3 flex justify-end">
               <button
                 type="submit"
-                className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors flex items-center gap-2"
+                className="btn btn-md btn-primary"
+                disabled={!participantId || !includedId}
               >
-                <UserCheck size={20} />
-                Ajouter
+                <Plus size={16} />
+                {t.common.add}
               </button>
             </div>
           </form>
 
-          <div className="space-y-2">
-            {inclusions.length === 0 ? (
-              <p className="text-gray-500 text-center py-4">
-                Aucune restriction définie
-              </p>
-            ) : (
-              inclusions.map((inclusion) => (
-                <div
-                  key={inclusion.id}
-                  className="flex items-center justify-between p-3 bg-green-50 rounded-lg"
-                >
-                  <div className="flex items-center gap-3 text-gray-800">
-                    <span className="font-medium">
-                      {getParticipantName(inclusion.participant_id)}
-                    </span>
-                    <UserCheck size={16} className="text-green-600" />
-                    <span className="font-medium">
-                      {getParticipantName(inclusion.included_participant_id)}
-                    </span>
-                  </div>
-                  <button
-                    onClick={() => onDeleteInclusion(inclusion.id)}
-                    className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+          {inclusions.length === 0 ? (
+            <EmptyState
+              icon={Target}
+              compact
+              title={t.inclusions.emptyTitle}
+              description={t.inclusions.emptyDescription}
+            />
+          ) : (
+            <>
+              <ul className="space-y-2">
+                {inclusions.map((inclusion) => (
+                  <li
+                    key={inclusion.id}
+                    className={`group flex items-center justify-between gap-3 rounded-xl border border-emerald-200 bg-emerald-50/70 p-3 dark:border-emerald-500/20 dark:bg-emerald-500/[0.08] ${
+                      recentlyAdded.has(inclusion.id) ? "item-added" : ""
+                    }`}
                   >
-                    <Trash2 size={18} />
-                  </button>
-                </div>
-              ))
-            )}
-          </div>
+                    <div className="flex min-w-0 flex-1 items-center gap-2.5 text-sm">
+                      <span className="truncate font-semibold text-ink-900 dark:text-white">
+                        {getParticipantName(inclusion.participant_id)}
+                      </span>
+                      <UserCheck
+                        size={15}
+                        className="shrink-0 text-emerald-600 dark:text-emerald-400"
+                      />
+                      <span className="truncate font-semibold text-ink-900 dark:text-white">
+                        {getParticipantName(inclusion.included_participant_id)}
+                      </span>
+                    </div>
+                    <button
+                      onClick={() => onDeleteInclusion(inclusion.id)}
+                      className="btn btn-danger-ghost btn-icon shrink-0 transition-opacity sm:opacity-0 sm:focus-visible:opacity-100 sm:group-hover:opacity-100"
+                      aria-label={t.inclusions.deleteLabel}
+                    >
+                      <Trash2 size={15} />
+                    </button>
+                  </li>
+                ))}
+              </ul>
 
-          {inclusions.length > 0 && (
-            <div className="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
-              <p className="text-sm text-yellow-800">
-                <strong>Note :</strong> Si une personne a des restrictions
-                définies, elle ne pourra être tirée QUE par les personnes
-                spécifiées. Toutes les autres personnes seront automatiquement
-                exclues de son tirage.
+              <p className="mt-4 flex gap-2.5 rounded-xl border border-amber-200 bg-amber-50 p-3 text-[13px] leading-relaxed text-amber-900 dark:border-amber-500/20 dark:bg-amber-500/[0.08] dark:text-amber-200">
+                <Info size={16} className="mt-0.5 shrink-0" />
+                <span>{t.inclusions.note}</span>
               </p>
-            </div>
+            </>
           )}
         </>
       )}
-    </div>
+    </>
   );
 }

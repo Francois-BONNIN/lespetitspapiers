@@ -1,3 +1,217 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer base {
+  :root {
+    color-scheme: light;
+  }
+
+  html.dark {
+    color-scheme: dark;
+  }
+
+  * {
+    @apply border-ink-200 dark:border-white/10;
+  }
+
+  html {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  body {
+    @apply bg-ink-50 font-sans text-ink-900 antialiased dark:bg-ink-950 dark:text-ink-100;
+    font-feature-settings: 'cv02', 'cv03', 'cv04', 'ss01';
+  }
+
+  :focus-visible {
+    @apply outline-none ring-2 ring-brand-500 ring-offset-2 ring-offset-ink-50 dark:ring-brand-400 dark:ring-offset-ink-950;
+  }
+
+  ::selection {
+    @apply bg-brand-200 text-brand-950;
+  }
+
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+
+  ::-webkit-scrollbar-track {
+    @apply bg-transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply rounded-full border-4 border-solid border-transparent bg-ink-300 bg-clip-content dark:bg-ink-700;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-ink-400 dark:bg-ink-600;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+}
+
+@layer components {
+  .card {
+    @apply rounded-2xl border border-ink-200/80 bg-white shadow-card transition-shadow duration-300 dark:border-white/10 dark:bg-ink-900;
+  }
+
+  .card-inset {
+    @apply rounded-xl border border-ink-200/70 bg-ink-50/60 dark:border-white/10 dark:bg-white/[0.03];
+  }
+
+  .btn {
+    @apply inline-flex select-none items-center justify-center gap-2 whitespace-nowrap rounded-xl text-sm font-semibold
+      transition-all duration-200 active:scale-[.97] disabled:pointer-events-none disabled:opacity-45;
+  }
+
+  .btn-md {
+    @apply h-10 px-4;
+  }
+
+  .btn-sm {
+    @apply h-9 px-3 text-[13px];
+  }
+
+  .btn-lg {
+    @apply h-12 px-7 text-base;
+  }
+
+  .btn-icon {
+    @apply h-9 w-9 shrink-0 px-0;
+  }
+
+  .btn-primary {
+    @apply bg-brand-700 text-white shadow-sm hover:bg-brand-800 hover:shadow-md dark:bg-brand-500 dark:text-brand-950 dark:hover:bg-brand-400;
+  }
+
+  .btn-accent {
+    @apply bg-rose-600 text-white shadow-sm hover:bg-rose-700 hover:shadow-md dark:bg-rose-500 dark:hover:bg-rose-400;
+  }
+
+  .btn-secondary {
+    @apply border border-ink-200 bg-white text-ink-700 hover:border-ink-300 hover:bg-ink-50
+      dark:border-white/10 dark:bg-white/[0.06] dark:text-ink-200 dark:hover:bg-white/[0.12];
+  }
+
+  .btn-ghost {
+    @apply text-ink-600 hover:bg-ink-100 hover:text-ink-900 dark:text-ink-400 dark:hover:bg-white/10 dark:hover:text-white;
+  }
+
+  .btn-danger-ghost {
+    @apply text-ink-400 hover:bg-rose-50 hover:text-rose-600 dark:hover:bg-rose-950/60 dark:hover:text-rose-400;
+  }
+
+  .field {
+    @apply h-11 w-full rounded-xl border border-ink-200 bg-white px-3.5 text-sm text-ink-900 shadow-sm
+      transition-colors placeholder:text-ink-400
+      focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/25 focus:ring-offset-0
+      dark:border-white/10 dark:bg-white/[0.04] dark:text-ink-100 dark:placeholder:text-ink-500
+      dark:focus:border-brand-400 dark:focus:ring-brand-400/25;
+  }
+
+  .field:focus-visible {
+    @apply ring-2 ring-brand-500/25 ring-offset-0 dark:ring-brand-400/25;
+  }
+
+  select.field {
+    @apply cursor-pointer appearance-none truncate bg-[length:1.1em] bg-[right_0.7rem_center] bg-no-repeat pr-9;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke-width='2' stroke='%2387817a'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+    color-scheme: light;
+  }
+
+  .dark select.field {
+    color-scheme: dark;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke-width='2' stroke='%23a8a29a'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  }
+
+  select.field option,
+  select.field optgroup {
+    background-color: #ffffff;
+    color: #2c2926;
+    padding: 0.375rem 0.5rem;
+    font-weight: 500;
+  }
+
+  .dark select.field option,
+  .dark select.field optgroup {
+    background-color: #2c2926;
+    color: #f1f0ee;
+  }
+
+  select.field option[value=""] {
+    color: #87817a;
+    font-weight: 400;
+  }
+
+  .dark select.field option[value=""] {
+    color: #a8a29a;
+  }
+
+  select.field:invalid {
+    @apply text-ink-400 dark:text-ink-500;
+  }
+
+  .label {
+    @apply mb-1.5 block text-xs font-semibold uppercase tracking-wider text-ink-500 dark:text-ink-400;
+  }
+
+  .chip {
+    @apply inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold;
+  }
+
+  .section-title {
+    @apply font-display text-xl font-semibold tracking-tight text-ink-900 dark:text-white sm:text-2xl;
+  }
+
+  .muted {
+    @apply text-sm text-ink-500 dark:text-ink-400;
+  }
+
+  .item-added {
+    @apply relative animate-item-in;
+  }
+
+  .item-added::after {
+    content: '';
+    @apply pointer-events-none absolute -inset-px animate-flash-ring rounded-[inherit];
+    box-shadow: 0 0 0 2px theme('colors.brand.400');
+  }
+
+  .aurora-bg {
+    background-image:
+      radial-gradient(
+        ellipse 80% 55% at 50% -10%,
+        rgb(74 76 229 / 0.12),
+        transparent 70%
+      ),
+      radial-gradient(
+        ellipse 60% 45% at 92% 8%,
+        rgb(244 63 94 / 0.08),
+        transparent 65%
+      );
+  }
+
+  .dark .aurora-bg {
+    background-image:
+      radial-gradient(
+        ellipse 80% 55% at 50% -10%,
+        rgb(97 108 241 / 0.2),
+        transparent 70%
+      ),
+      radial-gradient(
+        ellipse 60% 45% at 92% 8%,
+        rgb(244 63 94 / 0.14),
+        transparent 65%
+      );
+  }
+}

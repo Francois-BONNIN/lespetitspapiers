@@ -31,21 +31,76 @@ export interface Draw {
 }
 
 const STORAGE_KEYS = {
-  PARTICIPANTS: "secret_santa_participants",
-  EXCLUSIONS: "secret_santa_exclusions",
-  INCLUSIONS: "secret_santa_inclusions",
-  DRAWS: "secret_santa_draws",
-  EXCLUDE_SAME_FAMILY: "secret_santa_exclude_same_family",
+  PARTICIPANTS: "petits_papiers_participants",
+  EXCLUSIONS: "petits_papiers_exclusions",
+  INCLUSIONS: "petits_papiers_inclusions",
+  DRAWS: "petits_papiers_draws",
+  EXCLUDE_SAME_FAMILY: "petits_papiers_exclude_same_group",
+};
+
+const LEGACY_STORAGE_KEYS: Record<string, string> = {
+  [STORAGE_KEYS.PARTICIPANTS]: "secret_santa_participants",
+  [STORAGE_KEYS.EXCLUSIONS]: "secret_santa_exclusions",
+  [STORAGE_KEYS.INCLUSIONS]: "secret_santa_inclusions",
+  [STORAGE_KEYS.DRAWS]: "secret_santa_draws",
+  [STORAGE_KEYS.EXCLUDE_SAME_FAMILY]: "secret_santa_exclude_same_family",
 };
 
 function generateId(): string {
   return uuidv4();
 }
 
-// Participants
+function readRaw(key: string): string | null {
+  const current = localStorage.getItem(key);
+  if (current !== null) return current;
+
+  const legacyKey = LEGACY_STORAGE_KEYS[key];
+  const legacyValue = legacyKey ? localStorage.getItem(legacyKey) : null;
+  if (legacyValue === null) return null;
+
+  localStorage.setItem(key, legacyValue);
+  localStorage.removeItem(legacyKey);
+  return legacyValue;
+}
+
+function readList<T>(key: string): T[] {
+  try {
+    const data = readRaw(key);
+    if (!data) return [];
+    const parsed = JSON.parse(data);
+    return Array.isArray(parsed) ? (parsed as T[]) : [];
+  } catch (error) {
+    console.error(`Lecture impossible de "${key}" dans localStorage.`, error);
+    return [];
+  }
+}
+
+function write(key: string, value: unknown): boolean {
+  try {
+    localStorage.setItem(key, JSON.stringify(value));
+    return true;
+  } catch (error) {
+    console.error(
+      `Écriture impossible de "${key}" dans localStorage : les données de cette session ne seront pas conservées.`,
+      error
+    );
+    return false;
+  }
+}
+
+export function isStorageAvailable(): boolean {
+  try {
+    const probe = "__storage_probe__";
+    localStorage.setItem(probe, "1");
+    localStorage.removeItem(probe);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 export function getParticipants(): Participant[] {
-  const data = localStorage.getItem(STORAGE_KEYS.PARTICIPANTS);
-  return data ? JSON.parse(data) : [];
+  return readList<Participant>(STORAGE_KEYS.PARTICIPANTS);
 }
 
 export function addParticipant(
@@ -62,14 +117,12 @@ export function addParticipant(
     created_at: new Date().toISOString(),
   };
   participants.push(newParticipant);
-  localStorage.setItem(STORAGE_KEYS.PARTICIPANTS, JSON.stringify(participants));
+  write(STORAGE_KEYS.PARTICIPANTS, participants);
   return newParticipant;
 }
 
-// Exclusions
 export function getExclusions(): Exclusion[] {
-  const data = localStorage.getItem(STORAGE_KEYS.EXCLUSIONS);
-  return data ? JSON.parse(data) : [];
+  return readList<Exclusion>(STORAGE_KEYS.EXCLUSIONS);
 }
 
 export function addExclusion(
@@ -84,19 +137,17 @@ export function addExclusion(
     created_at: new Date().toISOString(),
   };
   exclusions.push(newExclusion);
-  localStorage.setItem(STORAGE_KEYS.EXCLUSIONS, JSON.stringify(exclusions));
+  write(STORAGE_KEYS.EXCLUSIONS, exclusions);
   return newExclusion;
 }
 
 export function deleteExclusion(id: string): void {
   const exclusions = getExclusions().filter((e) => e.id !== id);
-  localStorage.setItem(STORAGE_KEYS.EXCLUSIONS, JSON.stringify(exclusions));
+  write(STORAGE_KEYS.EXCLUSIONS, exclusions);
 }
 
-// Inclusions
 export function getInclusions(): Inclusion[] {
-  const data = localStorage.getItem(STORAGE_KEYS.INCLUSIONS);
-  return data ? JSON.parse(data) : [];
+  return readList<Inclusion>(STORAGE_KEYS.INCLUSIONS);
 }
 
 export function addInclusion(
@@ -111,40 +162,37 @@ export function addInclusion(
     created_at: new Date().toISOString(),
   };
   inclusions.push(newInclusion);
-  localStorage.setItem(STORAGE_KEYS.INCLUSIONS, JSON.stringify(inclusions));
+  write(STORAGE_KEYS.INCLUSIONS, inclusions);
   return newInclusion;
 }
 
 export function deleteInclusion(id: string): void {
   const inclusions = getInclusions().filter((i) => i.id !== id);
-  localStorage.setItem(STORAGE_KEYS.INCLUSIONS, JSON.stringify(inclusions));
+  write(STORAGE_KEYS.INCLUSIONS, inclusions);
 }
 
 export function deleteParticipant(id: string): void {
   const participants = getParticipants().filter((p) => p.id !== id);
-  localStorage.setItem(STORAGE_KEYS.PARTICIPANTS, JSON.stringify(participants));
+  write(STORAGE_KEYS.PARTICIPANTS, participants);
 
-  // Supprimer aussi les exclusions, inclusions et tirages liés
   const exclusions = getExclusions().filter(
     (e) => e.participant_id !== id && e.excluded_participant_id !== id
   );
-  localStorage.setItem(STORAGE_KEYS.EXCLUSIONS, JSON.stringify(exclusions));
+  write(STORAGE_KEYS.EXCLUSIONS, exclusions);
 
   const inclusions = getInclusions().filter(
     (i) => i.participant_id !== id && i.included_participant_id !== id
   );
-  localStorage.setItem(STORAGE_KEYS.INCLUSIONS, JSON.stringify(inclusions));
+  write(STORAGE_KEYS.INCLUSIONS, inclusions);
 
   const draws = getDraws().filter(
     (d) => d.drawer_id !== id && d.drawn_id !== id
   );
-  localStorage.setItem(STORAGE_KEYS.DRAWS, JSON.stringify(draws));
+  write(STORAGE_KEYS.DRAWS, draws);
 }
 
-// Draws
 export function getDraws(): Draw[] {
-  const data = localStorage.getItem(STORAGE_KEYS.DRAWS);
-  return data ? JSON.parse(data) : [];
+  return readList<Draw>(STORAGE_KEYS.DRAWS);
 }
 
 export function saveDraws(
@@ -157,20 +205,27 @@ export function saveDraws(
     draw_date: new Date().toISOString(),
     created_at: new Date().toISOString(),
   }));
-  localStorage.setItem(STORAGE_KEYS.DRAWS, JSON.stringify(newDraws));
+  write(STORAGE_KEYS.DRAWS, newDraws);
   return newDraws;
 }
 
 export function clearDraws(): void {
-  localStorage.setItem(STORAGE_KEYS.DRAWS, JSON.stringify([]));
+  write(STORAGE_KEYS.DRAWS, []);
 }
 
-// Exclude Same Family Setting
 export function getExcludeSameFamilySetting(): boolean {
-  const data = localStorage.getItem(STORAGE_KEYS.EXCLUDE_SAME_FAMILY);
-  return data ? JSON.parse(data) : true;
+  try {
+    const data = readRaw(STORAGE_KEYS.EXCLUDE_SAME_FAMILY);
+    return data ? JSON.parse(data) === true : true;
+  } catch (error) {
+    console.error(
+      "Lecture impossible du réglage d'exclusion par groupe.",
+      error
+    );
+    return true;
+  }
 }
 
 export function setExcludeSameFamilySetting(value: boolean): void {
-  localStorage.setItem(STORAGE_KEYS.EXCLUDE_SAME_FAMILY, JSON.stringify(value));
+  write(STORAGE_KEYS.EXCLUDE_SAME_FAMILY, value);
 }
