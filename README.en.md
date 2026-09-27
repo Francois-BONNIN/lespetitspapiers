@@ -62,6 +62,8 @@ What that means in practice:
   phone will not show you the list you created on your computer.
 - Clearing your browsing data erases the draw. To keep it or pass it on, use the
   CSV export.
+- To start from scratch, the "Erase everything" button in the settings deletes
+  participants, rules, the draw and the settings in one go.
 - In private browsing, saving is sometimes blocked by the browser. If so, a
   banner warns you as soon as you open the page, before you have typed anything.
 

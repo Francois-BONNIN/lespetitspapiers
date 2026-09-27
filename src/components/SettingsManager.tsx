@@ -1,5 +1,12 @@
 import { useRef } from "react";
-import { AlertTriangle, Info, Plus, RotateCcw, Settings } from "lucide-react";
+import {
+  AlertTriangle,
+  Info,
+  Plus,
+  RotateCcw,
+  Settings,
+  Trash2,
+} from "lucide-react";
 import { EventSettings } from "../lib/database";
 import {
   buildDrawMessage,
@@ -15,6 +22,7 @@ interface SettingsManagerProps {
   onClose: () => void;
   settings: EventSettings;
   onChange: (settings: EventSettings) => void;
+  onClearAll: () => void;
 }
 
 export function SettingsManager({
@@ -22,6 +30,7 @@ export function SettingsManager({
   onClose,
   settings,
   onChange,
+  onClearAll,
 }: SettingsManagerProps) {
   const { t } = useI18n();
   const templateRef = useRef<HTMLTextAreaElement>(null);
@@ -218,6 +227,29 @@ export function SettingsManager({
             {preview}
           </div>
         </div>
+      </section>
+
+      <section
+        aria-labelledby="settings-data-title"
+        className="mt-7 border-t border-ink-200/80 pt-6 dark:border-white/10"
+      >
+        <h3
+          id="settings-data-title"
+          className="text-sm font-semibold text-ink-900 dark:text-white"
+        >
+          {t.settings.dataTitle}
+        </h3>
+        <p className="mb-3 mt-1 text-[13px] leading-relaxed text-ink-500 dark:text-ink-400">
+          {t.settings.dataDescription}
+        </p>
+        <button
+          type="button"
+          onClick={onClearAll}
+          className="btn btn-sm border border-rose-200 bg-white text-rose-700 hover:border-rose-300 hover:bg-rose-50 dark:border-rose-500/30 dark:bg-transparent dark:text-rose-300 dark:hover:bg-rose-500/10"
+        >
+          <Trash2 size={15} />
+          {t.settings.clearAll}
+        </button>
       </section>
     </Modal>
   );

@@ -232,6 +232,10 @@ const fr = {
     previewDrawn: "Sacha",
     defaultTemplate:
       "Bonjour {participant} !\n\nLe tirage au sort est fait : tu as tiré {personne_tirée}.\n\nÉvénement : {événement}\nBudget : {budget}\nÉchange prévu le {date}",
+    dataTitle: "Données",
+    dataDescription:
+      "Tout est enregistré sur cet appareil uniquement. Pour garder une copie, téléchargez d'abord la liste en CSV (étape 1, bouton « Partager »).",
+    clearAll: "Tout effacer",
     autosave: "Les modifications sont enregistrées automatiquement.",
     done: "Terminé",
     customize: "Personnaliser le message",
@@ -286,6 +290,8 @@ const fr = {
     sharedInvalid: "Lien de partage invalide",
     sharedInvalidDescription:
       "Le lien est incomplet ou abîmé : demandez-en un nouveau.",
+    allCleared: "Tout a été effacé",
+    clearAllFailed: "Effacement impossible",
   },
 
   confirm: {
@@ -303,6 +309,10 @@ const fr = {
     redrawDescription:
       "Le tirage actuel sera remplacé. Si des messages ont déjà été envoyés, ils ne seront plus valables.",
     redrawConfirm: "Relancer",
+    clearAllTitle: "Tout effacer ?",
+    clearAllDescription:
+      "Les participants, les règles, le tirage et les paramètres seront supprimés de cet appareil. Cette action est définitive.",
+    clearAllConfirm: "Tout effacer",
     openSharedTitle: "Ouvrir le tirage partagé ?",
     openSharedDescription: (participants: number, rules: number) =>
       `Ce lien contient ${participants} participant(s) et ${rules} règle(s). Ils remplaceront vos participants, vos règles et votre tirage actuels.`,
@@ -540,6 +550,10 @@ const en: Translation = {
     previewDrawn: "Robin",
     defaultTemplate:
       "Hi {participant}!\n\nThe draw is done: you drew {drawn_person}.\n\nEvent: {event}\nBudget: {budget}\nExchange on {date}",
+    dataTitle: "Data",
+    dataDescription:
+      "Everything is saved on this device only. To keep a copy, first download the list as CSV (step 1, “Share” button).",
+    clearAll: "Erase everything",
     autosave: "Changes are saved automatically.",
     done: "Done",
     customize: "Customise the message",
@@ -594,6 +608,8 @@ const en: Translation = {
     sharedInvalid: "Invalid share link",
     sharedInvalidDescription:
       "The link is incomplete or damaged: ask for a new one.",
+    allCleared: "Everything has been erased",
+    clearAllFailed: "Could not erase",
   },
 
   confirm: {
@@ -611,6 +627,10 @@ const en: Translation = {
     redrawDescription:
       "The current draw will be replaced. Any messages already sent will no longer be valid.",
     redrawConfirm: "Run again",
+    clearAllTitle: "Erase everything?",
+    clearAllDescription:
+      "Participants, rules, the draw and the settings will be deleted from this device. This action cannot be undone.",
+    clearAllConfirm: "Erase everything",
     openSharedTitle: "Open the shared draw?",
     openSharedDescription: (participants: number, rules: number) =>
       `This link contains ${participants} participant(s) and ${rules} rule(s). They will replace your current participants, rules and draw.`,

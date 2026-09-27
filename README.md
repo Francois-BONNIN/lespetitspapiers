@@ -65,6 +65,8 @@ Ce qu'il faut savoir en échange :
   téléphone ne vous montrera pas la liste créée sur votre ordinateur.
 - Vider les données de navigation efface le tirage. Pour le conserver ou le
   transmettre, utilisez l'export CSV.
+- Pour repartir de zéro, le bouton « Tout effacer » des paramètres supprime
+  participants, règles, tirage et paramètres en une fois.
 - En navigation privée, l'enregistrement est parfois bloqué par le navigateur.
   Dans ce cas, un bandeau vous prévient dès l'ouverture, avant que vous ayez
   saisi quoi que ce soit.

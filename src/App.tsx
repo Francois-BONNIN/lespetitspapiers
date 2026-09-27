@@ -17,6 +17,7 @@ import {
   setExcludeSameFamilySetting,
   getAvoidReciprocalSetting,
   setAvoidReciprocalSetting,
+  clearAllData,
   addParticipant,
   deleteParticipant,
   addExclusion,
@@ -320,6 +321,25 @@ function App() {
     setAvoidReciprocalSetting(newValue);
   };
 
+  const handleClearAll = async () => {
+    closeSettings();
+
+    const confirmed = await confirm({
+      title: t.confirm.clearAllTitle,
+      description: t.confirm.clearAllDescription,
+      confirmLabel: t.confirm.clearAllConfirm,
+    });
+
+    if (!confirmed) return;
+
+    if (clearAllData()) {
+      loadData();
+      toast.success(t.toast.allCleared);
+    } else {
+      toast.error(t.toast.clearAllFailed);
+    }
+  };
+
   const handleExportData = () => {
     downloadCSV(
       exportParticipantsToCSV(participants, exclusions, inclusions, t),
@@ -551,6 +571,7 @@ function App() {
         onClose={closeSettings}
         settings={eventSettings}
         onChange={handleChangeEventSettings}
+        onClearAll={handleClearAll}
       />
     </div>
   );

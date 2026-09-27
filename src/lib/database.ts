@@ -294,6 +294,19 @@ export function setAvoidReciprocalSetting(value: boolean): void {
   write(STORAGE_KEYS.AVOID_RECIPROCAL, value);
 }
 
+export function clearAllData(): boolean {
+  try {
+    [
+      ...Object.values(STORAGE_KEYS),
+      ...Object.values(LEGACY_STORAGE_KEYS),
+    ].forEach((key) => localStorage.removeItem(key));
+    return true;
+  } catch (error) {
+    console.error("Effacement impossible des données.", error);
+    return false;
+  }
+}
+
 export function getEventSettings(): EventSettings {
   try {
     const data = readRaw(STORAGE_KEYS.EVENT_SETTINGS);
