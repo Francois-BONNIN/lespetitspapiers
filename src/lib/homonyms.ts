@@ -5,8 +5,6 @@ export interface HomonymHint {
   label: string | null;
 }
 
-const DISCRIMINANTS = ["family", "email"] as const;
-
 function firstNameKey(participant: Participant): string {
   const first = participant.name.trim().split(/\s+/)[0] ?? "";
   return first
@@ -35,10 +33,8 @@ function groupBy(
   return buckets;
 }
 
-function findDiscriminant(cluster: Participant[]) {
-  return DISCRIMINANTS.find(
-    (field) => new Set(cluster.map((p) => p[field]?.trim() ?? "")).size >= 2
-  );
+function isSplitByGroup(cluster: Participant[]): boolean {
+  return new Set(cluster.map((p) => p.family?.trim() ?? "")).size >= 2;
 }
 
 function rankSharedGroups(cluster: Participant[]): Map<string, number> {
@@ -61,12 +57,11 @@ export function buildHomonymHints(
   groupBy(named, firstNameKey).forEach((cluster) => {
     if (cluster.length < 2) return;
 
-    const discriminant = findDiscriminant(cluster);
+    const labelled = isSplitByGroup(cluster);
     const ranks = rankSharedGroups(cluster);
 
     cluster.forEach((participant) => {
-      const label =
-        (discriminant && participant[discriminant]?.trim()) || null;
+      const label = (labelled && participant.family?.trim()) || null;
       const index = ranks.get(participant.id) ?? null;
       if (!label && index === null) return;
       hints.set(participant.id, { index, label });

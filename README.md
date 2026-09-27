@@ -21,8 +21,8 @@ règles.
 
 ## En quatre étapes
 
-**1. Ajoutez les participants.** Un prénom suffit. L'e-mail et le groupe
-(« Famille Durand », « Équipe A »…) sont facultatifs.
+**1. Ajoutez les participants.** Un prénom suffit. Le groupe (« Famille
+Durand », « Équipe A »…) est facultatif.
 
 **2. Posez vos exclusions.** _Camille ne peut pas tirer Léa._ Autant de règles
 que nécessaire. Une option coche d'un coup le cas le plus courant : empêcher les
@@ -53,7 +53,7 @@ Pas de compte à créer. Pas de mot de passe. Pas de serveur qui stocke vos list
 d'invités.
 
 Tout est enregistré dans la mémoire locale de votre navigateur. Les noms, les
-e-mails, les règles et les résultats ne sont jamais envoyés nulle part — il n'y a
+groupes, les règles et les résultats ne sont jamais envoyés nulle part — il n'y a
 tout simplement pas de base de données à l'autre bout.
 
 Ce qu'il faut savoir en échange :
@@ -68,7 +68,7 @@ Ce qu'il faut savoir en échange :
 
 ## Import et export
 
-Une longue liste à saisir ? Importez un fichier CSV : noms, e-mails, groupes,
+Une longue liste à saisir ? Importez un fichier CSV : noms, groupes,
 exclusions et tirages limités sont repris en une fois.
 
 Dans l'autre sens, deux exports sont disponibles : la liste des participants

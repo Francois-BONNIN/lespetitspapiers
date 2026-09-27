@@ -77,21 +77,13 @@ function App() {
     [participants]
   );
 
-  const handleAddParticipant = (
-    name: string,
-    email: string,
-    family: string
-  ) => {
+  const handleAddParticipant = (name: string, family: string) => {
     const duplicate = participants.some(
       (p) => p.name.toLowerCase() === name.toLowerCase()
     );
 
     try {
-      const newParticipant = addParticipant(
-        name,
-        email || null,
-        family || null
-      );
+      const newParticipant = addParticipant(name, family || null);
       setParticipants([...participants, newParticipant]);
       if (duplicate) {
         toast.warning(
@@ -296,7 +288,7 @@ function App() {
 
       const participantMap = new Map<string, string>();
       importResult.participants.forEach((p) => {
-        participantMap.set(p.name, addParticipant(p.name, p.email, p.family).id);
+        participantMap.set(p.name, addParticipant(p.name, p.family).id);
       });
 
       importResult.exclusions.forEach((e) => {

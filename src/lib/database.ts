@@ -3,7 +3,6 @@ import { v4 as uuidv4 } from "uuid";
 export interface Participant {
   id: string;
   name: string;
-  email: string | null;
   family: string | null;
   created_at: string;
 }
@@ -105,14 +104,12 @@ export function getParticipants(): Participant[] {
 
 export function addParticipant(
   name: string,
-  email: string | null,
   family: string | null
 ): Participant {
   const participants = getParticipants();
   const newParticipant: Participant = {
     id: generateId(),
     name,
-    email,
     family,
     created_at: new Date().toISOString(),
   };

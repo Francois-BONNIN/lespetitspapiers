@@ -46,7 +46,7 @@ export function exportParticipantsToCSV(
       .map((i) => getParticipantName(i.included_participant_id))
       .join(";");
 
-    return `"${participant.name}","${participant.email || ""}","${
+    return `"${participant.name}","${
       participant.family || ""
     }","${participantExclusions}","${participantInclusions}"`;
   });
@@ -72,7 +72,6 @@ export function downloadCSV(content: string, filename: string): void {
 export interface ImportResult {
   participants: Array<{
     name: string;
-    email: string | null;
     family: string | null;
   }>;
   exclusions: Array<{
@@ -135,7 +134,6 @@ export function importParticipantsFromCSV(
       header.findIndex((h) => aliases.some((alias) => h.includes(alias)));
 
     const nameIndex = findColumn("nom", "name");
-    const emailIndex = findColumn("email", "e-mail", "mail");
     const familyIndex = findColumn("famille", "groupe", "group");
     const exclusionsIndex = findColumn("exclusion");
     const inclusionsIndex = findColumn("inclusion");
@@ -156,7 +154,6 @@ export function importParticipantsFromCSV(
 
       participants.push({
         name,
-        email: emailIndex !== -1 ? row[emailIndex]?.trim() || null : null,
         family: familyIndex !== -1 ? row[familyIndex]?.trim() || null : null,
       });
 

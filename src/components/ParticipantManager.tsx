@@ -1,7 +1,6 @@
 import { useMemo, useRef, useState } from "react";
 import {
   Download,
-  Mail,
   Search,
   Trash2,
   Upload,
@@ -19,7 +18,7 @@ import { useI18n } from "./ui/language-context";
 
 interface ParticipantManagerProps {
   participants: Participant[];
-  onAddParticipant: (name: string, email: string, family: string) => void;
+  onAddParticipant: (name: string, family: string) => void;
   onDeleteParticipant: (id: string) => void;
   onExportData: () => void;
   onImportData: (file: File) => void;
@@ -37,7 +36,6 @@ export function ParticipantManager({
   const { t } = useI18n();
   const locale = t.meta.locale;
   const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
   const [family, setFamily] = useState("");
   const [query, setQuery] = useState("");
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -52,9 +50,8 @@ export function ParticipantManager({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!name.trim()) return;
-    onAddParticipant(name.trim(), email.trim(), family.trim());
+    onAddParticipant(name.trim(), family.trim());
     setName("");
-    setEmail("");
     nameInputRef.current?.focus();
   };
 
@@ -82,7 +79,7 @@ export function ParticipantManager({
     const q = query.trim().toLowerCase();
     if (!q) return participants;
     return participants.filter((p) =>
-      [p.name, p.email, p.family]
+      [p.name, p.family]
         .filter(Boolean)
         .some((value) => value!.toLowerCase().includes(q))
     );
@@ -153,8 +150,8 @@ export function ParticipantManager({
       }
     >
       <form onSubmit={handleSubmit} className="card-inset mb-5 p-4">
-        <div className="grid gap-3 sm:grid-cols-2">
-          <div>
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-end">
+          <div className="flex-1">
             <label className="label" htmlFor="participant-name">
               {t.participants.nameLabel}
             </label>
@@ -169,24 +166,6 @@ export function ParticipantManager({
               required
             />
           </div>
-          <div>
-            <label className="label" htmlFor="participant-email">
-              {t.participants.emailLabel}{" "}
-              <span className="normal-case text-ink-400">
-                {t.common.optional}
-              </span>
-            </label>
-            <input
-              id="participant-email"
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder={t.participants.emailPlaceholder}
-              className="field"
-            />
-          </div>
-        </div>
-        <div className="mt-3 flex flex-col gap-3 sm:flex-row sm:items-end">
           <div className="flex-1">
             <label className="label" htmlFor="participant-group">
               {t.participants.groupLabel}{" "}
@@ -281,19 +260,9 @@ export function ParticipantManager({
                         group={participant.family}
                         index={homonymHints.get(participant.id)?.index}
                       />
-                      <div className="min-w-0 flex-1">
-                        <p className="truncate text-sm font-semibold text-ink-900 dark:text-white">
-                          {participant.name}
-                        </p>
-                        {participant.email && (
-                          <p className="mt-0.5 flex items-center gap-1 truncate text-xs text-ink-500 dark:text-ink-400">
-                            <Mail size={11} className="shrink-0" />
-                            <span className="truncate">
-                              {participant.email}
-                            </span>
-                          </p>
-                        )}
-                      </div>
+                      <p className="min-w-0 flex-1 truncate text-sm font-semibold text-ink-900 dark:text-white">
+                        {participant.name}
+                      </p>
                       <button
                         onClick={() => onDeleteParticipant(participant.id)}
                         className="btn btn-danger-ghost btn-icon opacity-0 transition-opacity focus-visible:opacity-100 group-hover:opacity-100"

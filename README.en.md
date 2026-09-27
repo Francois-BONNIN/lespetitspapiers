@@ -20,8 +20,8 @@ Les Petits Papiers does exactly the same thing, except the hat knows the rules.
 
 ## In four steps
 
-**1. Add the participants.** A first name is enough. Email and group ("Morgan
-family", "Team A"…) are optional.
+**1. Add the participants.** A first name is enough. The group ("Morgan
+family", "Team A"…) is optional.
 
 **2. Set your exclusions.** _Alex cannot draw Sam._ As many rules as you need.
 One checkbox covers the most common case in a single click: stop members of the
@@ -49,7 +49,7 @@ finds out who they drew without ever seeing the full list.
 
 No account to create. No password. No server storing your guest lists.
 
-Everything is saved in your browser's local storage. Names, emails, rules and
+Everything is saved in your browser's local storage. Names, groups, rules and
 results are never sent anywhere — there simply is no database at the other end.
 
 What that means in practice:
@@ -63,7 +63,7 @@ What that means in practice:
 
 ## Import and export
 
-Got a long list to type in? Import a CSV file: names, emails, groups, exclusions
+Got a long list to type in? Import a CSV file: names, groups, exclusions
 and restricted draws all come across in one go.
 
 Going the other way, two exports are available: the participant list with all of
