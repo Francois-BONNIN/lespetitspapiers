@@ -22,8 +22,24 @@ function canDraw(
   alreadyDrawn: Set<string>,
   excludeSameFamily: boolean
 ): boolean {
-  if (drawer.id === candidate.id) return false;
   if (alreadyDrawn.has(candidate.id)) return false;
+  return respectsRules(
+    drawer,
+    candidate,
+    exclusions,
+    inclusions,
+    excludeSameFamily
+  );
+}
+
+function respectsRules(
+  drawer: Participant,
+  candidate: Participant,
+  exclusions: Exclusion[],
+  inclusions: Inclusion[],
+  excludeSameFamily: boolean
+): boolean {
+  if (drawer.id === candidate.id) return false;
 
   const candidateInclusions = inclusions.filter(
     (inc) => inc.participant_id === candidate.id
@@ -105,4 +121,35 @@ export function performDraw(
   }
 
   return null;
+}
+
+export function isDrawConsistent(
+  draws: DrawResult[],
+  participants: Participant[],
+  exclusions: Exclusion[],
+  inclusions: Inclusion[],
+  excludeSameFamily: boolean
+): boolean {
+  if (draws.length !== participants.length) return false;
+
+  const participantsById = new Map(participants.map((p) => [p.id, p]));
+  const drawers = new Set<string>();
+  const drawn = new Set<string>();
+
+  return draws.every(({ drawer_id, drawn_id }) => {
+    const drawer = participantsById.get(drawer_id);
+    const candidate = participantsById.get(drawn_id);
+    if (!drawer || !candidate || drawers.has(drawer_id) || drawn.has(drawn_id)) {
+      return false;
+    }
+    drawers.add(drawer_id);
+    drawn.add(drawn_id);
+    return respectsRules(
+      drawer,
+      candidate,
+      exclusions,
+      inclusions,
+      excludeSameFamily
+    );
+  });
 }

@@ -19,6 +19,7 @@ const fr = {
   header: {
     tagline: "Tirage au sort",
     drawDone: "Tirage effectué",
+    drawStale: "Tirage à refaire",
   },
 
   hero: {
@@ -168,6 +169,10 @@ const fr = {
       }.`,
     resultInstructions:
       "Copiez le message de chaque personne et envoyez-le-lui, par SMS ou par e-mail. Il contient déjà le nom tiré : inutile de révéler les résultats.",
+    staleTitle: "Ce tirage ne correspond plus",
+    staleDescription:
+      "Les participants ou les règles ont changé depuis. Relancez le tirage pour que tout le monde soit pris en compte.",
+    redraw: "Relancer le tirage",
     revealResult: (name: string) => `Révéler le résultat de ${name}`,
     hideResult: (name: string) => `Masquer le résultat de ${name}`,
     reveal: "Révéler",
@@ -240,6 +245,10 @@ const fr = {
     resetDrawDescription:
       "Les attributions actuelles seront effacées. Les participants et les règles sont conservés.",
     resetDrawConfirm: "Recommencer",
+    redrawTitle: "Relancer le tirage ?",
+    redrawDescription:
+      "Le tirage actuel sera remplacé. Si des messages ont déjà été envoyés, ils ne seront plus valables.",
+    redrawConfirm: "Relancer",
     openSharedTitle: "Ouvrir le tirage partagé ?",
     openSharedDescription: (participants: number, rules: number) =>
       `Ce lien contient ${participants} participant(s) et ${rules} règle(s). Ils remplaceront vos participants, vos règles et votre tirage actuels.`,
@@ -272,6 +281,7 @@ const en: Translation = {
   header: {
     tagline: "Random draw",
     drawDone: "Draw complete",
+    drawStale: "Draw out of date",
   },
 
   hero: {
@@ -416,6 +426,10 @@ const en: Translation = {
       `Draw complete — ${count} assignment${count > 1 ? "s" : ""} generated.`,
     resultInstructions:
       "Copy each person's message and send it to them by text or email. It already contains the name they drew: no need to reveal the results.",
+    staleTitle: "This draw is out of date",
+    staleDescription:
+      "Participants or rules have changed since. Run the draw again so everyone is taken into account.",
+    redraw: "Run the draw again",
     revealResult: (name: string) => `Reveal the result for ${name}`,
     hideResult: (name: string) => `Hide the result for ${name}`,
     reveal: "Reveal",
@@ -488,6 +502,10 @@ const en: Translation = {
     resetDrawDescription:
       "The current assignments will be erased. Participants and rules are kept.",
     resetDrawConfirm: "Start over",
+    redrawTitle: "Run the draw again?",
+    redrawDescription:
+      "The current draw will be replaced. Any messages already sent will no longer be valid.",
+    redrawConfirm: "Run again",
     openSharedTitle: "Open the shared draw?",
     openSharedDescription: (participants: number, rules: number) =>
       `This link contains ${participants} participant(s) and ${rules} rule(s). They will replace your current participants, rules and draw.`,

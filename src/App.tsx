@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { AlertTriangle, Ticket, Trophy } from "lucide-react";
 import {
   Participant,
@@ -22,7 +22,7 @@ import {
   isStorageAvailable,
   replaceAllData,
 } from "./lib/database";
-import { performDraw } from "./lib/drawAlgorithm";
+import { isDrawConsistent, performDraw } from "./lib/drawAlgorithm";
 import {
   exportParticipantsToCSV,
   downloadCSV,
@@ -81,6 +81,19 @@ function App() {
     setDraws(getDraws());
     setExcludeSameFamilyState(getExcludeSameFamilySetting());
   };
+
+  const drawIsStale = useMemo(
+    () =>
+      draws.length > 0 &&
+      !isDrawConsistent(
+        draws,
+        participants,
+        exclusions,
+        inclusions,
+        excludeSameFamily
+      ),
+    [draws, participants, exclusions, inclusions, excludeSameFamily]
+  );
 
   const handleAddParticipant = (name: string, family: string) => {
     const duplicate = participants.some(
@@ -247,6 +260,16 @@ function App() {
     }, 700);
   };
 
+  const handleRedraw = async () => {
+    const confirmed = await confirm({
+      title: t.confirm.redrawTitle,
+      description: t.confirm.redrawDescription,
+      confirmLabel: t.confirm.redrawConfirm,
+    });
+
+    if (confirmed) handlePerformDraw();
+  };
+
   const handleClearDraws = async () => {
     const confirmed = await confirm({
       title: t.confirm.resetDrawTitle,
@@ -405,12 +428,18 @@ function App() {
           </div>
 
           <div className="flex items-center gap-2">
-            {draws.length > 0 && (
-              <span className="chip hidden bg-emerald-100 text-emerald-700 dark:bg-emerald-500/15 dark:text-emerald-300 sm:inline-flex">
-                <Trophy size={13} />
-                {t.header.drawDone}
-              </span>
-            )}
+            {draws.length > 0 &&
+              (drawIsStale ? (
+                <span className="chip hidden bg-amber-100 text-amber-800 dark:bg-amber-500/15 dark:text-amber-300 sm:inline-flex">
+                  <AlertTriangle size={13} />
+                  {t.header.drawStale}
+                </span>
+              ) : (
+                <span className="chip hidden bg-emerald-100 text-emerald-700 dark:bg-emerald-500/15 dark:text-emerald-300 sm:inline-flex">
+                  <Trophy size={13} />
+                  {t.header.drawDone}
+                </span>
+              ))}
             <LanguageToggle />
             <ThemeToggle />
           </div>
@@ -466,7 +495,9 @@ function App() {
           <DrawManager
             participants={participants}
             draws={draws}
+            isStale={drawIsStale}
             onPerformDraw={handlePerformDraw}
+            onRedraw={handleRedraw}
             onClearDraws={handleClearDraws}
             isDrawing={isDrawing}
           />
