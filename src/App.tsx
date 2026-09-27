@@ -443,6 +443,7 @@ function App() {
         <div className="space-y-5">
           <ParticipantManager
             participants={participants}
+            excludeSameFamily={excludeSameFamily}
             onAddParticipant={handleAddParticipant}
             onDeleteParticipant={handleDeleteParticipant}
             onExportData={handleExportData}

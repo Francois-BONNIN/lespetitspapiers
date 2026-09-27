@@ -36,8 +36,10 @@ export function RulesManager({
   const [open, setOpen] = useState(false);
   const [tab, setTab] = useState<Tab>("exclusions");
 
+  const hasGroups = participants.some((p) => p.family?.trim());
+  const sameGroupApplies = excludeSameFamily && hasGroups;
   const hasRule =
-    excludeSameFamily || exclusions.length > 0 || inclusions.length > 0;
+    sameGroupApplies || exclusions.length > 0 || inclusions.length > 0;
 
   const tabs: { id: Tab; label: string; icon: typeof Ban; count: number }[] = [
     {
@@ -78,7 +80,7 @@ export function RulesManager({
       >
         {hasRule ? (
           <div className="flex flex-wrap items-center gap-1.5">
-            {excludeSameFamily && (
+            {sameGroupApplies && (
               <span className="chip bg-ink-100 text-ink-600 dark:bg-white/[0.08] dark:text-ink-300">
                 <Users size={12} />
                 {t.rules.summarySameGroup}

@@ -1,6 +1,7 @@
 import { useMemo, useRef, useState } from "react";
 import {
   Download,
+  Info,
   Link2,
   Search,
   Trash2,
@@ -19,6 +20,7 @@ import { useI18n } from "./ui/language-context";
 
 interface ParticipantManagerProps {
   participants: Participant[];
+  excludeSameFamily: boolean;
   onAddParticipant: (name: string, family: string) => void;
   onDeleteParticipant: (id: string) => void;
   onExportData: () => void;
@@ -30,6 +32,7 @@ const UNGROUPED = "";
 
 export function ParticipantManager({
   participants,
+  excludeSameFamily,
   onAddParticipant,
   onDeleteParticipant,
   onExportData,
@@ -195,6 +198,7 @@ export function ParticipantManager({
               className="field"
               list="known-groups"
               autoComplete="off"
+              aria-describedby="participant-group-hint"
             />
             <datalist id="known-groups">
               {knownGroups.map((group) => (
@@ -207,6 +211,15 @@ export function ParticipantManager({
             {t.common.add}
           </button>
         </div>
+        <p
+          id="participant-group-hint"
+          className="mt-3 flex gap-2 text-xs leading-relaxed text-ink-500 dark:text-ink-400"
+        >
+          <Info size={14} className="mt-px shrink-0" />
+          {excludeSameFamily
+            ? t.participants.groupHintSameGroup
+            : t.participants.groupHintFree}
+        </p>
       </form>
 
       {participants.length > 3 && (

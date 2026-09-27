@@ -55,8 +55,7 @@ const fr = {
 
   participants: {
     title: "Qui participe ?",
-    description:
-      "Ajoutez les personnes qui participent au tirage. Le groupe est facultatif.",
+    description: "Ajoutez chaque personne qui participe au tirage.",
     exportAction: "Exporter",
     exportTitle: "Exporter les participants et leurs contraintes au format CSV",
     importAction: "Importer",
@@ -67,6 +66,10 @@ const fr = {
     namePlaceholder: "Camille Durand",
     groupLabel: "Groupe",
     groupPlaceholder: "Équipe A, Famille Durand…",
+    groupHintSameGroup:
+      "Les membres d'un même groupe ne se tireront pas entre eux : pratique pour un couple ou une famille.",
+    groupHintFree:
+      "Le groupe sert seulement à ranger la liste : la règle qui empêche ses membres de se tirer est désactivée (étape 2).",
     searchPlaceholder: "Rechercher un participant…",
     searchLabel: "Rechercher un participant",
     emptyTitle: "Aucun participant pour le moment",
@@ -295,7 +298,7 @@ const en: Translation = {
 
   participants: {
     title: "Who's taking part?",
-    description: "Add the people taking part in the draw. The group is optional.",
+    description: "Add everyone taking part in the draw.",
     exportAction: "Export",
     exportTitle: "Export participants and their constraints as a CSV file",
     importAction: "Import",
@@ -306,6 +309,10 @@ const en: Translation = {
     namePlaceholder: "Alex Morgan",
     groupLabel: "Group",
     groupPlaceholder: "Team A, Morgan family…",
+    groupHintSameGroup:
+      "Members of the same group won't draw each other: handy for a couple or a family.",
+    groupHintFree:
+      "The group only organises the list: the rule that stops its members from drawing each other is off (step 2).",
     searchPlaceholder: "Search for a participant…",
     searchLabel: "Search for a participant",
     emptyTitle: "No participants yet",
