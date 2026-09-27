@@ -38,6 +38,11 @@ export function Modal({
 }: ModalProps) {
   const { t } = useI18n();
   const panelRef = useRef<HTMLDivElement>(null);
+  const onCloseRef = useRef(onClose);
+
+  useEffect(() => {
+    onCloseRef.current = onClose;
+  });
 
   useEffect(() => {
     if (!open) return;
@@ -47,7 +52,7 @@ export function Modal({
 
     const onKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
-        onClose();
+        onCloseRef.current();
         return;
       }
 
@@ -82,7 +87,7 @@ export function Modal({
       document.body.style.overflow = previousOverflow;
       trigger?.focus?.();
     };
-  }, [open, onClose]);
+  }, [open]);
 
   if (!open) return null;
 
