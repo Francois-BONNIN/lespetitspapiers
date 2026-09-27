@@ -7,6 +7,7 @@ import {
   Eye,
   EyeOff,
   Info,
+  MoreHorizontal,
   RotateCcw,
   Shuffle,
   Sparkles,
@@ -19,6 +20,7 @@ import {
 } from "../lib/csvExport";
 import { buildHomonymHints, labelWithHint } from "../lib/homonyms";
 import { SectionCard } from "./ui/SectionCard";
+import { ActionMenu } from "./ui/ActionMenu";
 import { EmptyState } from "./ui/EmptyState";
 import { ParticipantAvatar } from "./ui/ParticipantAvatar";
 import { useToast } from "./ui/toast-context";
@@ -140,29 +142,38 @@ export function DrawManager({
       actions={
         hasDraws ? (
           <>
-            <button
-              onClick={toggleRevealAll}
-              className="btn btn-sm btn-secondary"
-            >
-              {allRevealed ? <EyeOff size={15} /> : <Eye size={15} />}
-              <span className="hidden sm:inline">
-                {allRevealed ? t.draw.hideAll : t.draw.revealAll}
-              </span>
-            </button>
-            <button onClick={handleCopyAll} className="btn btn-sm btn-secondary">
-              <Copy size={15} />
-              <span className="hidden sm:inline">{t.draw.copyAll}</span>
-            </button>
-            <button
-              onClick={handleExportDraws}
-              className="btn btn-sm btn-secondary"
-            >
-              <Download size={15} />
-              <span className="hidden sm:inline">{t.draw.csv}</span>
-            </button>
+            <ActionMenu
+              icon={MoreHorizontal}
+              label={t.draw.moreActions}
+              items={[
+                {
+                  id: "reveal-all",
+                  icon: allRevealed ? EyeOff : Eye,
+                  label: allRevealed ? t.draw.hideAll : t.draw.revealAll,
+                  description: allRevealed
+                    ? t.draw.hideAllDescription
+                    : t.draw.revealAllDescription,
+                  onSelect: toggleRevealAll,
+                },
+                {
+                  id: "copy-all",
+                  icon: Copy,
+                  label: t.draw.copyAll,
+                  description: t.draw.copyAllDescription,
+                  onSelect: handleCopyAll,
+                },
+                {
+                  id: "export-csv",
+                  icon: Download,
+                  label: t.draw.csv,
+                  description: t.draw.csvDescription,
+                  onSelect: handleExportDraws,
+                },
+              ]}
+            />
             <button onClick={onClearDraws} className="btn btn-sm btn-secondary">
               <RotateCcw size={15} />
-              <span className="hidden sm:inline">{t.draw.restart}</span>
+              {t.draw.restart}
             </button>
           </>
         ) : null

@@ -4,6 +4,7 @@ import {
   Info,
   Link2,
   Search,
+  Share2,
   Trash2,
   Upload,
   UserPlus,
@@ -14,6 +15,7 @@ import { getGroupColor } from "../lib/familyColors";
 import { buildHomonymHints } from "../lib/homonyms";
 import { useRecentlyAdded } from "../lib/useRecentlyAdded";
 import { SectionCard } from "./ui/SectionCard";
+import { ActionMenu } from "./ui/ActionMenu";
 import { EmptyState } from "./ui/EmptyState";
 import { ParticipantAvatar } from "./ui/ParticipantAvatar";
 import { useI18n } from "./ui/language-context";
@@ -124,37 +126,34 @@ export function ParticipantManager({
       actions={
         <>
           <button
-            onClick={onShareLink}
-            className="btn btn-sm btn-secondary"
-            disabled={participants.length === 0}
-            title={t.participants.shareTitle}
-          >
-            <Link2 size={15} />
-            <span className="hidden sm:inline">
-              {t.participants.shareAction}
-            </span>
-          </button>
-          <button
-            onClick={onExportData}
-            className="btn btn-sm btn-secondary"
-            disabled={participants.length === 0}
-            title={t.participants.exportTitle}
-          >
-            <Download size={15} />
-            <span className="hidden sm:inline">
-              {t.participants.exportAction}
-            </span>
-          </button>
-          <button
             onClick={() => fileInputRef.current?.click()}
             className="btn btn-sm btn-secondary"
             title={t.participants.importTitle}
           >
             <Upload size={15} />
-            <span className="hidden sm:inline">
-              {t.participants.importAction}
-            </span>
+            {t.participants.importAction}
           </button>
+          <ActionMenu
+            icon={Share2}
+            label={t.participants.shareAction}
+            disabled={participants.length === 0}
+            items={[
+              {
+                id: "share-link",
+                icon: Link2,
+                label: t.participants.shareLinkAction,
+                description: t.participants.shareLinkDescription,
+                onSelect: onShareLink,
+              },
+              {
+                id: "export-csv",
+                icon: Download,
+                label: t.participants.exportAction,
+                description: t.participants.exportDescription,
+                onSelect: onExportData,
+              },
+            ]}
+          />
           <input
             ref={fileInputRef}
             type="file"

@@ -49,7 +49,9 @@ export function SectionCard({
             )}
           </div>
         </div>
-        {actions && <div className="flex shrink-0 gap-2">{actions}</div>}
+        {actions && (
+          <div className="flex shrink-0 flex-wrap gap-2">{actions}</div>
+        )}
       </header>
       <div className="flex-1">{children}</div>
     </section>

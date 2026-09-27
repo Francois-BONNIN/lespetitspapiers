@@ -56,12 +56,15 @@ const fr = {
   participants: {
     title: "Qui participe ?",
     description: "Ajoutez chaque personne qui participe au tirage.",
-    exportAction: "Exporter",
-    exportTitle: "Exporter les participants et leurs contraintes au format CSV",
     importAction: "Importer",
     importTitle: "Importer un fichier CSV de participants",
     shareAction: "Partager",
-    shareTitle: "Copier un lien qui contient les participants et les règles",
+    shareLinkAction: "Copier un lien de partage",
+    shareLinkDescription:
+      "Les participants et les règles, sans les résultats : à envoyer à qui organise avec vous.",
+    exportAction: "Télécharger en CSV",
+    exportDescription:
+      "Un fichier à garder, à retoucher dans un tableur ou à réimporter l'an prochain.",
     nameLabel: "Nom",
     namePlaceholder: "Camille Durand",
     groupLabel: "Groupe",
@@ -139,10 +142,17 @@ const fr = {
       "Les résultats sont masqués par défaut : révélez-les uniquement si besoin.",
     descriptionPending:
       "Lancez le tirage une fois vos participants et vos règles en place.",
+    moreActions: "Plus d'actions",
     revealAll: "Tout révéler",
+    revealAllDescription:
+      "Affiche tous les résultats à l'écran : vous saurez qui a tiré qui.",
     hideAll: "Tout masquer",
-    copyAll: "Tout copier",
-    csv: "CSV",
+    hideAllDescription: "Masque de nouveau tous les résultats.",
+    copyAll: "Copier tous les messages",
+    copyAllDescription:
+      "Les messages de tout le monde, à la suite, dans le presse-papiers.",
+    csv: "Télécharger en CSV",
+    csvDescription: "La liste complète de qui tire qui.",
     restart: "Recommencer",
     notPossibleTitle: "Le tirage n'est pas encore possible",
     notPossibleDescription:
@@ -297,12 +307,15 @@ const en: Translation = {
   participants: {
     title: "Who's taking part?",
     description: "Add everyone taking part in the draw.",
-    exportAction: "Export",
-    exportTitle: "Export participants and their constraints as a CSV file",
     importAction: "Import",
     importTitle: "Import a CSV file of participants",
     shareAction: "Share",
-    shareTitle: "Copy a link that contains the participants and the rules",
+    shareLinkAction: "Copy a share link",
+    shareLinkDescription:
+      "The participants and the rules, without the results: send it to whoever is organising with you.",
+    exportAction: "Download as CSV",
+    exportDescription:
+      "A file to keep, edit in a spreadsheet or re-import next year.",
     nameLabel: "Name",
     namePlaceholder: "Alex Morgan",
     groupLabel: "Group",
@@ -377,10 +390,17 @@ const en: Translation = {
       "Results are hidden by default: reveal them only when you need to.",
     descriptionPending:
       "Run the draw once your participants and your rules are in place.",
+    moreActions: "More actions",
     revealAll: "Reveal all",
+    revealAllDescription:
+      "Shows every result on screen: you will know who drew whom.",
     hideAll: "Hide all",
-    copyAll: "Copy all",
-    csv: "CSV",
+    hideAllDescription: "Hides every result again.",
+    copyAll: "Copy all messages",
+    copyAllDescription:
+      "Everyone's messages, one after the other, in your clipboard.",
+    csv: "Download as CSV",
+    csvDescription: "The full list of who draws whom.",
     restart: "Start over",
     notPossibleTitle: "The draw is not possible yet",
     notPossibleDescription:
