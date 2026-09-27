@@ -222,14 +222,19 @@ export function DrawManager({
         )
       ) : (
         <div className="animate-fade-up">
-          <div className="mb-5 flex items-center gap-3 rounded-xl border border-emerald-200 bg-emerald-50 p-3.5 dark:border-emerald-500/20 dark:bg-emerald-500/[0.08]">
+          <div className="mb-5 flex gap-3 rounded-xl border border-emerald-200 bg-emerald-50 p-3.5 dark:border-emerald-500/20 dark:bg-emerald-500/[0.08]">
             <Check
               size={18}
-              className="shrink-0 text-emerald-600 dark:text-emerald-400"
+              className="mt-0.5 shrink-0 text-emerald-600 dark:text-emerald-400"
             />
-            <p className="text-sm font-semibold text-emerald-900 dark:text-emerald-200">
-              {t.draw.resultBanner(draws.length)}
-            </p>
+            <div className="min-w-0">
+              <p className="text-sm font-semibold text-emerald-900 dark:text-emerald-200">
+                {t.draw.resultBanner(draws.length)}
+              </p>
+              <p className="mt-0.5 text-[13px] leading-relaxed text-emerald-800 dark:text-emerald-200/80">
+                {t.draw.resultInstructions}
+              </p>
+            </div>
           </div>
 
           <ul className="grid gap-2.5 lg:grid-cols-2">
@@ -248,7 +253,7 @@ export function DrawManager({
               return (
                 <li
                   key={draw.id}
-                  className="flex animate-draw-in items-center gap-3 rounded-xl border border-ink-200 bg-white p-3 transition-shadow hover:shadow-card dark:border-white/10 dark:bg-white/[0.03]"
+                  className="flex animate-draw-in flex-wrap items-center gap-3 rounded-xl border border-ink-200 bg-white p-3 transition-shadow hover:shadow-card dark:border-white/10 dark:bg-white/[0.03]"
                   style={{ animationDelay: `${Math.min(index, 14) * 55}ms` }}
                 >
                   <ParticipantAvatar
@@ -291,7 +296,7 @@ export function DrawManager({
                     </button>
                   </div>
 
-                  <div className="flex shrink-0 items-center gap-1">
+                  <div className="flex shrink-0 items-center gap-1 max-sm:w-full max-sm:pl-12">
                     <button
                       onClick={() => toggleReveal(draw.id)}
                       className="btn btn-ghost btn-icon"
@@ -302,15 +307,13 @@ export function DrawManager({
                     </button>
                     <button
                       onClick={() => handleCopyMessage(draw)}
-                      className={`btn btn-sm ${
+                      className={`btn btn-sm max-sm:flex-1 ${
                         isCopied ? "btn-primary" : "btn-secondary"
                       }`}
                       title={t.draw.copyMessageTitle(drawerName)}
                     >
                       {isCopied ? <Check size={15} /> : <Copy size={15} />}
-                      <span className="hidden xl:inline">
-                        {isCopied ? t.draw.copied : t.draw.message}
-                      </span>
+                      {isCopied ? t.draw.copied : t.draw.copyMessage}
                     </button>
                   </div>
                 </li>

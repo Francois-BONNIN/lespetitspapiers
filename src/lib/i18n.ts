@@ -139,7 +139,7 @@ const fr = {
   draw: {
     title: "Tirage au sort",
     descriptionDone:
-      "Les résultats sont masqués par défaut : révélez-les uniquement si besoin.",
+      "Les résultats restent masqués, pour que le tirage reste une surprise, même pour vous.",
     descriptionPending:
       "Lancez le tirage une fois vos participants et vos règles en place.",
     moreActions: "Plus d'actions",
@@ -166,14 +166,16 @@ const fr = {
       `Tirage effectué — ${count} attribution${count > 1 ? "s" : ""} générée${
         count > 1 ? "s" : ""
       }.`,
+    resultInstructions:
+      "Copiez le message de chaque personne et envoyez-le-lui, par SMS ou par e-mail. Il contient déjà le nom tiré : inutile de révéler les résultats.",
     revealResult: (name: string) => `Révéler le résultat de ${name}`,
     hideResult: (name: string) => `Masquer le résultat de ${name}`,
     reveal: "Révéler",
     hide: "Masquer",
+    copyMessage: "Copier le message",
     copyMessageTitle: (name: string) => `Copier le message destiné à ${name}`,
     copied: "Copié",
-    message: "Message",
-    note: "Ces résultats ne sont visibles que sur cet appareil. Transmettez à chaque participant son message individuellement, sans montrer la liste complète.",
+    note: "Les résultats ne sont enregistrés que sur cet appareil : ouvrir le site ailleurs ne les montrera pas.",
   },
 
   toast: {
@@ -387,7 +389,7 @@ const en: Translation = {
   draw: {
     title: "Random draw",
     descriptionDone:
-      "Results are hidden by default: reveal them only when you need to.",
+      "Results stay hidden, so the draw stays a surprise, even for you.",
     descriptionPending:
       "Run the draw once your participants and your rules are in place.",
     moreActions: "More actions",
@@ -412,14 +414,16 @@ const en: Translation = {
     inProgress: "Drawing…",
     resultBanner: (count: number) =>
       `Draw complete — ${count} assignment${count > 1 ? "s" : ""} generated.`,
+    resultInstructions:
+      "Copy each person's message and send it to them by text or email. It already contains the name they drew: no need to reveal the results.",
     revealResult: (name: string) => `Reveal the result for ${name}`,
     hideResult: (name: string) => `Hide the result for ${name}`,
     reveal: "Reveal",
     hide: "Hide",
+    copyMessage: "Copy message",
     copyMessageTitle: (name: string) => `Copy the message for ${name}`,
     copied: "Copied",
-    message: "Message",
-    note: "These results are only visible on this device. Send each participant their own message individually, without showing the full list.",
+    note: "Results are only saved on this device: opening the site elsewhere won't show them.",
   },
 
   toast: {
