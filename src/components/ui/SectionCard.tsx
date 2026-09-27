@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { useI18n } from "./language-context";
+import { useI18n } from "@/i18n/language-context";
 
 interface SectionCardProps {
   step: number;

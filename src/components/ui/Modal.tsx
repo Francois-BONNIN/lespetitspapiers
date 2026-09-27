@@ -2,7 +2,8 @@ import { useEffect, useRef, type ReactNode } from "react";
 import { createPortal } from "react-dom";
 import { X } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
-import { useI18n } from "./language-context";
+import { useLatest } from "@/hooks/useLatest";
+import { useI18n } from "@/i18n/language-context";
 
 interface ModalProps {
   open: boolean;
@@ -38,11 +39,7 @@ export function Modal({
 }: ModalProps) {
   const { t } = useI18n();
   const panelRef = useRef<HTMLDivElement>(null);
-  const onCloseRef = useRef(onClose);
-
-  useEffect(() => {
-    onCloseRef.current = onClose;
-  });
+  const onCloseRef = useLatest(onClose);
 
   useEffect(() => {
     if (!open) return;
@@ -87,7 +84,7 @@ export function Modal({
       document.body.style.overflow = previousOverflow;
       trigger?.focus?.();
     };
-  }, [open]);
+  }, [open, onCloseRef]);
 
   if (!open) return null;
 
