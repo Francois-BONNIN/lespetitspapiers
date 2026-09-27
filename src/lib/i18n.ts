@@ -22,6 +22,17 @@ const fr = {
     drawStale: "Tirage à refaire",
   },
 
+  share: {
+    action: "Partager",
+    linkAction: "Copier un lien de partage",
+    linkDescription:
+      "Les participants, les règles et les paramètres, sans les résultats : à envoyer à qui organise avec vous.",
+    fullLinkAction: "Copier un lien complet",
+    fullLinkDescription:
+      "Avec les résultats, pour passer sur un autre appareil. Toute personne qui l'ouvre peut voir qui a tiré qui.",
+    fullLinkUnavailable: "Disponible une fois le tirage lancé.",
+  },
+
   hero: {
     titleMain: "Le tirage des petits papiers,",
     titleAccent: " en ligne",
@@ -59,14 +70,6 @@ const fr = {
     description: "Ajoutez chaque personne qui participe au tirage.",
     importAction: "Importer",
     importTitle: "Importer un fichier CSV de participants",
-    shareAction: "Partager",
-    shareLinkAction: "Copier un lien de partage",
-    shareLinkDescription:
-      "Les participants, les règles et les paramètres, sans les résultats : à envoyer à qui organise avec vous.",
-    fullLinkAction: "Copier un lien complet",
-    fullLinkDescription:
-      "Avec les résultats, pour passer sur un autre appareil. Toute personne qui l'ouvre peut voir qui a tiré qui.",
-    fullLinkUnavailable: "Disponible une fois le tirage lancé.",
     nameLabel: "Nom",
     namePlaceholder: "Camille Durand",
     groupLabel: "Groupe",
@@ -246,7 +249,7 @@ const fr = {
       "Bonjour {participant} !\n\nLe tirage au sort est fait : tu as tiré {personne_tirée}.\nLe tirage au sort est fait ! Découvre qui tu as tiré ici : {lien}\n\nÉvénement : {événement}\nBudget : {budget}\nÉchange prévu le {date}",
     dataTitle: "Données",
     dataDescription:
-      "Tout est enregistré sur cet appareil uniquement. Pour garder une copie, copiez d'abord un lien de partage (étape 1, bouton « Partager »).",
+      "Tout est enregistré sur cet appareil uniquement. Pour garder une copie, copiez d'abord un lien de partage (bouton « Partager » en haut de la page).",
     clearAll: "Tout effacer",
     autosave: "Les modifications sont enregistrées automatiquement.",
     done: "Terminé",
@@ -378,6 +381,17 @@ const en: Translation = {
     drawStale: "Draw out of date",
   },
 
+  share: {
+    action: "Share",
+    linkAction: "Copy a share link",
+    linkDescription:
+      "The participants, the rules and the settings, without the results: send it to whoever is organising with you.",
+    fullLinkAction: "Copy a full link",
+    fullLinkDescription:
+      "With the results, to move to another device. Anyone who opens it can see who drew whom.",
+    fullLinkUnavailable: "Available once the draw has been run.",
+  },
+
   hero: {
     titleMain: "The paper-slip draw,",
     titleAccent: " online",
@@ -415,14 +429,6 @@ const en: Translation = {
     description: "Add everyone taking part in the draw.",
     importAction: "Import",
     importTitle: "Import a CSV file of participants",
-    shareAction: "Share",
-    shareLinkAction: "Copy a share link",
-    shareLinkDescription:
-      "The participants, the rules and the settings, without the results: send it to whoever is organising with you.",
-    fullLinkAction: "Copy a full link",
-    fullLinkDescription:
-      "With the results, to move to another device. Anyone who opens it can see who drew whom.",
-    fullLinkUnavailable: "Available once the draw has been run.",
     nameLabel: "Name",
     namePlaceholder: "Alex Morgan",
     groupLabel: "Group",
@@ -596,7 +602,7 @@ const en: Translation = {
       "Hi {participant}!\n\nThe draw is done: you drew {drawn_person}.\nThe draw is done! Find out who you drew here: {link}\n\nEvent: {event}\nBudget: {budget}\nExchange on {date}",
     dataTitle: "Data",
     dataDescription:
-      "Everything is saved on this device only. To keep a copy, first copy a share link (step 1, “Share” button).",
+      "Everything is saved on this device only. To keep a copy, first copy a share link (“Share” button at the top of the page).",
     clearAll: "Erase everything",
     autosave: "Changes are saved automatically.",
     done: "Done",

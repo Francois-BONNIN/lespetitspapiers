@@ -1,5 +1,12 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { AlertTriangle, Settings, Ticket, Trophy } from "lucide-react";
+import {
+  AlertTriangle,
+  Link2,
+  Settings,
+  Share2,
+  Smartphone,
+  Ticket,
+} from "lucide-react";
 import {
   Participant,
   Exclusion,
@@ -45,6 +52,7 @@ import { RevealPage } from "./components/RevealPage";
 import { RulesManager } from "./components/RulesManager";
 import { DrawManager } from "./components/DrawManager";
 import { SettingsManager } from "./components/SettingsManager";
+import { ActionMenu } from "./components/ui/ActionMenu";
 import { ThemeToggle } from "./components/ui/ThemeToggle";
 import { LanguageToggle } from "./components/ui/LanguageToggle";
 import { useToast } from "./components/ui/toast-context";
@@ -514,18 +522,32 @@ function App() {
           </div>
 
           <div className="flex items-center gap-2">
-            {draws.length > 0 &&
-              (drawIsStale ? (
-                <span className="chip hidden bg-amber-100 text-amber-800 dark:bg-amber-500/15 dark:text-amber-300 sm:inline-flex">
-                  <AlertTriangle size={13} />
-                  {t.header.drawStale}
-                </span>
-              ) : (
-                <span className="chip hidden bg-emerald-100 text-emerald-700 dark:bg-emerald-500/15 dark:text-emerald-300 sm:inline-flex">
-                  <Trophy size={13} />
-                  {t.header.drawDone}
-                </span>
-              ))}
+            <ActionMenu
+              icon={Share2}
+              label={t.share.action}
+              disabled={participants.length === 0}
+              variant="toolbar"
+              items={[
+                {
+                  id: "share-link",
+                  icon: Link2,
+                  label: t.share.linkAction,
+                  description: t.share.linkDescription,
+                  onSelect: () => copyShareLink(false),
+                },
+                {
+                  id: "full-link",
+                  icon: Smartphone,
+                  label: t.share.fullLinkAction,
+                  description:
+                    draws.length > 0
+                      ? t.share.fullLinkDescription
+                      : t.share.fullLinkUnavailable,
+                  disabled: draws.length === 0,
+                  onSelect: () => copyShareLink(true),
+                },
+              ]}
+            />
             <button
               onClick={openSettings}
               className="btn btn-sm btn-outline rounded-full"
@@ -571,9 +593,6 @@ function App() {
             onAddParticipant={handleAddParticipant}
             onDeleteParticipant={handleDeleteParticipant}
             onImportData={handleImportData}
-            hasDraws={draws.length > 0}
-            onShareLink={() => copyShareLink(false)}
-            onShareFullLink={() => copyShareLink(true)}
           />
 
           <RulesManager

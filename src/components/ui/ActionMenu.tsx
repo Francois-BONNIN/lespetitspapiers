@@ -16,14 +16,32 @@ interface ActionMenuProps {
   label: string;
   items: ActionMenuItem[];
   disabled?: boolean;
+  variant?: "card" | "toolbar";
 }
+
+const VARIANT_CLASSES = {
+  card: {
+    trigger: "btn-outline",
+    label: "",
+    chevron: "",
+    menu: "absolute left-0 top-full mt-2 w-72 origin-top-left sm:left-auto sm:right-0 sm:origin-top-right",
+  },
+  toolbar: {
+    trigger: "btn-secondary rounded-full",
+    label: "hidden sm:inline",
+    chevron: "hidden sm:block",
+    menu: "fixed inset-x-4 top-[4.25rem] origin-top sm:absolute sm:inset-x-auto sm:right-0 sm:top-full sm:mt-2 sm:w-72 sm:origin-top-right",
+  },
+};
 
 export function ActionMenu({
   icon: Icon,
   label,
   items,
   disabled = false,
+  variant = "card",
 }: ActionMenuProps) {
+  const classes = VARIANT_CLASSES[variant];
   const [open, setOpen] = useState(false);
   const menuId = useId();
   const rootRef = useRef<HTMLDivElement>(null);
@@ -80,17 +98,21 @@ export function ActionMenu({
         ref={triggerRef}
         type="button"
         onClick={() => setOpen((current) => !current)}
-        className="btn btn-sm btn-outline"
+        className={`btn btn-sm ${classes.trigger}`}
+        aria-label={variant === "toolbar" ? label : undefined}
+        title={variant === "toolbar" ? label : undefined}
         aria-haspopup="menu"
         aria-expanded={open}
         aria-controls={open ? menuId : undefined}
         disabled={disabled}
       >
         <Icon size={15} />
-        {label}
+        <span className={classes.label}>{label}</span>
         <ChevronDown
           size={14}
-          className={`transition-transform ${open ? "rotate-180" : ""}`}
+          className={`transition-transform ${open ? "rotate-180" : ""} ${
+            classes.chevron
+          }`}
         />
       </button>
 
@@ -100,7 +122,7 @@ export function ActionMenu({
           role="menu"
           aria-label={label}
           onKeyDown={handleMenuKeyDown}
-          className="card absolute left-0 top-full z-20 mt-2 w-72 max-w-[calc(100vw-2rem)] origin-top-left animate-scale-in p-1.5 sm:left-auto sm:right-0 sm:origin-top-right"
+          className={`card z-20 max-w-[calc(100vw-2rem)] animate-scale-in p-1.5 ${classes.menu}`}
         >
           {items.map((item, index) => {
             const ItemIcon = item.icon;

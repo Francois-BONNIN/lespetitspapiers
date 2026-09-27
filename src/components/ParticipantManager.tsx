@@ -1,21 +1,10 @@
 import { useMemo, useRef, useState } from "react";
-import {
-  Info,
-  Link2,
-  Search,
-  Share2,
-  Smartphone,
-  Upload,
-  UserPlus,
-  Users,
-  X,
-} from "lucide-react";
+import { Info, Search, Upload, UserPlus, Users, X } from "lucide-react";
 import { Participant } from "../lib/database";
 import { getGroupColor } from "../lib/familyColors";
 import { buildHomonymHints } from "../lib/homonyms";
 import { useRecentlyAdded } from "../lib/useRecentlyAdded";
 import { SectionCard } from "./ui/SectionCard";
-import { ActionMenu } from "./ui/ActionMenu";
 import { EmptyState } from "./ui/EmptyState";
 import { ParticipantName } from "./ui/ParticipantName";
 import { useI18n } from "./ui/language-context";
@@ -23,12 +12,9 @@ import { useI18n } from "./ui/language-context";
 interface ParticipantManagerProps {
   participants: Participant[];
   excludeSameFamily: boolean;
-  hasDraws: boolean;
   onAddParticipant: (name: string, family: string) => void;
   onDeleteParticipant: (id: string) => void;
   onImportData: (file: File) => void;
-  onShareLink: () => void;
-  onShareFullLink: () => void;
 }
 
 const UNGROUPED = "";
@@ -36,12 +22,9 @@ const UNGROUPED = "";
 export function ParticipantManager({
   participants,
   excludeSameFamily,
-  hasDraws,
   onAddParticipant,
   onDeleteParticipant,
   onImportData,
-  onShareLink,
-  onShareFullLink,
 }: ParticipantManagerProps) {
   const { t } = useI18n();
   const locale = t.meta.locale;
@@ -135,30 +118,6 @@ export function ParticipantManager({
             <Upload size={15} />
             {t.participants.importAction}
           </button>
-          <ActionMenu
-            icon={Share2}
-            label={t.participants.shareAction}
-            disabled={participants.length === 0}
-            items={[
-              {
-                id: "share-link",
-                icon: Link2,
-                label: t.participants.shareLinkAction,
-                description: t.participants.shareLinkDescription,
-                onSelect: onShareLink,
-              },
-              {
-                id: "full-link",
-                icon: Smartphone,
-                label: t.participants.fullLinkAction,
-                description: hasDraws
-                  ? t.participants.fullLinkDescription
-                  : t.participants.fullLinkUnavailable,
-                disabled: !hasDraws,
-                onSelect: onShareFullLink,
-              },
-            ]}
-          />
           <input
             ref={fileInputRef}
             type="file"
