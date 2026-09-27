@@ -190,11 +190,3 @@ export function importParticipantsFromCSV(
     return null;
   }
 }
-
-export function generateMessageForDraw(
-  drawerName: string,
-  drawnName: string,
-  t: Translation,
-): string {
-  return t.csv.message(drawerName, drawnName);
-}

@@ -1,10 +1,14 @@
-import { useEffect, useMemo, useRef, useState } from "react";
-import { AlertTriangle, Ticket, Trophy } from "lucide-react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { AlertTriangle, Settings, Ticket, Trophy } from "lucide-react";
 import {
   Participant,
   Exclusion,
   Inclusion,
   Draw,
+  EventSettings,
+  DEFAULT_EVENT_SETTINGS,
+  getEventSettings,
+  saveEventSettings,
   getParticipants,
   getExclusions,
   getInclusions,
@@ -36,6 +40,7 @@ import {
 import { ParticipantManager } from "./components/ParticipantManager";
 import { RulesManager } from "./components/RulesManager";
 import { DrawManager } from "./components/DrawManager";
+import { SettingsManager } from "./components/SettingsManager";
 import { ThemeToggle } from "./components/ui/ThemeToggle";
 import { LanguageToggle } from "./components/ui/LanguageToggle";
 import { useToast } from "./components/ui/toast-context";
@@ -49,6 +54,10 @@ function App() {
   const [draws, setDraws] = useState<Draw[]>([]);
   const [isDrawing, setIsDrawing] = useState(false);
   const [excludeSameFamily, setExcludeSameFamilyState] = useState(true);
+  const [eventSettings, setEventSettings] = useState<EventSettings>(
+    DEFAULT_EVENT_SETTINGS
+  );
+  const [settingsOpen, setSettingsOpen] = useState(false);
   const [storageAvailable] = useState(isStorageAvailable);
 
   const toast = useToast();
@@ -80,6 +89,15 @@ function App() {
     setInclusions(getInclusions());
     setDraws(getDraws());
     setExcludeSameFamilyState(getExcludeSameFamilySetting());
+    setEventSettings(getEventSettings());
+  };
+
+  const openSettings = useCallback(() => setSettingsOpen(true), []);
+  const closeSettings = useCallback(() => setSettingsOpen(false), []);
+
+  const handleChangeEventSettings = (settings: EventSettings) => {
+    setEventSettings(settings);
+    saveEventSettings(settings);
   };
 
   const drawIsStale = useMemo(
@@ -440,6 +458,15 @@ function App() {
                   {t.header.drawDone}
                 </span>
               ))}
+            <button
+              onClick={openSettings}
+              className="btn btn-sm btn-secondary rounded-full"
+              aria-label={t.settings.open}
+              title={t.settings.open}
+            >
+              <Settings size={15} />
+              <span className="hidden sm:inline">{t.settings.open}</span>
+            </button>
             <LanguageToggle />
             <ThemeToggle />
           </div>
@@ -495,9 +522,11 @@ function App() {
           <DrawManager
             participants={participants}
             draws={draws}
+            eventSettings={eventSettings}
             isStale={drawIsStale}
             onPerformDraw={handlePerformDraw}
             onRedraw={handleRedraw}
+            onCustomizeMessage={openSettings}
             onClearDraws={handleClearDraws}
             isDrawing={isDrawing}
           />
@@ -507,6 +536,13 @@ function App() {
           {t.footer}
         </footer>
       </main>
+
+      <SettingsManager
+        open={settingsOpen}
+        onClose={closeSettings}
+        settings={eventSettings}
+        onChange={handleChangeEventSettings}
+      />
     </div>
   );
 }

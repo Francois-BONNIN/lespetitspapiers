@@ -78,6 +78,8 @@ and the other way round.
 
 ## Also in the box
 
+- ✉️ A **customisable message** in the settings: event name, budget, exchange date
+  and the wording itself, with a live preview.
 - 🇫🇷 🇬🇧 **French and English**, switchable at any time. The starting language
   follows your browser's.
 - 🌙 **Light and dark themes**, matching your system preference by default.

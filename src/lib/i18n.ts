@@ -183,6 +183,56 @@ const fr = {
     note: "Les résultats ne sont enregistrés que sur cet appareil : ouvrir le site ailleurs ne les montrera pas.",
   },
 
+  settings: {
+    open: "Paramètres",
+    title: "Paramètres",
+    description:
+      "Personnalisez le message que chaque participant recevra avec son tirage.",
+    eventTitle: "L'événement",
+    eventHint:
+      "Ces informations s'ajoutent au message. Laissez vide ce qui ne sert pas.",
+    eventNameLabel: "Nom de l'événement",
+    eventNamePlaceholder: "Noël 2026 chez les Durand",
+    budgetLabel: "Budget",
+    budgetPlaceholder: "20 €",
+    dateLabel: "Date de l'échange",
+    messageTitle: "Le message",
+    messageLabel: "Message envoyé à chaque participant",
+    insertLabel: "Insérer :",
+    insertTitle: (label: string) =>
+      `Insérer « ${label} » à l'emplacement du curseur`,
+    tokenLabels: {
+      participant: "Participant",
+      drawn: "Personne tirée",
+      event: "Événement",
+      budget: "Budget",
+      date: "Date",
+    },
+    tokens: {
+      participant: "participant",
+      drawn: "personne_tirée",
+      event: "événement",
+      budget: "budget",
+      date: "date",
+    },
+    messageHint:
+      "Une ligne qui contient une information laissée vide (budget, date…) n'apparaît pas dans le message.",
+    unknownPlaceholders: (placeholders: string[]) =>
+      placeholders.length > 1
+        ? `${placeholders.join(", ")} ne sont pas reconnus : ils apparaîtront tels quels dans le message. Utilisez les boutons « Insérer ».`
+        : `${placeholders[0]} n'est pas reconnu : il apparaîtra tel quel dans le message. Utilisez les boutons « Insérer ».`,
+    resetMessage: "Rétablir le message par défaut",
+    previewTitle: "Aperçu",
+    previewDescription: "Avec des prénoms d'exemple, pas ceux de votre tirage.",
+    previewDrawer: "Camille",
+    previewDrawn: "Sacha",
+    defaultTemplate:
+      "Bonjour {participant} !\n\nLe tirage au sort est fait : tu as tiré {personne_tirée}.\n\nÉvénement : {événement}\nBudget : {budget}\nÉchange prévu le {date}",
+    autosave: "Les modifications sont enregistrées automatiquement.",
+    done: "Terminé",
+    customize: "Personnaliser le message",
+  },
+
   toast: {
     participantAdded: (name: string) => `${name} ajouté`,
     participantDuplicate:
@@ -260,8 +310,6 @@ const fr = {
     drawsFilename: "tirage",
     drawsHeader: "Tireur,Tiré",
     participantsHeader: "Nom,Famille,Exclusions,Inclusions",
-    message: (drawerName: string, drawnName: string) =>
-      `Bonjour ${drawerName} !\n\nLe tirage au sort est fait : tu as tiré ${drawnName}.`,
   },
 };
 
@@ -440,6 +488,55 @@ const en: Translation = {
     note: "Results are only saved on this device: opening the site elsewhere won't show them.",
   },
 
+  settings: {
+    open: "Settings",
+    title: "Settings",
+    description:
+      "Customise the message each participant will receive with their draw.",
+    eventTitle: "The event",
+    eventHint:
+      "These details are added to the message. Leave empty whatever you don't need.",
+    eventNameLabel: "Event name",
+    eventNamePlaceholder: "Christmas 2026 at the Morgans'",
+    budgetLabel: "Budget",
+    budgetPlaceholder: "$20",
+    dateLabel: "Exchange date",
+    messageTitle: "The message",
+    messageLabel: "Message sent to each participant",
+    insertLabel: "Insert:",
+    insertTitle: (label: string) => `Insert “${label}” at the cursor`,
+    tokenLabels: {
+      participant: "Participant",
+      drawn: "Person drawn",
+      event: "Event",
+      budget: "Budget",
+      date: "Date",
+    },
+    tokens: {
+      participant: "participant",
+      drawn: "drawn_person",
+      event: "event",
+      budget: "budget",
+      date: "date",
+    },
+    messageHint:
+      "A line containing a detail left empty (budget, date…) is left out of the message.",
+    unknownPlaceholders: (placeholders: string[]) =>
+      placeholders.length > 1
+        ? `${placeholders.join(", ")} are not recognised and will appear as is in the message. Use the “Insert” buttons.`
+        : `${placeholders[0]} is not recognised and will appear as is in the message. Use the “Insert” buttons.`,
+    resetMessage: "Restore the default message",
+    previewTitle: "Preview",
+    previewDescription: "With example names, not the ones from your draw.",
+    previewDrawer: "Alex",
+    previewDrawn: "Robin",
+    defaultTemplate:
+      "Hi {participant}!\n\nThe draw is done: you drew {drawn_person}.\n\nEvent: {event}\nBudget: {budget}\nExchange on {date}",
+    autosave: "Changes are saved automatically.",
+    done: "Done",
+    customize: "Customise the message",
+  },
+
   toast: {
     participantAdded: (name: string) => `${name} added`,
     participantDuplicate:
@@ -517,8 +614,6 @@ const en: Translation = {
     drawsFilename: "draw",
     drawsHeader: "Drawer,Drawn",
     participantsHeader: "Name,Group,Exclusions,Inclusions",
-    message: (drawerName: string, drawnName: string) =>
-      `Hi ${drawerName}!\n\nThe draw is done: you drew ${drawnName}.`,
   },
 };
 

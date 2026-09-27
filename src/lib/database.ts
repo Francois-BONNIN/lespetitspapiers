@@ -29,12 +29,27 @@ export interface Draw {
   created_at: string;
 }
 
+export interface EventSettings {
+  eventName: string;
+  budget: string;
+  exchangeDate: string;
+  messageTemplate: string | null;
+}
+
+export const DEFAULT_EVENT_SETTINGS: EventSettings = {
+  eventName: "",
+  budget: "",
+  exchangeDate: "",
+  messageTemplate: null,
+};
+
 const STORAGE_KEYS = {
   PARTICIPANTS: "petits_papiers_participants",
   EXCLUSIONS: "petits_papiers_exclusions",
   INCLUSIONS: "petits_papiers_inclusions",
   DRAWS: "petits_papiers_draws",
   EXCLUDE_SAME_FAMILY: "petits_papiers_exclude_same_group",
+  EVENT_SETTINGS: "petits_papiers_event_settings",
 };
 
 const LEGACY_STORAGE_KEYS: Record<string, string> = {
@@ -263,4 +278,33 @@ export function getExcludeSameFamilySetting(): boolean {
 
 export function setExcludeSameFamilySetting(value: boolean): void {
   write(STORAGE_KEYS.EXCLUDE_SAME_FAMILY, value);
+}
+
+export function getEventSettings(): EventSettings {
+  try {
+    const data = readRaw(STORAGE_KEYS.EVENT_SETTINGS);
+    const parsed: unknown = data ? JSON.parse(data) : null;
+    if (typeof parsed !== "object" || parsed === null) {
+      return DEFAULT_EVENT_SETTINGS;
+    }
+
+    const stored = parsed as Record<string, unknown>;
+    const text = (value: unknown) => (typeof value === "string" ? value : "");
+    return {
+      eventName: text(stored.eventName),
+      budget: text(stored.budget),
+      exchangeDate: text(stored.exchangeDate),
+      messageTemplate:
+        typeof stored.messageTemplate === "string"
+          ? stored.messageTemplate
+          : null,
+    };
+  } catch (error) {
+    console.error("Lecture impossible des paramètres de l'événement.", error);
+    return DEFAULT_EVENT_SETTINGS;
+  }
+}
+
+export function saveEventSettings(settings: EventSettings): void {
+  write(STORAGE_KEYS.EVENT_SETTINGS, settings);
 }

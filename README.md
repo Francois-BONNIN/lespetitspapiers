@@ -82,6 +82,8 @@ anglaise, et inversement.
 
 ## Aussi dans la boîte
 
+- ✉️ Un **message personnalisable** dans les paramètres : nom de l'événement,
+  budget, date de l'échange et le texte lui-même, avec un aperçu en direct.
 - 🇫🇷 🇬🇧 **Français et anglais**, avec bascule à tout moment. La langue de
   départ suit celle de votre navigateur.
 - 🌙 **Thème clair et sombre**, calé par défaut sur les préférences de votre

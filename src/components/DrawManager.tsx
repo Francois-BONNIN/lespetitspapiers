@@ -9,16 +9,14 @@ import {
   EyeOff,
   Info,
   MoreHorizontal,
+  PenLine,
   RotateCcw,
   Shuffle,
   Sparkles,
 } from "lucide-react";
-import { Participant, Draw } from "../lib/database";
-import {
-  exportDrawsToCSV,
-  downloadCSV,
-  generateMessageForDraw,
-} from "../lib/csvExport";
+import { Participant, Draw, EventSettings } from "../lib/database";
+import { exportDrawsToCSV, downloadCSV } from "../lib/csvExport";
+import { buildDrawMessage } from "../lib/message";
 import { buildHomonymHints, labelWithHint } from "../lib/homonyms";
 import { SectionCard } from "./ui/SectionCard";
 import { ActionMenu } from "./ui/ActionMenu";
@@ -30,20 +28,24 @@ import { useI18n } from "./ui/language-context";
 interface DrawManagerProps {
   participants: Participant[];
   draws: Draw[];
+  eventSettings: EventSettings;
   isStale: boolean;
   onPerformDraw: () => void;
   onRedraw: () => void;
   onClearDraws: () => void;
+  onCustomizeMessage: () => void;
   isDrawing: boolean;
 }
 
 export function DrawManager({
   participants,
   draws,
+  eventSettings,
   isStale,
   onPerformDraw,
   onRedraw,
   onClearDraws,
+  onCustomizeMessage,
   isDrawing,
 }: DrawManagerProps) {
   const [copiedId, setCopiedId] = useState<string | null>(null);
@@ -107,12 +109,16 @@ export function DrawManager({
     }
   };
 
-  const handleCopyMessage = (draw: Draw) => {
-    const message = generateMessageForDraw(
+  const messageFor = (draw: Draw) =>
+    buildDrawMessage(
       getParticipantLabel(draw.drawer_id),
       getParticipantLabel(draw.drawn_id),
+      eventSettings,
       t
     );
+
+  const handleCopyMessage = (draw: Draw) => {
+    const message = messageFor(draw);
     copyText(message, () => {
       setCopiedId(draw.id);
       window.setTimeout(() => setCopiedId(null), 2000);
@@ -120,15 +126,7 @@ export function DrawManager({
   };
 
   const handleCopyAll = () => {
-    const all = sortedDraws
-      .map((draw) =>
-        generateMessageForDraw(
-          getParticipantLabel(draw.drawer_id),
-          getParticipantLabel(draw.drawn_id),
-          t
-        )
-      )
-      .join("\n\n———\n\n");
+    const all = sortedDraws.map(messageFor).join("\n\n———\n\n");
     copyText(all, () =>
       toast.success(
         t.toast.messagesCopied,
@@ -223,6 +221,15 @@ export function DrawManager({
                 </>
               )}
             </button>
+            <div className="mt-3">
+              <button
+                onClick={onCustomizeMessage}
+                className="btn btn-sm btn-ghost"
+              >
+                <PenLine size={14} />
+                {t.settings.customize}
+              </button>
+            </div>
           </div>
         )
       ) : (
@@ -266,6 +273,13 @@ export function DrawManager({
                 <p className="mt-0.5 text-[13px] leading-relaxed text-emerald-800 dark:text-emerald-200/80">
                   {t.draw.resultInstructions}
                 </p>
+                <button
+                  onClick={onCustomizeMessage}
+                  className="mt-1.5 inline-flex items-center gap-1.5 rounded-md text-[13px] font-semibold text-emerald-800 underline-offset-2 hover:underline dark:text-emerald-200"
+                >
+                  <PenLine size={13} />
+                  {t.settings.customize}
+                </button>
               </div>
             </div>
           )}
