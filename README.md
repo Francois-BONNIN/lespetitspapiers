@@ -71,7 +71,7 @@ Ce qu'il faut savoir en échange :
   téléphone ne vous montrera pas la liste créée sur votre ordinateur. Pour la
   transférer, utilisez un lien de partage (voir plus bas).
 - Vider les données de navigation efface le tirage. Pour le conserver ou le
-  transmettre, utilisez l'export CSV.
+  transmettre, copiez un lien de partage.
 - Pour repartir de zéro, le bouton « Tout effacer » des paramètres supprime
   participants, règles, tirage et paramètres en une fois.
 - En navigation privée, l'enregistrement est parfois bloqué par le navigateur.
@@ -96,12 +96,10 @@ copiez-en un nouveau.
 Une longue liste à saisir ? Importez un fichier CSV : noms, groupes,
 exclusions et tirages imposés sont repris en une fois.
 
-Dans l'autre sens, deux exports sont disponibles : la liste des participants
-avec toutes leurs contraintes (pour rejouer le même tirage l'an prochain), et le
-résultat du tirage lui-même.
+Les en-têtes de colonnes sont reconnus en français comme en anglais (« Nom » ou
+« Name », « Groupe » ou « Group »…).
 
-Un fichier exporté en français se réimporte sans problème depuis l'interface
-anglaise, et inversement.
+Dans l'autre sens, le résultat du tirage peut être téléchargé en CSV.
 
 ## Aussi dans la boîte
 

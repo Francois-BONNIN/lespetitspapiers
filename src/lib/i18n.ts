@@ -67,9 +67,6 @@ const fr = {
     fullLinkDescription:
       "Avec les résultats, pour passer sur un autre appareil. Toute personne qui l'ouvre peut voir qui a tiré qui.",
     fullLinkUnavailable: "Disponible une fois le tirage lancé.",
-    exportAction: "Télécharger en CSV",
-    exportDescription:
-      "Un fichier à garder, à retoucher dans un tableur ou à réimporter l'an prochain.",
     nameLabel: "Nom",
     namePlaceholder: "Camille Durand",
     groupLabel: "Groupe",
@@ -249,7 +246,7 @@ const fr = {
       "Bonjour {participant} !\n\nLe tirage au sort est fait : tu as tiré {personne_tirée}.\nLe tirage au sort est fait ! Découvre qui tu as tiré ici : {lien}\n\nÉvénement : {événement}\nBudget : {budget}\nÉchange prévu le {date}",
     dataTitle: "Données",
     dataDescription:
-      "Tout est enregistré sur cet appareil uniquement. Pour garder une copie, téléchargez d'abord la liste en CSV (étape 1, bouton « Partager »).",
+      "Tout est enregistré sur cet appareil uniquement. Pour garder une copie, copiez d'abord un lien de partage (étape 1, bouton « Partager »).",
     clearAll: "Tout effacer",
     autosave: "Les modifications sont enregistrées automatiquement.",
     done: "Terminé",
@@ -298,7 +295,6 @@ const fr = {
     drawReset: "Tirage réinitialisé",
     drawResetFailed: "Réinitialisation impossible",
     exportStarted: "Export lancé",
-    exportParticipantsDescription: "Le fichier CSV a été téléchargé.",
     exportDrawsDescription: "Le fichier CSV du tirage a été téléchargé.",
     importFailed: "Import impossible",
     importFailedDescription: "Le fichier ne correspond pas au format attendu.",
@@ -358,10 +354,8 @@ const fr = {
   },
 
   csv: {
-    participantsFilename: "participants",
     drawsFilename: "tirage",
     drawsHeader: "Tireur,Tiré",
-    participantsHeader: "Nom,Famille,Exclusions,Inclusions",
   },
 };
 
@@ -429,9 +423,6 @@ const en: Translation = {
     fullLinkDescription:
       "With the results, to move to another device. Anyone who opens it can see who drew whom.",
     fullLinkUnavailable: "Available once the draw has been run.",
-    exportAction: "Download as CSV",
-    exportDescription:
-      "A file to keep, edit in a spreadsheet or re-import next year.",
     nameLabel: "Name",
     namePlaceholder: "Alex Morgan",
     groupLabel: "Group",
@@ -605,7 +596,7 @@ const en: Translation = {
       "Hi {participant}!\n\nThe draw is done: you drew {drawn_person}.\nThe draw is done! Find out who you drew here: {link}\n\nEvent: {event}\nBudget: {budget}\nExchange on {date}",
     dataTitle: "Data",
     dataDescription:
-      "Everything is saved on this device only. To keep a copy, first download the list as CSV (step 1, “Share” button).",
+      "Everything is saved on this device only. To keep a copy, first copy a share link (step 1, “Share” button).",
     clearAll: "Erase everything",
     autosave: "Changes are saved automatically.",
     done: "Done",
@@ -654,7 +645,6 @@ const en: Translation = {
     drawReset: "Draw reset",
     drawResetFailed: "Could not reset",
     exportStarted: "Export started",
-    exportParticipantsDescription: "The CSV file has been downloaded.",
     exportDrawsDescription: "The draw CSV file has been downloaded.",
     importFailed: "Import failed",
     importFailedDescription: "The file does not match the expected format.",
@@ -714,10 +704,8 @@ const en: Translation = {
   },
 
   csv: {
-    participantsFilename: "participants",
     drawsFilename: "draw",
     drawsHeader: "Drawer,Drawn",
-    participantsHeader: "Name,Group,Exclusions,Inclusions",
   },
 };
 

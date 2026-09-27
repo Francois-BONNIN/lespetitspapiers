@@ -1,4 +1,4 @@
-import { Participant, Exclusion, Inclusion, Draw } from "./database";
+import { Participant, Draw } from "./database";
 import type { Translation } from "./i18n";
 import { buildHomonymHints, labelWithHint } from "./homonyms";
 
@@ -21,35 +21,6 @@ export function exportDrawsToCSV(
         draw.drawn_id,
       )}"`,
   );
-
-  return header + rows.join("\n");
-}
-
-export function exportParticipantsToCSV(
-  participants: Participant[],
-  exclusions: Exclusion[],
-  inclusions: Inclusion[],
-  t: Translation,
-): string {
-  const getParticipantName = (id: string) =>
-    participants.find((p) => p.id === id)?.name || "";
-
-  const header = `${t.csv.participantsHeader}\n`;
-  const rows = participants.map((participant) => {
-    const participantExclusions = exclusions
-      .filter((e) => e.participant_id === participant.id)
-      .map((e) => getParticipantName(e.excluded_participant_id))
-      .join(";");
-
-    const participantInclusions = inclusions
-      .filter((i) => i.participant_id === participant.id)
-      .map((i) => getParticipantName(i.included_participant_id))
-      .join(";");
-
-    return `"${participant.name}","${
-      participant.family || ""
-    }","${participantExclusions}","${participantInclusions}"`;
-  });
 
   return header + rows.join("\n");
 }

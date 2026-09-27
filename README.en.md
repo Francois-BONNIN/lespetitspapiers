@@ -67,8 +67,8 @@ What that means in practice:
 - The draw lives **on the device where you made it**. Opening the site on your
   phone will not show you the list you created on your computer. To move it, use a
   share link (see below).
-- Clearing your browsing data erases the draw. To keep it or pass it on, use the
-  CSV export.
+- Clearing your browsing data erases the draw. To keep it or pass it on, copy a
+  share link.
 - To start from scratch, the "Erase everything" button in the settings deletes
   participants, rules, the draw and the settings in one go.
 - In private browsing, saving is sometimes blocked by the browser. If so, a
@@ -90,12 +90,10 @@ one.
 Got a long list to type in? Import a CSV file: names, groups, exclusions
 and forced draws all come across in one go.
 
-Going the other way, two exports are available: the participant list with all of
-their constraints (to replay the same draw next year), and the result of the
-draw itself.
+Column headers are recognised in English as well as French ("Name" or "Nom",
+"Group" or "Groupe"…).
 
-A file exported in French re-imports without trouble from the English interface,
-and the other way round.
+Going the other way, the result of the draw can be downloaded as CSV.
 
 ## Also in the box
 

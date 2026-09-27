@@ -1,6 +1,5 @@
 import { useMemo, useRef, useState } from "react";
 import {
-  Download,
   Info,
   Link2,
   Search,
@@ -27,7 +26,6 @@ interface ParticipantManagerProps {
   hasDraws: boolean;
   onAddParticipant: (name: string, family: string) => void;
   onDeleteParticipant: (id: string) => void;
-  onExportData: () => void;
   onImportData: (file: File) => void;
   onShareLink: () => void;
   onShareFullLink: () => void;
@@ -41,7 +39,6 @@ export function ParticipantManager({
   hasDraws,
   onAddParticipant,
   onDeleteParticipant,
-  onExportData,
   onImportData,
   onShareLink,
   onShareFullLink,
@@ -159,13 +156,6 @@ export function ParticipantManager({
                   : t.participants.fullLinkUnavailable,
                 disabled: !hasDraws,
                 onSelect: onShareFullLink,
-              },
-              {
-                id: "export-csv",
-                icon: Download,
-                label: t.participants.exportAction,
-                description: t.participants.exportDescription,
-                onSelect: onExportData,
               },
             ]}
           />

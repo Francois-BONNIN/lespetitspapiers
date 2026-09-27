@@ -30,11 +30,7 @@ import {
   replaceAllData,
 } from "./lib/database";
 import { DrawRules, isDrawConsistent, performDraw } from "./lib/drawAlgorithm";
-import {
-  exportParticipantsToCSV,
-  downloadCSV,
-  importParticipantsFromCSV,
-} from "./lib/csvExport";
+import { importParticipantsFromCSV } from "./lib/csvExport";
 import {
   buildShareUrl,
   clearLinkFromUrl,
@@ -351,16 +347,6 @@ function App() {
     }
   };
 
-  const handleExportData = () => {
-    downloadCSV(
-      exportParticipantsToCSV(participants, exclusions, inclusions, t),
-      `${t.csv.participantsFilename}-${
-        new Date().toISOString().split("T")[0]
-      }.csv`
-    );
-    toast.success(t.toast.exportStarted, t.toast.exportParticipantsDescription);
-  };
-
   const handleImportData = async (file: File) => {
     try {
       const importResult = importParticipantsFromCSV(await file.text());
@@ -584,7 +570,6 @@ function App() {
             excludeSameFamily={excludeSameFamily}
             onAddParticipant={handleAddParticipant}
             onDeleteParticipant={handleDeleteParticipant}
-            onExportData={handleExportData}
             onImportData={handleImportData}
             hasDraws={draws.length > 0}
             onShareLink={() => copyShareLink(false)}
