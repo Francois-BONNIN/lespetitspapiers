@@ -174,7 +174,7 @@ export function ExclusionManager({
                   </div>
                   <button
                     onClick={() => onDeleteExclusion(exclusion.id)}
-                    className="btn btn-danger-ghost btn-icon shrink-0 transition-opacity sm:opacity-0 sm:focus-visible:opacity-100 sm:group-hover:opacity-100"
+                    className="reveal-on-hover btn btn-danger-ghost btn-icon shrink-0"
                     aria-label={t.exclusions.deleteLabel}
                   >
                     <Trash2 size={15} />

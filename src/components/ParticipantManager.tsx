@@ -291,7 +291,7 @@ export function ParticipantManager({
                       </p>
                       <button
                         onClick={() => onDeleteParticipant(participant.id)}
-                        className="btn btn-danger-ghost btn-icon opacity-0 transition-opacity focus-visible:opacity-100 group-hover:opacity-100"
+                        className="reveal-on-hover btn btn-danger-ghost btn-icon"
                         aria-label={t.participants.deleteLabel(participant.name)}
                         title={t.participants.deleteLabel(participant.name)}
                       >

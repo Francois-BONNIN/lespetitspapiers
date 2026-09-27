@@ -177,6 +177,17 @@
     @apply text-sm text-ink-500 dark:text-ink-400;
   }
 
+  @media (hover: hover) {
+    .reveal-on-hover {
+      @apply opacity-0;
+    }
+
+    .group:hover .reveal-on-hover,
+    .reveal-on-hover:focus-visible {
+      @apply opacity-100;
+    }
+  }
+
   .item-added {
     @apply relative animate-item-in;
   }
