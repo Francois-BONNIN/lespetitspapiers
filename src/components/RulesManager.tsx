@@ -85,7 +85,7 @@ export function RulesManager({
         actions={
           <button
             onClick={() => setOpen(true)}
-            className="btn btn-sm btn-secondary"
+            className="btn btn-sm btn-outline"
             title={t.rules.openLabel}
           >
             <SlidersHorizontal size={15} />

@@ -542,7 +542,7 @@ function App() {
               ))}
             <button
               onClick={openSettings}
-              className="btn btn-sm btn-secondary rounded-full"
+              className="btn btn-sm btn-outline rounded-full"
               aria-label={t.settings.open}
               title={t.settings.open}
             >

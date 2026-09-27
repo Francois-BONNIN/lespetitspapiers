@@ -268,7 +268,7 @@ export function DrawManager({
                 },
               ]}
             />
-            <button onClick={onClearDraws} className="btn btn-sm btn-secondary">
+            <button onClick={onClearDraws} className="btn btn-sm btn-outline">
               <RotateCcw size={15} />
               {t.draw.restart}
             </button>

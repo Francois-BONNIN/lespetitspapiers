@@ -132,7 +132,7 @@ export function ParticipantManager({
         <>
           <button
             onClick={() => fileInputRef.current?.click()}
-            className="btn btn-sm btn-secondary"
+            className="btn btn-sm btn-outline"
             title={t.participants.importTitle}
           >
             <Upload size={15} />

@@ -80,7 +80,7 @@ export function ActionMenu({
         ref={triggerRef}
         type="button"
         onClick={() => setOpen((current) => !current)}
-        className="btn btn-sm btn-secondary"
+        className="btn btn-sm btn-outline"
         aria-haspopup="menu"
         aria-expanded={open}
         aria-controls={open ? menuId : undefined}

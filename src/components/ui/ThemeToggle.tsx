@@ -23,7 +23,7 @@ export function ThemeToggle() {
   return (
     <button
       onClick={() => setIsDark((v) => !v)}
-      className="btn btn-secondary btn-icon rounded-full"
+      className="btn btn-outline btn-icon rounded-full"
       aria-label={isDark ? t.common.themeToLight : t.common.themeToDark}
       title={isDark ? t.common.themeLight : t.common.themeDark}
     >
