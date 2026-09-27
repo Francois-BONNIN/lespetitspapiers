@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { ArrowRight, Ban, Plus, Trash2, Users } from "lucide-react";
+import { Ban, Plus, Trash2, Users } from "lucide-react";
 import { Participant, Exclusion } from "../lib/database";
 import { useRecentlyAdded } from "../lib/useRecentlyAdded";
 import { buildHomonymHints, labelWithHint } from "../lib/homonyms";
@@ -82,43 +82,52 @@ export function ExclusionManager({
       ) : (
         <>
           <form onSubmit={handleSubmit} className="card-inset mb-4 p-4">
-            <div className="grid items-center gap-2 sm:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)]">
-              <select
-                value={participantId}
-                onChange={(e) => setParticipantId(e.target.value)}
-                className="field w-full min-w-0"
-                aria-label={t.exclusions.drawerLabel}
-                required
-              >
-                <option value="">{t.common.select}</option>
-                {participants.map((p) => (
-                  <option key={p.id} value={p.id}>
-                    {getOptionLabel(p)}
-                  </option>
-                ))}
-              </select>
-
-              <span className="text-center text-xs font-semibold uppercase tracking-wider text-ink-500 dark:text-ink-400">
-                {t.exclusions.connector}
-              </span>
-
-              <select
-                value={excludedId}
-                onChange={(e) => setExcludedId(e.target.value)}
-                className="field w-full min-w-0"
-                aria-label={t.exclusions.excludedLabel}
-                required
-              >
-                <option value="">{t.common.select}</option>
-                {participants
-                  .filter((p) => p.id !== participantId)
-                  .map((p) => (
+            <div className="grid gap-2 sm:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] sm:items-end">
+              <div className="min-w-0">
+                <label className="label" htmlFor="exclusion-drawer">
+                  {t.rules.drawerLabel}
+                </label>
+                <select
+                  id="exclusion-drawer"
+                  value={participantId}
+                  onChange={(e) => setParticipantId(e.target.value)}
+                  className="field w-full min-w-0"
+                  required
+                >
+                  <option value="">{t.common.select}</option>
+                  {participants.map((p) => (
                     <option key={p.id} value={p.id}>
                       {getOptionLabel(p)}
                     </option>
                   ))}
-              </select>
+                </select>
+              </div>
 
+              <span className="text-center text-sm font-medium text-ink-500 dark:text-ink-400 sm:flex sm:h-11 sm:items-center">
+                {t.exclusions.connector}
+              </span>
+
+              <div className="min-w-0">
+                <label className="label" htmlFor="exclusion-drawn">
+                  {t.rules.drawnLabel}
+                </label>
+                <select
+                  id="exclusion-drawn"
+                  value={excludedId}
+                  onChange={(e) => setExcludedId(e.target.value)}
+                  className="field w-full min-w-0"
+                  required
+                >
+                  <option value="">{t.common.select}</option>
+                  {participants
+                    .filter((p) => p.id !== participantId)
+                    .map((p) => (
+                      <option key={p.id} value={p.id}>
+                        {getOptionLabel(p)}
+                      </option>
+                    ))}
+                </select>
+              </div>
             </div>
             <div className="mt-3 flex justify-end">
               <button
@@ -148,17 +157,20 @@ export function ExclusionManager({
                     recentlyAdded.has(exclusion.id) ? "item-added" : ""
                   }`}
                 >
-                  <div className="flex min-w-0 flex-1 items-center gap-2.5 text-sm">
-                    <span className="truncate font-semibold text-ink-900 dark:text-white">
-                      {getParticipantName(exclusion.participant_id)}
-                    </span>
-                    <span className="flex shrink-0 items-center gap-1 text-rose-600 dark:text-rose-400">
-                      <ArrowRight size={14} />
-                      <Ban size={14} />
-                    </span>
-                    <span className="truncate font-semibold text-ink-900 dark:text-white">
-                      {getParticipantName(exclusion.excluded_participant_id)}
-                    </span>
+                  <div className="flex min-w-0 flex-1 items-start gap-2.5">
+                    <Ban
+                      size={15}
+                      className="mt-0.5 shrink-0 text-rose-600 dark:text-rose-400"
+                    />
+                    <p className="min-w-0 break-words text-sm text-ink-600 dark:text-ink-300">
+                      <span className="font-semibold text-ink-900 dark:text-white">
+                        {getParticipantName(exclusion.participant_id)}
+                      </span>{" "}
+                      {t.exclusions.connector}{" "}
+                      <span className="font-semibold text-ink-900 dark:text-white">
+                        {getParticipantName(exclusion.excluded_participant_id)}
+                      </span>
+                    </p>
                   </div>
                   <button
                     onClick={() => onDeleteExclusion(exclusion.id)}

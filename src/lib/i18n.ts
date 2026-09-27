@@ -87,7 +87,7 @@ const fr = {
     stepTitle: "Des règles à respecter ?",
     optional: "Facultatif",
     description:
-      "Affinez le tirage : qui ne peut pas tirer qui, et qui ne peut être tiré que par certains.",
+      "Empêchez certaines personnes de se tirer, ou imposez qui tire qui.",
     configure: "Configurer",
     openLabel: "Configurer les règles du tirage",
     done: "Terminé",
@@ -96,22 +96,22 @@ const fr = {
     summaryExclusions: (count: number) =>
       `${count} exclusion${count > 1 ? "s" : ""}`,
     summaryInclusions: (count: number) =>
-      `${count} tirage${count > 1 ? "s" : ""} limité${count > 1 ? "s" : ""}`,
+      `${count} tirage${count > 1 ? "s" : ""} imposé${count > 1 ? "s" : ""}`,
+    drawerLabel: "Qui tire",
+    drawnLabel: "Qui est tiré",
   },
 
   exclusions: {
     title: "Exclusions",
     description:
-      "Définissez qui ne peut pas tirer qui, par exemple deux personnes qui se connaissent trop bien.",
+      "Empêchez une personne d'en tirer une autre, par exemple deux personnes qui se connaissent trop bien. La règle ne joue que dans un sens.",
     sameGroupLabel: "Exclure automatiquement les membres d'un même groupe",
     sameGroupDescription:
       "Les participants partageant le même groupe ne pourront pas se tirer entre eux.",
     notEnoughTitle: "Pas encore assez de participants",
     notEnoughDescription:
       "Ajoutez au moins deux personnes pour pouvoir définir des exclusions.",
-    drawerLabel: "Personne qui tire",
-    excludedLabel: "Personne exclue du tirage",
-    connector: "ne peut pas tirer",
+    connector: "ne tirera pas",
     emptyTitle: "Aucune exclusion définie",
     emptyDescription:
       "Le tirage reste entièrement libre entre tous les participants.",
@@ -119,20 +119,18 @@ const fr = {
   },
 
   inclusions: {
-    title: "Tirages limités",
+    title: "Tirages imposés",
     description:
-      "Restreignez le tirage d'une personne à une liste fermée de tireurs possibles.",
+      "Imposez qui tire qui : personne d'autre ne pourra tirer la personne choisie. Avec plusieurs tireurs pour la même personne, le hasard choisit entre eux.",
     notEnoughTitle: "Pas encore assez de participants",
     notEnoughDescription:
-      "Ajoutez au moins deux personnes pour pouvoir définir des restrictions.",
-    drawnLabel: "Personne tirée",
-    drawerLabel: "Tireur autorisé",
-    connector: "peut être tiré par",
-    emptyTitle: "Aucune restriction définie",
-    emptyDescription:
-      "Chaque participant peut être tiré par n'importe qui d'autre.",
-    deleteLabel: "Supprimer cette restriction",
-    note: "Dès qu'une personne a au moins une restriction, elle ne peut plus être tirée que par les tireurs listés ici. Toutes les autres sont automatiquement écartées.",
+      "Ajoutez au moins deux personnes pour pouvoir imposer un tirage.",
+    connector: "tirera",
+    or: "ou",
+    emptyTitle: "Aucun tirage imposé",
+    emptyDescription: "Le hasard décide pour tout le monde.",
+    deleteLabel: (drawer: string, drawn: string) =>
+      `Supprimer « ${drawer} tirera ${drawn} »`,
   },
 
   draw: {
@@ -180,13 +178,13 @@ const fr = {
     exclusionAdded: "Exclusion ajoutée",
     exclusionAddFailedDescription: "L'exclusion n'a pas pu être créée.",
     exclusionDeleted: "Exclusion supprimée",
-    inclusionExists: "Restriction déjà définie",
-    inclusionAdded: "Restriction ajoutée",
-    inclusionAddFailedDescription: "La restriction n'a pas pu être créée.",
-    inclusionDeleted: "Restriction supprimée",
+    inclusionExists: "Tirage imposé déjà défini",
+    inclusionAdded: "Tirage imposé ajouté",
+    inclusionAddFailedDescription: "Le tirage imposé n'a pas pu être créé.",
+    inclusionDeleted: "Tirage imposé supprimé",
     drawFailed: "Tirage impossible",
     drawFailedDescription:
-      "Aucune combinaison ne respecte toutes les règles. Réduisez les exclusions ou assouplissez les tirages limités.",
+      "Aucune combinaison ne respecte toutes les règles. Retirez une exclusion ou un tirage imposé.",
     drawDone: "Tirage effectué",
     drawDoneDescription: (count: number) => `${count} attribution(s) générée(s).`,
     drawSaveFailed: "Enregistrement impossible",
@@ -329,7 +327,7 @@ const en: Translation = {
     stepTitle: "Any rules to follow?",
     optional: "Optional",
     description:
-      "Fine-tune the draw: who cannot draw whom, and who can only be drawn by certain people.",
+      "Stop some people from drawing each other, or decide who draws whom.",
     configure: "Configure",
     openLabel: "Configure the draw rules",
     done: "Done",
@@ -338,21 +336,21 @@ const en: Translation = {
     summaryExclusions: (count: number) =>
       `${count} exclusion${count > 1 ? "s" : ""}`,
     summaryInclusions: (count: number) =>
-      `${count} restricted draw${count > 1 ? "s" : ""}`,
+      `${count} forced draw${count > 1 ? "s" : ""}`,
+    drawerLabel: "Who draws",
+    drawnLabel: "Who is drawn",
   },
 
   exclusions: {
     title: "Exclusions",
     description:
-      "Define who cannot draw whom, for example two people who know each other far too well.",
+      "Stop one person from drawing another, for example two people who know each other far too well. The rule only works one way.",
     sameGroupLabel: "Automatically exclude members of the same group",
     sameGroupDescription:
       "Participants who share a group will not be able to draw each other.",
     notEnoughTitle: "Not enough participants yet",
     notEnoughDescription: "Add at least two people before defining exclusions.",
-    drawerLabel: "Person drawing",
-    excludedLabel: "Person excluded from the draw",
-    connector: "cannot draw",
+    connector: "won't draw",
     emptyTitle: "No exclusions defined",
     emptyDescription:
       "The draw stays completely open between all participants.",
@@ -360,19 +358,17 @@ const en: Translation = {
   },
 
   inclusions: {
-    title: "Restricted draws",
+    title: "Forced draws",
     description:
-      "Restrict who is allowed to draw a given person to a closed list.",
+      "Decide who draws whom: nobody else will be able to draw the chosen person. With several drawers for the same person, chance picks between them.",
     notEnoughTitle: "Not enough participants yet",
-    notEnoughDescription:
-      "Add at least two people before defining restrictions.",
-    drawnLabel: "Person being drawn",
-    drawerLabel: "Allowed drawer",
-    connector: "can be drawn by",
-    emptyTitle: "No restrictions defined",
-    emptyDescription: "Every participant can be drawn by anyone else.",
-    deleteLabel: "Delete this restriction",
-    note: "As soon as someone has at least one restriction, they can only be drawn by the people listed here. Everyone else is automatically ruled out.",
+    notEnoughDescription: "Add at least two people before forcing a draw.",
+    connector: "will draw",
+    or: "or",
+    emptyTitle: "No forced draws",
+    emptyDescription: "Chance decides for everyone.",
+    deleteLabel: (drawer: string, drawn: string) =>
+      `Delete “${drawer} will draw ${drawn}”`,
   },
 
   draw: {
@@ -418,13 +414,13 @@ const en: Translation = {
     exclusionAdded: "Exclusion added",
     exclusionAddFailedDescription: "The exclusion could not be created.",
     exclusionDeleted: "Exclusion deleted",
-    inclusionExists: "Restriction already defined",
-    inclusionAdded: "Restriction added",
-    inclusionAddFailedDescription: "The restriction could not be created.",
-    inclusionDeleted: "Restriction deleted",
+    inclusionExists: "Forced draw already defined",
+    inclusionAdded: "Forced draw added",
+    inclusionAddFailedDescription: "The forced draw could not be created.",
+    inclusionDeleted: "Forced draw deleted",
     drawFailed: "Draw impossible",
     drawFailedDescription:
-      "No combination satisfies every rule. Remove some exclusions or loosen the restricted draws.",
+      "No combination satisfies every rule. Remove an exclusion or a forced draw.",
     drawDone: "Draw complete",
     drawDoneDescription: (count: number) => `${count} assignment(s) generated.`,
     drawSaveFailed: "Could not save",

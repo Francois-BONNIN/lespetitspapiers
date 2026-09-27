@@ -18,20 +18,23 @@ a present, and that it would be better to avoid it. So you start over again.
 
 Les Petits Papiers does exactly the same thing, except the hat knows the rules.
 
-## In four steps
+## In three steps
 
 **1. Add the participants.** A first name is enough. The group ("Morgan
-family", "Team A"…) is optional.
+family", "Team A"…) is optional: its members won't draw each other, unless you
+turn that rule off.
 
-**2. Set your exclusions.** _Alex cannot draw Sam._ As many rules as you need.
-One checkbox covers the most common case in a single click: stop members of the
-same group from drawing each other.
+**2. Set your rules, if you need them.** Two kinds of rules, to combine as you
+like:
 
-**3. Add restricted draws, if you need them.** The opposite of an exclusion:
-_Robin can only be drawn by Alex or Jamie._ Handy when a gift is going in
-together, or when a child should land on an adult.
+- **exclusions**: _Alex won't draw Sam._ As many rules as you need. One
+  checkbox covers the most common case in a single click: stop members of the
+  same group from drawing each other.
+- **forced draws**: _Alex or Jamie will draw Robin._ Nobody else can draw
+  Robin. Handy when a gift is going in together, or when a child should land on
+  an adult.
 
-**4. Run the draw.** The assignment satisfies every rule at once. If your
+**3. Run the draw.** The assignment satisfies every rule at once. If your
 constraints make a valid draw impossible, the app tells you so instead of
 handing you a half-broken result.
 
@@ -64,7 +67,7 @@ What that means in practice:
 ## Import and export
 
 Got a long list to type in? Import a CSV file: names, groups, exclusions
-and restricted draws all come across in one go.
+and forced draws all come across in one go.
 
 Going the other way, two exports are available: the participant list with all of
 their constraints (to replay the same draw next year), and the result of the

@@ -19,20 +19,22 @@ s'offrent déjà un cadeau, et qu'il vaudrait mieux éviter. On recommence encor
 Les Petits Papiers fait exactement la même chose, mais le chapeau connaît les
 règles.
 
-## En quatre étapes
+## En trois étapes
 
 **1. Ajoutez les participants.** Un prénom suffit. Le groupe (« Famille
-Durand », « Équipe A »…) est facultatif.
+Durand », « Équipe A »…) est facultatif : ses membres ne se tireront pas entre
+eux, sauf si vous désactivez cette règle.
 
-**2. Posez vos exclusions.** _Camille ne peut pas tirer Léa._ Autant de règles
-que nécessaire. Une option coche d'un coup le cas le plus courant : empêcher les
-membres d'un même groupe de se tirer entre eux.
+**2. Posez vos règles, si besoin.** Deux sortes de règles, à combiner à volonté :
 
-**3. Ajoutez des tirages limités, si besoin.** L'inverse de l'exclusion :
-_Sacha ne peut être tiré que par Camille ou Tom._ Pratique quand un cadeau est
-prévu à plusieurs, ou quand un enfant doit tomber sur un adulte.
+- les **exclusions** : _Camille ne tirera pas Léa._ Autant de règles que
+  nécessaire. Une option coche d'un coup le cas le plus courant : empêcher les
+  membres d'un même groupe de se tirer entre eux.
+- les **tirages imposés** : _Camille ou Tom tirera Sacha._ Personne d'autre ne
+  pourra tirer Sacha. Pratique quand un cadeau est prévu à plusieurs, ou quand un
+  enfant doit tomber sur un adulte.
 
-**4. Lancez le tirage.** L'attribution respecte toutes les règles d'un coup. Si
+**3. Lancez le tirage.** L'attribution respecte toutes les règles d'un coup. Si
 vos contraintes rendent le tirage impossible, l'application vous le dit au lieu
 de vous donner un résultat bancal.
 
@@ -69,7 +71,7 @@ Ce qu'il faut savoir en échange :
 ## Import et export
 
 Une longue liste à saisir ? Importez un fichier CSV : noms, groupes,
-exclusions et tirages limités sont repris en une fois.
+exclusions et tirages imposés sont repris en une fois.
 
 Dans l'autre sens, deux exports sont disponibles : la liste des participants
 avec toutes leurs contraintes (pour rejouer le même tirage l'an prochain), et le

@@ -38,8 +38,10 @@ export function RulesManager({
 
   const hasGroups = participants.some((p) => p.family?.trim());
   const sameGroupApplies = excludeSameFamily && hasGroups;
+  const forcedDrawCount = new Set(inclusions.map((i) => i.participant_id))
+    .size;
   const hasRule =
-    sameGroupApplies || exclusions.length > 0 || inclusions.length > 0;
+    sameGroupApplies || exclusions.length > 0 || forcedDrawCount > 0;
 
   const tabs: { id: Tab; label: string; icon: typeof Ban; count: number }[] = [
     {
@@ -52,7 +54,7 @@ export function RulesManager({
       id: "inclusions",
       label: t.inclusions.title,
       icon: Target,
-      count: inclusions.length,
+      count: forcedDrawCount,
     },
   ];
 
@@ -92,10 +94,10 @@ export function RulesManager({
                 {t.rules.summaryExclusions(exclusions.length)}
               </span>
             )}
-            {inclusions.length > 0 && (
+            {forcedDrawCount > 0 && (
               <span className="chip bg-emerald-100 text-emerald-700 dark:bg-emerald-500/15 dark:text-emerald-300">
                 <Target size={12} />
-                {t.rules.summaryInclusions(inclusions.length)}
+                {t.rules.summaryInclusions(forcedDrawCount)}
               </span>
             )}
           </div>
