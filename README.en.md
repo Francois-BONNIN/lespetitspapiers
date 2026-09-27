@@ -29,7 +29,8 @@ like:
 
 - **exclusions**: _Alex won't draw Sam._ As many rules as you need. One
   checkbox covers the most common case in a single click: stop members of the
-  same group from drawing each other.
+  same group from drawing each other. Another avoids reciprocal draws: if Alex
+  draws Sam, Sam won't draw Alex.
 - **forced draws**: _Alex or Jamie will draw Robin._ Nobody else can draw
   Robin. Handy when a gift is going in together, or when a child should land on
   an adult.

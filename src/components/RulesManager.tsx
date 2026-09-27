@@ -1,5 +1,11 @@
 import { useState } from "react";
-import { Ban, SlidersHorizontal, Target, Users } from "lucide-react";
+import {
+  ArrowLeftRight,
+  Ban,
+  SlidersHorizontal,
+  Target,
+  Users,
+} from "lucide-react";
 import { Participant, Exclusion, Inclusion } from "../lib/database";
 import { ExclusionManager } from "./ExclusionManager";
 import { InclusionManager } from "./InclusionManager";
@@ -17,6 +23,8 @@ interface RulesManagerProps {
   onDeleteInclusion: (id: string) => void;
   excludeSameFamily: boolean;
   onToggleExcludeSameFamily: () => void;
+  avoidReciprocal: boolean;
+  onToggleAvoidReciprocal: () => void;
 }
 
 type Tab = "exclusions" | "inclusions";
@@ -31,6 +39,8 @@ export function RulesManager({
   onDeleteInclusion,
   excludeSameFamily,
   onToggleExcludeSameFamily,
+  avoidReciprocal,
+  onToggleAvoidReciprocal,
 }: RulesManagerProps) {
   const { t } = useI18n();
   const [open, setOpen] = useState(false);
@@ -41,7 +51,10 @@ export function RulesManager({
   const forcedDrawCount = new Set(inclusions.map((i) => i.participant_id))
     .size;
   const hasRule =
-    sameGroupApplies || exclusions.length > 0 || forcedDrawCount > 0;
+    sameGroupApplies ||
+    avoidReciprocal ||
+    exclusions.length > 0 ||
+    forcedDrawCount > 0;
 
   const tabs: { id: Tab; label: string; icon: typeof Ban; count: number }[] = [
     {
@@ -86,6 +99,12 @@ export function RulesManager({
               <span className="chip bg-ink-100 text-ink-600 dark:bg-white/[0.08] dark:text-ink-300">
                 <Users size={12} />
                 {t.rules.summarySameGroup}
+              </span>
+            )}
+            {avoidReciprocal && (
+              <span className="chip bg-ink-100 text-ink-600 dark:bg-white/[0.08] dark:text-ink-300">
+                <ArrowLeftRight size={12} />
+                {t.rules.summaryNoReciprocal}
               </span>
             )}
             {exclusions.length > 0 && (
@@ -172,6 +191,8 @@ export function RulesManager({
               onDeleteExclusion={onDeleteExclusion}
               excludeSameFamily={excludeSameFamily}
               onToggleExcludeSameFamily={onToggleExcludeSameFamily}
+              avoidReciprocal={avoidReciprocal}
+              onToggleAvoidReciprocal={onToggleAvoidReciprocal}
             />
           ) : (
             <InclusionManager

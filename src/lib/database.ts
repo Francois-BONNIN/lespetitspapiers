@@ -49,6 +49,7 @@ const STORAGE_KEYS = {
   INCLUSIONS: "petits_papiers_inclusions",
   DRAWS: "petits_papiers_draws",
   EXCLUDE_SAME_FAMILY: "petits_papiers_exclude_same_group",
+  AVOID_RECIPROCAL: "petits_papiers_avoid_reciprocal",
   EVENT_SETTINGS: "petits_papiers_event_settings",
 };
 
@@ -278,6 +279,19 @@ export function getExcludeSameFamilySetting(): boolean {
 
 export function setExcludeSameFamilySetting(value: boolean): void {
   write(STORAGE_KEYS.EXCLUDE_SAME_FAMILY, value);
+}
+
+export function getAvoidReciprocalSetting(): boolean {
+  try {
+    return JSON.parse(readRaw(STORAGE_KEYS.AVOID_RECIPROCAL) ?? "false") === true;
+  } catch (error) {
+    console.error("Lecture impossible du réglage des tirages réciproques.", error);
+    return false;
+  }
+}
+
+export function setAvoidReciprocalSetting(value: boolean): void {
+  write(STORAGE_KEYS.AVOID_RECIPROCAL, value);
 }
 
 export function getEventSettings(): EventSettings {

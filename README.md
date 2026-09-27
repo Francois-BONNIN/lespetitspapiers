@@ -29,7 +29,8 @@ eux, sauf si vous désactivez cette règle.
 
 - les **exclusions** : _Camille ne tirera pas Léa._ Autant de règles que
   nécessaire. Une option coche d'un coup le cas le plus courant : empêcher les
-  membres d'un même groupe de se tirer entre eux.
+  membres d'un même groupe de se tirer entre eux. Une autre évite les tirages
+  réciproques : si Camille tire Léa, Léa ne tirera pas Camille.
 - les **tirages imposés** : _Camille ou Tom tirera Sacha._ Personne d'autre ne
   pourra tirer Sacha. Pratique quand un cadeau est prévu à plusieurs, ou quand un
   enfant doit tomber sur un adulte.

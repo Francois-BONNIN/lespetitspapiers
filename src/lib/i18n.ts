@@ -97,6 +97,7 @@ const fr = {
     done: "Terminé",
     none: "Aucune règle : tout le monde peut tirer tout le monde.",
     summarySameGroup: "Même groupe exclu",
+    summaryNoReciprocal: "Pas de tirage réciproque",
     summaryExclusions: (count: number) =>
       `${count} exclusion${count > 1 ? "s" : ""}`,
     summaryInclusions: (count: number) =>
@@ -112,6 +113,9 @@ const fr = {
     sameGroupLabel: "Exclure automatiquement les membres d'un même groupe",
     sameGroupDescription:
       "Les participants partageant le même groupe ne pourront pas se tirer entre eux.",
+    reciprocalLabel: "Éviter les tirages réciproques",
+    reciprocalDescription:
+      "Si Alex tire Sam, Sam ne pourra pas tirer Alex. Il faut au moins trois participants.",
     notEnoughTitle: "Pas encore assez de participants",
     notEnoughDescription:
       "Ajoutez au moins deux personnes pour pouvoir définir des exclusions.",
@@ -251,7 +255,7 @@ const fr = {
     inclusionDeleted: "Tirage imposé supprimé",
     drawFailed: "Tirage impossible",
     drawFailedDescription:
-      "Aucune combinaison ne respecte toutes les règles. Retirez une exclusion ou un tirage imposé.",
+      "Aucune combinaison ne respecte toutes les règles. Retirez une exclusion ou un tirage imposé, ou désactivez une option.",
     drawDone: "Tirage effectué",
     drawDoneDescription: (count: number) => `${count} attribution(s) générée(s).`,
     drawSaveFailed: "Enregistrement impossible",
@@ -406,6 +410,7 @@ const en: Translation = {
     done: "Done",
     none: "No rules: anyone can draw anyone.",
     summarySameGroup: "Same group excluded",
+    summaryNoReciprocal: "No reciprocal draws",
     summaryExclusions: (count: number) =>
       `${count} exclusion${count > 1 ? "s" : ""}`,
     summaryInclusions: (count: number) =>
@@ -421,6 +426,9 @@ const en: Translation = {
     sameGroupLabel: "Automatically exclude members of the same group",
     sameGroupDescription:
       "Participants who share a group will not be able to draw each other.",
+    reciprocalLabel: "Avoid reciprocal draws",
+    reciprocalDescription:
+      "If Alex draws Sam, Sam won't be able to draw Alex. Needs at least three participants.",
     notEnoughTitle: "Not enough participants yet",
     notEnoughDescription: "Add at least two people before defining exclusions.",
     connector: "won't draw",
@@ -555,7 +563,7 @@ const en: Translation = {
     inclusionDeleted: "Forced draw deleted",
     drawFailed: "Draw impossible",
     drawFailedDescription:
-      "No combination satisfies every rule. Remove an exclusion or a forced draw.",
+      "No combination satisfies every rule. Remove an exclusion or a forced draw, or turn off an option.",
     drawDone: "Draw complete",
     drawDoneDescription: (count: number) => `${count} assignment(s) generated.`,
     drawSaveFailed: "Could not save",

@@ -5,6 +5,13 @@ export interface DrawResult {
   drawn_id: string;
 }
 
+export interface DrawRules {
+  exclusions: Exclusion[];
+  inclusions: Inclusion[];
+  excludeSameFamily: boolean;
+  avoidReciprocal: boolean;
+}
+
 function shuffleArray<T>(array: T[]): T[] {
   const shuffled = [...array];
   for (let i = shuffled.length - 1; i > 0; i--) {
@@ -14,34 +21,19 @@ function shuffleArray<T>(array: T[]): T[] {
   return shuffled;
 }
 
-function canDraw(
-  drawer: Participant,
-  candidate: Participant,
-  exclusions: Exclusion[],
-  inclusions: Inclusion[],
-  alreadyDrawn: Set<string>,
-  excludeSameFamily: boolean
-): boolean {
-  if (alreadyDrawn.has(candidate.id)) return false;
-  return respectsRules(
-    drawer,
-    candidate,
-    exclusions,
-    inclusions,
-    excludeSameFamily
-  );
-}
-
 function respectsRules(
   drawer: Participant,
   candidate: Participant,
-  exclusions: Exclusion[],
-  inclusions: Inclusion[],
-  excludeSameFamily: boolean
+  rules: DrawRules,
+  drawnByDrawer: Map<string, string>
 ): boolean {
   if (drawer.id === candidate.id) return false;
 
-  const candidateInclusions = inclusions.filter(
+  if (rules.avoidReciprocal && drawnByDrawer.get(candidate.id) === drawer.id) {
+    return false;
+  }
+
+  const candidateInclusions = rules.inclusions.filter(
     (inc) => inc.participant_id === candidate.id
   );
 
@@ -53,7 +45,7 @@ function respectsRules(
   }
 
   if (
-    excludeSameFamily &&
+    rules.excludeSameFamily &&
     drawer.family &&
     candidate.family &&
     drawer.family === candidate.family
@@ -61,7 +53,7 @@ function respectsRules(
     return false;
   }
 
-  const hasExclusion = exclusions.some(
+  const hasExclusion = rules.exclusions.some(
     (exc) =>
       exc.participant_id === drawer.id &&
       exc.excluded_participant_id === candidate.id
@@ -72,9 +64,7 @@ function respectsRules(
 
 export function performDraw(
   participants: Participant[],
-  exclusions: Exclusion[],
-  inclusions: Inclusion[],
-  excludeSameFamily: boolean = false
+  rules: DrawRules
 ): DrawResult[] | null {
   if (participants.length < 2) {
     return null;
@@ -85,20 +75,16 @@ export function performDraw(
   for (let attempt = 0; attempt < maxAttempts; attempt++) {
     const results: DrawResult[] = [];
     const alreadyDrawn = new Set<string>();
+    const drawnByDrawer = new Map<string, string>();
     const shuffledParticipants = shuffleArray(participants);
     let failed = false;
 
     for (const drawer of shuffledParticipants) {
       const candidates = shuffleArray(
-        participants.filter((p) =>
-          canDraw(
-            drawer,
-            p,
-            exclusions,
-            inclusions,
-            alreadyDrawn,
-            excludeSameFamily
-          )
+        participants.filter(
+          (p) =>
+            !alreadyDrawn.has(p.id) &&
+            respectsRules(drawer, p, rules, drawnByDrawer)
         )
       );
 
@@ -113,6 +99,7 @@ export function performDraw(
         drawn_id: drawn.id,
       });
       alreadyDrawn.add(drawn.id);
+      drawnByDrawer.set(drawer.id, drawn.id);
     }
 
     if (!failed && results.length === participants.length) {
@@ -126,30 +113,24 @@ export function performDraw(
 export function isDrawConsistent(
   draws: DrawResult[],
   participants: Participant[],
-  exclusions: Exclusion[],
-  inclusions: Inclusion[],
-  excludeSameFamily: boolean
+  rules: DrawRules
 ): boolean {
   if (draws.length !== participants.length) return false;
 
   const participantsById = new Map(participants.map((p) => [p.id, p]));
-  const drawers = new Set<string>();
-  const drawn = new Set<string>();
+  const drawnByDrawer = new Map(draws.map((d) => [d.drawer_id, d.drawn_id]));
+  const drawn = new Set(draws.map((d) => d.drawn_id));
+  if (drawnByDrawer.size !== draws.length || drawn.size !== draws.length) {
+    return false;
+  }
 
   return draws.every(({ drawer_id, drawn_id }) => {
     const drawer = participantsById.get(drawer_id);
     const candidate = participantsById.get(drawn_id);
-    if (!drawer || !candidate || drawers.has(drawer_id) || drawn.has(drawn_id)) {
-      return false;
-    }
-    drawers.add(drawer_id);
-    drawn.add(drawn_id);
-    return respectsRules(
-      drawer,
-      candidate,
-      exclusions,
-      inclusions,
-      excludeSameFamily
+    return Boolean(
+      drawer &&
+        candidate &&
+        respectsRules(drawer, candidate, rules, drawnByDrawer)
     );
   });
 }

@@ -15,6 +15,8 @@ import {
   getDraws,
   getExcludeSameFamilySetting,
   setExcludeSameFamilySetting,
+  getAvoidReciprocalSetting,
+  setAvoidReciprocalSetting,
   addParticipant,
   deleteParticipant,
   addExclusion,
@@ -26,7 +28,11 @@ import {
   isStorageAvailable,
   replaceAllData,
 } from "./lib/database";
-import { isDrawConsistent, performDraw } from "./lib/drawAlgorithm";
+import {
+  DrawRules,
+  isDrawConsistent,
+  performDraw,
+} from "./lib/drawAlgorithm";
 import {
   exportParticipantsToCSV,
   downloadCSV,
@@ -54,6 +60,7 @@ function App() {
   const [draws, setDraws] = useState<Draw[]>([]);
   const [isDrawing, setIsDrawing] = useState(false);
   const [excludeSameFamily, setExcludeSameFamilyState] = useState(true);
+  const [avoidReciprocal, setAvoidReciprocalState] = useState(false);
   const [eventSettings, setEventSettings] = useState<EventSettings>(
     DEFAULT_EVENT_SETTINGS
   );
@@ -89,6 +96,7 @@ function App() {
     setInclusions(getInclusions());
     setDraws(getDraws());
     setExcludeSameFamilyState(getExcludeSameFamilySetting());
+    setAvoidReciprocalState(getAvoidReciprocalSetting());
     setEventSettings(getEventSettings());
   };
 
@@ -100,17 +108,15 @@ function App() {
     saveEventSettings(settings);
   };
 
+  const drawRules = useMemo<DrawRules>(
+    () => ({ exclusions, inclusions, excludeSameFamily, avoidReciprocal }),
+    [exclusions, inclusions, excludeSameFamily, avoidReciprocal]
+  );
+
   const drawIsStale = useMemo(
     () =>
-      draws.length > 0 &&
-      !isDrawConsistent(
-        draws,
-        participants,
-        exclusions,
-        inclusions,
-        excludeSameFamily
-      ),
-    [draws, participants, exclusions, inclusions, excludeSameFamily]
+      draws.length > 0 && !isDrawConsistent(draws, participants, drawRules),
+    [draws, participants, drawRules]
   );
 
   const handleAddParticipant = (name: string, family: string) => {
@@ -243,12 +249,7 @@ function App() {
     setIsDrawing(true);
 
     window.setTimeout(() => {
-      const results = performDraw(
-        participants,
-        exclusions,
-        inclusions,
-        excludeSameFamily
-      );
+      const results = performDraw(participants, drawRules);
 
       if (!results) {
         toast.error(t.toast.drawFailed, t.toast.drawFailedDescription);
@@ -311,6 +312,12 @@ function App() {
     const newValue = !excludeSameFamily;
     setExcludeSameFamilyState(newValue);
     setExcludeSameFamilySetting(newValue);
+  };
+
+  const handleToggleAvoidReciprocal = () => {
+    const newValue = !avoidReciprocal;
+    setAvoidReciprocalState(newValue);
+    setAvoidReciprocalSetting(newValue);
   };
 
   const handleExportData = () => {
@@ -517,6 +524,8 @@ function App() {
             onDeleteInclusion={handleDeleteInclusion}
             excludeSameFamily={excludeSameFamily}
             onToggleExcludeSameFamily={handleToggleExcludeSameFamily}
+            avoidReciprocal={avoidReciprocal}
+            onToggleAvoidReciprocal={handleToggleAvoidReciprocal}
           />
 
           <DrawManager
