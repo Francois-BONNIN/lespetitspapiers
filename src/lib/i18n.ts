@@ -33,13 +33,6 @@ const fr = {
     body: "Votre navigateur bloque l'enregistrement des données (mode privé ou cookies tiers désactivés) : tout sera perdu en fermant cet onglet. Pensez à exporter votre tirage en CSV.",
   },
 
-  stats: {
-    participants: "Participants",
-    groups: "Groupes",
-    exclusions: "Exclusions",
-    inclusions: "Tirages limités",
-  },
-
   footer: "Aucune donnée ne quitte votre navigateur.",
 
   common: {
@@ -51,6 +44,7 @@ const fr = {
     select: "Sélectionner…",
     unknown: "Inconnu",
     optional: "(facultatif)",
+    step: (step: number) => `Étape ${step} :`,
     notifications: "Notifications",
     closeNotification: "Fermer la notification",
     themeToLight: "Passer en thème clair",
@@ -60,7 +54,7 @@ const fr = {
   },
 
   participants: {
-    title: "Participants",
+    title: "Qui participe ?",
     description:
       "Ajoutez les personnes qui participent au tirage. Le groupe est facultatif.",
     exportAction: "Exporter",
@@ -87,12 +81,14 @@ const fr = {
 
   rules: {
     title: "Règles du tirage",
+    stepTitle: "Des règles à respecter ?",
+    optional: "Facultatif",
     description:
       "Affinez le tirage : qui ne peut pas tirer qui, et qui ne peut être tiré que par certains.",
     configure: "Configurer",
     openLabel: "Configurer les règles du tirage",
     done: "Terminé",
-    none: "Aucune règle : le tirage est entièrement libre.",
+    none: "Aucune règle : tout le monde peut tirer tout le monde.",
     summarySameGroup: "Même groupe exclu",
     summaryExclusions: (count: number) =>
       `${count} exclusion${count > 1 ? "s" : ""}`,
@@ -277,13 +273,6 @@ const en: Translation = {
     body: "Your browser is blocking data storage (private mode or third-party cookies disabled): everything will be lost when you close this tab. Remember to export your draw as a CSV file.",
   },
 
-  stats: {
-    participants: "Participants",
-    groups: "Groups",
-    exclusions: "Exclusions",
-    inclusions: "Restricted draws",
-  },
-
   footer: "No data ever leaves your browser.",
 
   common: {
@@ -295,6 +284,7 @@ const en: Translation = {
     select: "Select…",
     unknown: "Unknown",
     optional: "(optional)",
+    step: (step: number) => `Step ${step}:`,
     notifications: "Notifications",
     closeNotification: "Dismiss notification",
     themeToLight: "Switch to light theme",
@@ -304,7 +294,7 @@ const en: Translation = {
   },
 
   participants: {
-    title: "Participants",
+    title: "Who's taking part?",
     description: "Add the people taking part in the draw. The group is optional.",
     exportAction: "Export",
     exportTitle: "Export participants and their constraints as a CSV file",
@@ -329,12 +319,14 @@ const en: Translation = {
 
   rules: {
     title: "Draw rules",
+    stepTitle: "Any rules to follow?",
+    optional: "Optional",
     description:
       "Fine-tune the draw: who cannot draw whom, and who can only be drawn by certain people.",
     configure: "Configure",
     openLabel: "Configure the draw rules",
     done: "Done",
-    none: "No rules: the draw is completely open.",
+    none: "No rules: anyone can draw anyone.",
     summarySameGroup: "Same group excluded",
     summaryExclusions: (count: number) =>
       `${count} exclusion${count > 1 ? "s" : ""}`,

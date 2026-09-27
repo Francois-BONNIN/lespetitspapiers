@@ -1,11 +1,5 @@
-import { useEffect, useMemo, useRef, useState } from "react";
-import {
-  AlertTriangle,
-  Sparkles,
-  Ticket,
-  Trophy,
-  Users,
-} from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { AlertTriangle, Ticket, Trophy } from "lucide-react";
 import {
   Participant,
   Exclusion,
@@ -87,16 +81,6 @@ function App() {
     setDraws(getDraws());
     setExcludeSameFamilyState(getExcludeSameFamilySetting());
   };
-
-  const groupCount = useMemo(
-    () =>
-      new Set(
-        participants
-          .map((p) => p.family?.trim())
-          .filter((group): group is string => Boolean(group))
-      ).size,
-    [participants]
-  );
 
   const handleAddParticipant = (name: string, family: string) => {
     const duplicate = participants.some(
@@ -402,21 +386,6 @@ function App() {
     );
   };
 
-  const stats = [
-    {
-      id: "participants",
-      icon: Users,
-      label: t.stats.participants,
-      value: participants.length,
-    },
-    {
-      id: "groups",
-      icon: Sparkles,
-      label: t.stats.groups,
-      value: groupCount,
-    },
-  ];
-
   return (
     <div className="aurora-bg min-h-screen">
       <header className="sticky top-0 z-30 border-b border-ink-200/70 bg-ink-50/80 backdrop-blur-md dark:border-white/10 dark:bg-ink-950/80">
@@ -471,43 +440,6 @@ function App() {
           </div>
         )}
 
-        <div className="mb-8 flex flex-col gap-3 sm:flex-row sm:items-stretch">
-          <div className="grid grid-cols-2 gap-3 sm:shrink-0">
-            {stats.map(({ id, icon: Icon, label, value }) => (
-              <div key={id} className="card flex items-center gap-3 p-3.5">
-                <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-ink-100 text-ink-500 dark:bg-white/[0.06] dark:text-ink-400">
-                  <Icon size={16} />
-                </span>
-                <div className="min-w-0">
-                  <p
-                    key={value}
-                    className="animate-pop font-display text-xl font-semibold leading-none text-ink-900 dark:text-white"
-                  >
-                    {value}
-                  </p>
-                  <p className="mt-1 truncate text-xs text-ink-500 dark:text-ink-400">
-                    {label}
-                  </p>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          <div className="min-w-0 flex-1">
-            <RulesManager
-              participants={participants}
-              exclusions={exclusions}
-              inclusions={inclusions}
-              onAddExclusion={handleAddExclusion}
-              onDeleteExclusion={handleDeleteExclusion}
-              onAddInclusion={handleAddInclusion}
-              onDeleteInclusion={handleDeleteInclusion}
-              excludeSameFamily={excludeSameFamily}
-              onToggleExcludeSameFamily={handleToggleExcludeSameFamily}
-            />
-          </div>
-        </div>
-
         <div className="space-y-5">
           <ParticipantManager
             participants={participants}
@@ -516,6 +448,18 @@ function App() {
             onExportData={handleExportData}
             onImportData={handleImportData}
             onShareLink={handleShareLink}
+          />
+
+          <RulesManager
+            participants={participants}
+            exclusions={exclusions}
+            inclusions={inclusions}
+            onAddExclusion={handleAddExclusion}
+            onDeleteExclusion={handleDeleteExclusion}
+            onAddInclusion={handleAddInclusion}
+            onDeleteInclusion={handleDeleteInclusion}
+            excludeSameFamily={excludeSameFamily}
+            onToggleExcludeSameFamily={handleToggleExcludeSameFamily}
           />
 
           <DrawManager

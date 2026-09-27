@@ -108,10 +108,9 @@ export function ParticipantManager({
 
   return (
     <SectionCard
-      icon={Users}
+      step={1}
       title={t.participants.title}
       description={t.participants.description}
-      accent="brand"
       badge={
         participants.length > 0 ? (
           <span className="chip bg-brand-100 text-brand-700 dark:bg-brand-500/15 dark:text-brand-300">

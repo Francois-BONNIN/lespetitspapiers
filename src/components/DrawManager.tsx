@@ -132,12 +132,11 @@ export function DrawManager({
 
   return (
     <SectionCard
-      icon={Shuffle}
+      step={3}
       title={t.draw.title}
       description={
         hasDraws ? t.draw.descriptionDone : t.draw.descriptionPending
       }
-      accent="amber"
       actions={
         hasDraws ? (
           <>

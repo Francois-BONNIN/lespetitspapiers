@@ -1,37 +1,27 @@
-import type { LucideIcon } from "lucide-react";
 import type { ReactNode } from "react";
+import { useI18n } from "./language-context";
 
 interface SectionCardProps {
-  icon: LucideIcon;
+  step: number;
   title: string;
   description?: string;
-  accent?: "brand" | "amber" | "rose" | "emerald";
   badge?: ReactNode;
   actions?: ReactNode;
   children: ReactNode;
   className?: string;
 }
 
-const ACCENTS = {
-  brand:
-    "bg-brand-100 text-brand-700 dark:bg-brand-500/15 dark:text-brand-300",
-  amber:
-    "bg-amber-100 text-amber-700 dark:bg-amber-500/15 dark:text-amber-300",
-  rose: "bg-rose-100 text-rose-700 dark:bg-rose-500/15 dark:text-rose-300",
-  emerald:
-    "bg-emerald-100 text-emerald-700 dark:bg-emerald-500/15 dark:text-emerald-300",
-};
-
 export function SectionCard({
-  icon: Icon,
+  step,
   title,
   description,
-  accent = "brand",
   badge,
   actions,
   children,
   className = "",
 }: SectionCardProps) {
+  const { t } = useI18n();
+
   return (
     <section
       className={`card flex flex-col p-5 hover:shadow-card-hover sm:p-6 ${className}`}
@@ -39,13 +29,17 @@ export function SectionCard({
       <header className="mb-5 flex flex-wrap items-start justify-between gap-3">
         <div className="flex min-w-0 items-start gap-3">
           <span
-            className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${ACCENTS[accent]}`}
+            aria-hidden
+            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-brand-100 font-display text-lg font-bold text-brand-700 dark:bg-brand-500/15 dark:text-brand-300"
           >
-            <Icon size={19} />
+            {step}
           </span>
           <div className="min-w-0">
             <div className="flex flex-wrap items-center gap-2">
-              <h2 className="section-title">{title}</h2>
+              <h2 className="section-title">
+                <span className="sr-only">{t.common.step(step)} </span>
+                {title}
+              </h2>
               {badge}
             </div>
             {description && (

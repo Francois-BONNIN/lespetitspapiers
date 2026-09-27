@@ -4,6 +4,7 @@ import { Participant, Exclusion, Inclusion } from "../lib/database";
 import { ExclusionManager } from "./ExclusionManager";
 import { InclusionManager } from "./InclusionManager";
 import { Modal } from "./ui/Modal";
+import { SectionCard } from "./ui/SectionCard";
 import { useI18n } from "./ui/language-context";
 
 interface RulesManagerProps {
@@ -55,53 +56,53 @@ export function RulesManager({
 
   return (
     <>
-      <section className="card flex h-full w-full flex-col gap-3 p-4 sm:flex-row sm:items-center sm:justify-between sm:gap-5 sm:p-5">
-        <div className="flex min-w-0 items-center gap-3">
-          <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-amber-100 text-amber-700 dark:bg-amber-500/15 dark:text-amber-300">
-            <SlidersHorizontal size={19} />
+      <SectionCard
+        step={2}
+        title={t.rules.stepTitle}
+        description={t.rules.description}
+        badge={
+          <span className="chip bg-ink-100 text-ink-600 dark:bg-white/[0.08] dark:text-ink-300">
+            {t.rules.optional}
           </span>
-          <div className="min-w-0">
-            <h2 className="font-display text-lg font-semibold tracking-tight text-ink-900 dark:text-white">
-              {t.rules.title}
-            </h2>
-            {hasRule ? (
-              <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
-                {excludeSameFamily && (
-                  <span className="chip bg-ink-100 text-ink-600 dark:bg-white/[0.08] dark:text-ink-300">
-                    <Users size={12} />
-                    {t.rules.summarySameGroup}
-                  </span>
-                )}
-                {exclusions.length > 0 && (
-                  <span className="chip bg-rose-100 text-rose-700 dark:bg-rose-500/15 dark:text-rose-300">
-                    <Ban size={12} />
-                    {t.rules.summaryExclusions(exclusions.length)}
-                  </span>
-                )}
-                {inclusions.length > 0 && (
-                  <span className="chip bg-emerald-100 text-emerald-700 dark:bg-emerald-500/15 dark:text-emerald-300">
-                    <Target size={12} />
-                    {t.rules.summaryInclusions(inclusions.length)}
-                  </span>
-                )}
-              </div>
-            ) : (
-              <p className="mt-1 text-[13px] leading-relaxed text-ink-500 dark:text-ink-400">
-                {t.rules.none}
-              </p>
+        }
+        actions={
+          <button
+            onClick={() => setOpen(true)}
+            className="btn btn-sm btn-secondary"
+            title={t.rules.openLabel}
+          >
+            <SlidersHorizontal size={15} />
+            {t.rules.configure}
+          </button>
+        }
+      >
+        {hasRule ? (
+          <div className="flex flex-wrap items-center gap-1.5">
+            {excludeSameFamily && (
+              <span className="chip bg-ink-100 text-ink-600 dark:bg-white/[0.08] dark:text-ink-300">
+                <Users size={12} />
+                {t.rules.summarySameGroup}
+              </span>
+            )}
+            {exclusions.length > 0 && (
+              <span className="chip bg-rose-100 text-rose-700 dark:bg-rose-500/15 dark:text-rose-300">
+                <Ban size={12} />
+                {t.rules.summaryExclusions(exclusions.length)}
+              </span>
+            )}
+            {inclusions.length > 0 && (
+              <span className="chip bg-emerald-100 text-emerald-700 dark:bg-emerald-500/15 dark:text-emerald-300">
+                <Target size={12} />
+                {t.rules.summaryInclusions(inclusions.length)}
+              </span>
             )}
           </div>
-        </div>
-
-        <button
-          onClick={() => setOpen(true)}
-          className="btn btn-md btn-secondary shrink-0 max-sm:w-full"
-          title={t.rules.openLabel}
-        >
-          <SlidersHorizontal size={16} />
-          {t.rules.configure}
-        </button>
-      </section>
+        ) : (
+          <p className="text-[13px] leading-relaxed text-ink-500 dark:text-ink-400">
+            {t.rules.none}
+          </p>
+        )}
+      </SectionCard>
 
       <Modal
         open={open}
