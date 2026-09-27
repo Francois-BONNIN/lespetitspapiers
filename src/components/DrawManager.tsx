@@ -19,10 +19,11 @@ import { exportDrawsToCSV, downloadCSV } from "../lib/csvExport";
 import { buildDrawMessage } from "../lib/message";
 import { buildRevealUrl, type PersonalDraw } from "../lib/shareLink";
 import { buildHomonymHints, labelWithHint } from "../lib/homonyms";
+import { getGroupColor } from "../lib/familyColors";
 import { SectionCard } from "./ui/SectionCard";
 import { ActionMenu } from "./ui/ActionMenu";
 import { EmptyState } from "./ui/EmptyState";
-import { ParticipantAvatar } from "./ui/ParticipantAvatar";
+import { ParticipantName } from "./ui/ParticipantName";
 import { useToast } from "./ui/toast-context";
 import { useI18n } from "./ui/language-context";
 
@@ -72,6 +73,11 @@ export function DrawManager({
 
   const getParticipantName = (id: string) =>
     participants.find((p) => p.id === id)?.name ?? t.common.unknown;
+
+  const getGroupColorOf = (id: string) =>
+    getGroupColor(
+      participants.find((p) => p.id === id)?.family?.trim() ?? ""
+    );
 
   const homonymHints = useMemo(
     () => buildHomonymHints(participants),
@@ -376,12 +382,8 @@ export function DrawManager({
 
           <ul className="grid gap-2.5 lg:grid-cols-2">
             {sortedDraws.map((draw, index) => {
-              const drawer = participants.find(
-                (p) => p.id === draw.drawer_id
-              );
-              const drawn = participants.find((p) => p.id === draw.drawn_id);
-              const drawerName = drawer?.name ?? t.common.unknown;
-              const drawnName = drawn?.name ?? t.common.unknown;
+              const drawerName = getParticipantName(draw.drawer_id);
+              const drawnName = getParticipantName(draw.drawn_id);
               const drawerHint = homonymHints.get(draw.drawer_id);
               const drawnHint = homonymHints.get(draw.drawn_id);
               const isRevealed = revealedIds.has(draw.id);
@@ -393,35 +395,27 @@ export function DrawManager({
                   className="flex animate-draw-in flex-wrap items-center gap-3 rounded-xl border border-ink-200 bg-white p-3 transition-shadow hover:shadow-card dark:border-white/10 dark:bg-white/[0.03]"
                   style={{ animationDelay: `${Math.min(index, 14) * 55}ms` }}
                 >
-                  <ParticipantAvatar
-                    name={drawerName}
-                    group={drawer?.family}
-                    index={drawerHint?.index}
-                  />
-
-                  <div className="flex min-w-0 flex-1 flex-wrap items-center gap-x-2 gap-y-1 text-sm">
-                    <span className="truncate font-semibold text-ink-900 dark:text-white">
-                      {drawerName}
+                  <div className="flex min-w-0 flex-1 flex-wrap items-center gap-x-2 gap-y-1.5">
+                    <span
+                      className={`pill px-3 py-1.5 text-ink-900 dark:text-white ${
+                        getGroupColorOf(draw.drawer_id).surface
+                      }`}
+                    >
+                      <ParticipantName name={drawerName} hint={drawerHint} />
                     </span>
                     <ArrowRight
                       size={14}
                       className="shrink-0 text-ink-400"
                       aria-hidden
                     />
-                    {isRevealed && (
-                      <ParticipantAvatar
-                        name={drawnName}
-                        group={drawn?.family}
-                        index={drawnHint?.index}
-                        size="sm"
-                      />
-                    )}
                     <button
                       onClick={() => toggleReveal(draw.id)}
-                      className={`min-w-0 truncate rounded-md px-1.5 py-0.5 text-left font-semibold transition-all ${
+                      className={`pill px-3 py-1.5 text-left transition-all ${
                         isRevealed
-                          ? "text-ink-900 dark:text-white"
-                          : "select-none bg-ink-100 text-transparent blur-[5px] dark:bg-white/10"
+                          ? `text-ink-900 dark:text-white ${
+                              getGroupColorOf(draw.drawn_id).surface
+                            }`
+                          : "select-none border-transparent bg-ink-100 text-transparent blur-[5px] dark:bg-white/10"
                       }`}
                       aria-label={
                         isRevealed
@@ -429,11 +423,15 @@ export function DrawManager({
                           : t.draw.revealResult(drawerName)
                       }
                     >
-                      {drawnName}
+                      {isRevealed ? (
+                        <ParticipantName name={drawnName} hint={drawnHint} />
+                      ) : (
+                        <span className="truncate">{drawnName}</span>
+                      )}
                     </button>
                   </div>
 
-                  <div className="flex shrink-0 items-center gap-1 max-sm:w-full max-sm:pl-12">
+                  <div className="flex shrink-0 items-center gap-1 max-sm:w-full">
                     <button
                       onClick={() => toggleReveal(draw.id)}
                       className="btn btn-ghost btn-icon"

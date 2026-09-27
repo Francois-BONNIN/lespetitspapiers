@@ -169,6 +169,10 @@
     @apply inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold;
   }
 
+  .pill {
+    @apply inline-flex min-w-0 max-w-full items-center rounded-full border text-sm font-semibold;
+  }
+
   .section-title {
     @apply font-display text-xl font-semibold tracking-tight text-ink-900 dark:text-white sm:text-2xl;
   }

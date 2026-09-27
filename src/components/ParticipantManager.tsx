@@ -6,10 +6,10 @@ import {
   Search,
   Share2,
   Smartphone,
-  Trash2,
   Upload,
   UserPlus,
   Users,
+  X,
 } from "lucide-react";
 import { Participant } from "../lib/database";
 import { getGroupColor } from "../lib/familyColors";
@@ -18,7 +18,7 @@ import { useRecentlyAdded } from "../lib/useRecentlyAdded";
 import { SectionCard } from "./ui/SectionCard";
 import { ActionMenu } from "./ui/ActionMenu";
 import { EmptyState } from "./ui/EmptyState";
-import { ParticipantAvatar } from "./ui/ParticipantAvatar";
+import { ParticipantName } from "./ui/ParticipantName";
 import { useI18n } from "./ui/language-context";
 
 interface ParticipantManagerProps {
@@ -287,29 +287,26 @@ export function ParticipantManager({
                     </span>
                   </div>
                 )}
-                <ul className="grid gap-2 sm:grid-cols-2 xl:grid-cols-3">
+                <ul className="flex flex-wrap gap-2">
                   {members.map((participant) => (
                     <li
                       key={participant.id}
-                      className={`group flex items-center gap-3 rounded-xl border p-2.5 transition-all hover:shadow-card ${
+                      className={`pill gap-0.5 py-0.5 pl-3 pr-0.5 text-ink-900 dark:text-white ${
                         colors.surface
                       } ${recentlyAdded.has(participant.id) ? "item-added" : ""}`}
                     >
-                      <ParticipantAvatar
+                      <ParticipantName
                         name={participant.name}
-                        group={participant.family}
-                        index={homonymHints.get(participant.id)?.index}
+                        hint={homonymHints.get(participant.id)}
+                        withGroupLabel={false}
                       />
-                      <p className="min-w-0 flex-1 truncate text-sm font-semibold text-ink-900 dark:text-white">
-                        {participant.name}
-                      </p>
                       <button
                         onClick={() => onDeleteParticipant(participant.id)}
-                        className="reveal-on-hover btn btn-danger-ghost btn-icon"
+                        className="btn btn-danger-ghost h-7 w-7 shrink-0 rounded-full px-0"
                         aria-label={t.participants.deleteLabel(participant.name)}
                         title={t.participants.deleteLabel(participant.name)}
                       >
-                        <Trash2 size={15} />
+                        <X size={14} />
                       </button>
                     </li>
                   ))}

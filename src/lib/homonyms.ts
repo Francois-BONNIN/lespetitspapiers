@@ -71,15 +71,24 @@ export function buildHomonymHints(
   return hints;
 }
 
+export function hintSuffix(
+  hint: HomonymHint | undefined,
+  { withLabel = true } = {}
+): string {
+  if (!hint) return "";
+
+  return [
+    withLabel ? hint.label : null,
+    hint.index === null ? null : `#${hint.index}`,
+  ]
+    .filter(Boolean)
+    .join(" ");
+}
+
 export function labelWithHint(
   name: string,
   hint: HomonymHint | undefined
 ): string {
-  if (!hint) return name;
-
-  const suffix = [hint.label, hint.index === null ? null : `#${hint.index}`]
-    .filter(Boolean)
-    .join(" ");
-
+  const suffix = hintSuffix(hint);
   return suffix ? `${name} (${suffix})` : name;
 }
