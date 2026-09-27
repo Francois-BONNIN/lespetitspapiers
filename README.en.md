@@ -49,6 +49,12 @@ you need to. And for each participant, a button copies a ready-written message â
 recipient's name included â€” that you just paste into a text or an email. Everyone
 finds out who they drew without ever seeing the full list.
 
+Even more discreet: in the settings, choose to send **a personal link** instead of
+the name. The message then only holds a link. Opening it, each participant unfolds
+their paper slip and finds out who they drew, along with the budget and exchange
+date. The link contains only their own pair: even if forwarded, it reveals nothing
+about anyone else.
+
 ## Your data stays with you
 
 No account to create. No password. No server storing your guest lists.

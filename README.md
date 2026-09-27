@@ -50,6 +50,12 @@ copie un message déjà rédigé — nom du destinataire inclus — que vous n'a
 qu'à coller dans un SMS ou un e-mail. Chacun découvre son tirage sans jamais voir
 la liste complète.
 
+Encore plus discret : dans les paramètres, choisissez d'envoyer **un lien
+personnel** plutôt que le nom. Le message ne contient alors qu'un lien. En
+l'ouvrant, chaque participant déplie son petit papier et découvre son tirage,
+avec le budget et la date de l'échange. Le lien ne contient que sa propre paire :
+même transféré, il ne révèle rien sur les autres.
+
 ## Vos données restent chez vous
 
 Pas de compte à créer. Pas de mot de passe. Pas de serveur qui stocke vos listes

@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   AlertTriangle,
   ArrowRight,
@@ -17,6 +17,7 @@ import {
 import { Participant, Draw, EventSettings } from "../lib/database";
 import { exportDrawsToCSV, downloadCSV } from "../lib/csvExport";
 import { buildDrawMessage } from "../lib/message";
+import { buildRevealUrl, type PersonalDraw } from "../lib/shareLink";
 import { buildHomonymHints, labelWithHint } from "../lib/homonyms";
 import { SectionCard } from "./ui/SectionCard";
 import { ActionMenu } from "./ui/ActionMenu";
@@ -35,6 +36,22 @@ interface DrawManagerProps {
   onClearDraws: () => void;
   onCustomizeMessage: () => void;
   isDrawing: boolean;
+}
+
+function toPersonalDraw(
+  draw: Draw,
+  labels: Map<string, string>,
+  unknownLabel: string,
+  settings: EventSettings
+): PersonalDraw {
+  return {
+    drawerName: labels.get(draw.drawer_id) ?? unknownLabel,
+    drawnName: labels.get(draw.drawn_id) ?? unknownLabel,
+    eventName: settings.eventName.trim(),
+    budget: settings.budget.trim(),
+    exchangeDate: settings.exchangeDate,
+    drawDate: draw.draw_date,
+  };
 }
 
 export function DrawManager({
@@ -61,8 +78,51 @@ export function DrawManager({
     [participants]
   );
 
+  const participantLabels = useMemo(
+    () =>
+      new Map(
+        participants.map((p) => [
+          p.id,
+          labelWithHint(p.name, homonymHints.get(p.id)),
+        ])
+      ),
+    [participants, homonymHints]
+  );
+
+  const unknownLabel = t.common.unknown;
   const getParticipantLabel = (id: string) =>
-    labelWithHint(getParticipantName(id), homonymHints.get(id));
+    participantLabels.get(id) ?? unknownLabel;
+
+  const sendsLink = eventSettings.delivery === "link";
+  const [personalLinks, setPersonalLinks] = useState<Map<string, string>>(
+    () => new Map()
+  );
+
+  useEffect(() => {
+    if (!sendsLink || draws.length === 0) return;
+
+    let cancelled = false;
+    Promise.all(
+      draws.map(
+        async (draw) =>
+          [
+            draw.id,
+            await buildRevealUrl(
+              toPersonalDraw(draw, participantLabels, unknownLabel, eventSettings)
+            ),
+          ] as const
+      )
+    ).then(
+      (entries) => {
+        if (!cancelled) setPersonalLinks(new Map(entries));
+      },
+      (error) => console.error(error)
+    );
+
+    return () => {
+      cancelled = true;
+    };
+  }, [sendsLink, draws, participantLabels, unknownLabel, eventSettings]);
 
   const hasDraws = draws.length > 0;
   const allRevealed = hasDraws && revealedIds.size === draws.length;
@@ -109,30 +169,58 @@ export function DrawManager({
     }
   };
 
-  const messageFor = (draw: Draw) =>
+  const linkFor = (draw: Draw): string | Promise<string> =>
+    !sendsLink
+      ? ""
+      : personalLinks.get(draw.id) ??
+        buildRevealUrl(
+          toPersonalDraw(draw, participantLabels, unknownLabel, eventSettings)
+        );
+
+  const whenLinksReady = (
+    links: Array<string | Promise<string>>,
+    onReady: (resolved: string[]) => void
+  ) => {
+    if (links.every((link): link is string => typeof link === "string")) {
+      onReady(links);
+      return;
+    }
+    Promise.all(links).then(onReady, (error) => {
+      console.error(error);
+      toast.error(t.toast.copyFailed);
+    });
+  };
+
+  const messageFor = (draw: Draw, link: string) =>
     buildDrawMessage(
       getParticipantLabel(draw.drawer_id),
       getParticipantLabel(draw.drawn_id),
       eventSettings,
-      t
+      t,
+      link
     );
 
   const handleCopyMessage = (draw: Draw) => {
-    const message = messageFor(draw);
-    copyText(message, () => {
-      setCopiedId(draw.id);
-      window.setTimeout(() => setCopiedId(null), 2000);
-    });
+    whenLinksReady([linkFor(draw)], ([link]) =>
+      copyText(messageFor(draw, link), () => {
+        setCopiedId(draw.id);
+        window.setTimeout(() => setCopiedId(null), 2000);
+      })
+    );
   };
 
   const handleCopyAll = () => {
-    const all = sortedDraws.map(messageFor).join("\n\n———\n\n");
-    copyText(all, () =>
-      toast.success(
-        t.toast.messagesCopied,
-        t.toast.messagesCopiedDescription(draws.length)
-      )
-    );
+    whenLinksReady(sortedDraws.map(linkFor), (links) => {
+      const all = sortedDraws
+        .map((draw, index) => messageFor(draw, links[index]))
+        .join("\n\n———\n\n");
+      copyText(all, () =>
+        toast.success(
+          t.toast.messagesCopied,
+          t.toast.messagesCopiedDescription(draws.length)
+        )
+      );
+    });
   };
 
   return (
@@ -271,7 +359,9 @@ export function DrawManager({
                   {t.draw.resultBanner(draws.length)}
                 </p>
                 <p className="mt-0.5 text-[13px] leading-relaxed text-emerald-800 dark:text-emerald-200/80">
-                  {t.draw.resultInstructions}
+                  {sendsLink
+                    ? t.draw.resultInstructionsLink
+                    : t.draw.resultInstructions}
                 </p>
                 <button
                   onClick={onCustomizeMessage}

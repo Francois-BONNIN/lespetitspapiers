@@ -9,6 +9,7 @@ import {
 } from "./database";
 
 const SETUP_HASH_PREFIX = "#share=";
+const REVEAL_HASH_PREFIX = "#reveal=";
 const SHARE_FORMAT_VERSION = 1;
 
 type IndexPair = [number, number];
@@ -25,6 +26,16 @@ interface SharePayload {
   w?: string;
 }
 
+interface RevealPayload {
+  v: number;
+  f: string;
+  t: string;
+  e: string;
+  b: string;
+  x: string;
+  w: string | null;
+}
+
 export interface ShareSource {
   participants: Participant[];
   exclusions: Exclusion[];
@@ -33,6 +44,15 @@ export interface ShareSource {
   excludeSameFamily: boolean;
   avoidReciprocal: boolean;
   eventSettings: EventSettings;
+}
+
+export interface PersonalDraw {
+  drawerName: string;
+  drawnName: string;
+  eventName: string;
+  budget: string;
+  exchangeDate: string;
+  drawDate: string | null;
 }
 
 function bytesToBase64Url(bytes: Uint8Array): string {
@@ -76,6 +96,10 @@ async function decodeJson(encoded: string): Promise<unknown> {
 function currentPageLink(hash: string): string {
   const { origin, pathname, search } = window.location;
   return `${origin}${pathname}${search}${hash}`;
+}
+
+function text(value: unknown): string {
+  return typeof value === "string" ? value : "";
 }
 
 function toPayload(source: ShareSource, includeDraws: boolean): SharePayload {
@@ -170,11 +194,36 @@ export async function buildShareUrl(
   return currentPageLink(`${SETUP_HASH_PREFIX}${encoded}`);
 }
 
+export async function buildRevealUrl(draw: PersonalDraw): Promise<string> {
+  const payload: RevealPayload = {
+    v: SHARE_FORMAT_VERSION,
+    f: draw.drawerName,
+    t: draw.drawnName,
+    e: draw.eventName,
+    b: draw.budget,
+    x: draw.exchangeDate,
+    w: draw.drawDate,
+  };
+  return currentPageLink(`${REVEAL_HASH_PREFIX}${await encodeJson(payload)}`);
+}
+
 export function takeSharePayloadFromUrl(): string | null {
   const { hash, pathname, search } = window.location;
   if (!hash.startsWith(SETUP_HASH_PREFIX)) return null;
   window.history.replaceState(null, "", `${pathname}${search}`);
   return hash.slice(SETUP_HASH_PREFIX.length);
+}
+
+export function readRevealPayloadFromUrl(): string | null {
+  const { hash } = window.location;
+  return hash.startsWith(REVEAL_HASH_PREFIX)
+    ? hash.slice(REVEAL_HASH_PREFIX.length)
+    : null;
+}
+
+export function clearLinkFromUrl(): void {
+  const { pathname, search } = window.location;
+  window.history.replaceState(null, "", `${pathname}${search}`);
 }
 
 export async function decodeSharePayload(
@@ -184,6 +233,33 @@ export async function decodeSharePayload(
     return fromPayload(await decodeJson(encoded));
   } catch (error) {
     console.error("Lien de partage illisible.", error);
+    return null;
+  }
+}
+
+export async function decodeRevealPayload(
+  encoded: string
+): Promise<PersonalDraw | null> {
+  try {
+    const raw = await decodeJson(encoded);
+    if (typeof raw !== "object" || raw === null) return null;
+    const payload = raw as Partial<Record<keyof RevealPayload, unknown>>;
+    if (payload.v !== SHARE_FORMAT_VERSION) return null;
+
+    const drawerName = text(payload.f).trim();
+    const drawnName = text(payload.t).trim();
+    if (!drawerName || !drawnName) return null;
+
+    return {
+      drawerName,
+      drawnName,
+      eventName: text(payload.e).trim(),
+      budget: text(payload.b).trim(),
+      exchangeDate: text(payload.x),
+      drawDate: optionalText(payload.w),
+    };
+  } catch (error) {
+    console.error("Lien personnel illisible.", error);
     return null;
   }
 }

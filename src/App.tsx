@@ -41,10 +41,15 @@ import {
 } from "./lib/csvExport";
 import {
   buildShareUrl,
+  clearLinkFromUrl,
+  decodeRevealPayload,
   decodeSharePayload,
+  readRevealPayloadFromUrl,
   takeSharePayloadFromUrl,
+  type PersonalDraw,
 } from "./lib/shareLink";
 import { ParticipantManager } from "./components/ParticipantManager";
+import { RevealPage } from "./components/RevealPage";
 import { RulesManager } from "./components/RulesManager";
 import { DrawManager } from "./components/DrawManager";
 import { SettingsManager } from "./components/SettingsManager";
@@ -67,28 +72,41 @@ function App() {
   );
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [storageAvailable] = useState(isStorageAvailable);
+  const [personalDraw, setPersonalDraw] = useState<
+    PersonalDraw | "loading" | null
+  >(() => (readRevealPayloadFromUrl() ? "loading" : null));
 
   const toast = useToast();
   const confirm = useConfirm();
   const { t } = useI18n();
-  const openSharedSetupRef = useRef<(payload: string) => Promise<void>>();
+  const linkHandlersRef = useRef<{
+    openSetup: (payload: string) => Promise<void>;
+    openReveal: (payload: string) => Promise<void>;
+  }>();
 
   useEffect(() => {
-    openSharedSetupRef.current = handleOpenSharedSetup;
+    linkHandlersRef.current = {
+      openSetup: handleOpenSharedSetup,
+      openReveal: handleOpenReveal,
+    };
   });
 
   useEffect(() => {
     loadData();
 
-    const openSharedLinkFromUrl = () => {
-      const payload = takeSharePayloadFromUrl();
-      if (payload) void openSharedSetupRef.current?.(payload);
+    const openLinkFromUrl = () => {
+      const revealPayload = readRevealPayloadFromUrl();
+      if (revealPayload) {
+        void linkHandlersRef.current?.openReveal(revealPayload);
+        return;
+      }
+      const setupPayload = takeSharePayloadFromUrl();
+      if (setupPayload) void linkHandlersRef.current?.openSetup(setupPayload);
     };
 
-    openSharedLinkFromUrl();
-    window.addEventListener("hashchange", openSharedLinkFromUrl);
-    return () =>
-      window.removeEventListener("hashchange", openSharedLinkFromUrl);
+    openLinkFromUrl();
+    window.addEventListener("hashchange", openLinkFromUrl);
+    return () => window.removeEventListener("hashchange", openLinkFromUrl);
   }, []);
 
   const loadData = () => {
@@ -467,6 +485,34 @@ function App() {
         : t.toast.sharedLoadedDescription(setup.participants.length)
     );
   };
+
+  const handleOpenReveal = async (payload: string) => {
+    setPersonalDraw("loading");
+    const draw = await decodeRevealPayload(payload);
+
+    if (!draw) {
+      clearLinkFromUrl();
+      setPersonalDraw(null);
+      toast.error(t.toast.sharedInvalid, t.toast.sharedInvalidDescription);
+      return;
+    }
+
+    setPersonalDraw(draw);
+  };
+
+  const handleExitReveal = () => {
+    clearLinkFromUrl();
+    setPersonalDraw(null);
+  };
+
+  if (personalDraw !== null) {
+    return (
+      <RevealPage
+        draw={personalDraw === "loading" ? null : personalDraw}
+        onExit={handleExitReveal}
+      />
+    );
+  }
 
   return (
     <div className="aurora-bg min-h-screen">

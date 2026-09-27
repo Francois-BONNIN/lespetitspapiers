@@ -2,12 +2,15 @@ import { useRef } from "react";
 import {
   AlertTriangle,
   Info,
+  Link2,
+  MessageSquare,
   Plus,
   RotateCcw,
   Settings,
   Trash2,
 } from "lucide-react";
-import { EventSettings } from "../lib/database";
+import type { LucideIcon } from "lucide-react";
+import { Delivery, EventSettings } from "../lib/database";
 import {
   buildDrawMessage,
   findUnknownPlaceholders,
@@ -35,8 +38,31 @@ export function SettingsManager({
   const { t } = useI18n();
   const templateRef = useRef<HTMLTextAreaElement>(null);
   const template = settings.messageTemplate ?? t.settings.defaultTemplate;
-  const tokens = Object.keys(t.settings.tokens) as MessageToken[];
+  const sendsLink = settings.delivery === "link";
+  const tokens = (Object.keys(t.settings.tokens) as MessageToken[]).filter(
+    (token) => token !== (sendsLink ? "drawn" : "link")
+  );
   const unknownPlaceholders = findUnknownPlaceholders(template);
+
+  const deliveryOptions: Array<{
+    value: Delivery;
+    icon: LucideIcon;
+    label: string;
+    description: string;
+  }> = [
+    {
+      value: "message",
+      icon: MessageSquare,
+      label: t.settings.deliveryMessage,
+      description: t.settings.deliveryMessageDescription,
+    },
+    {
+      value: "link",
+      icon: Link2,
+      label: t.settings.deliveryLink,
+      description: t.settings.deliveryLinkDescription,
+    },
+  ];
 
   const update = (changes: Partial<EventSettings>) =>
     onChange({ ...settings, ...changes });
@@ -64,7 +90,8 @@ export function SettingsManager({
     t.settings.previewDrawer,
     t.settings.previewDrawn,
     settings,
-    t
+    t,
+    `${window.location.origin}${window.location.pathname}#reveal=…`
   );
 
   return (
@@ -160,6 +187,43 @@ export function SettingsManager({
         >
           {t.settings.messageTitle}
         </h3>
+
+        <fieldset className="mb-4">
+          <legend className="label">{t.settings.deliveryLabel}</legend>
+          <div className="grid gap-2 sm:grid-cols-2">
+            {deliveryOptions.map(({ value, icon: Icon, label, description }) => {
+              const selected = settings.delivery === value;
+              return (
+                <label
+                  key={value}
+                  className={`card-inset flex cursor-pointer items-start gap-3 p-3.5 transition-colors ${
+                    selected
+                      ? "border-brand-400 bg-brand-50/60 ring-1 ring-brand-400 dark:border-brand-400/60 dark:bg-brand-500/10 dark:ring-brand-400/60"
+                      : "hover:bg-ink-100/60 dark:hover:bg-white/[0.06]"
+                  }`}
+                >
+                  <input
+                    type="radio"
+                    name="settings-delivery"
+                    value={value}
+                    checked={selected}
+                    onChange={() => update({ delivery: value })}
+                    className="mt-0.5 h-4 w-4 shrink-0 cursor-pointer"
+                  />
+                  <span className="min-w-0">
+                    <span className="flex items-center gap-2 text-sm font-semibold text-ink-900 dark:text-white">
+                      <Icon size={15} className="text-ink-400" />
+                      {label}
+                    </span>
+                    <span className="mt-1 block text-xs leading-relaxed text-ink-500 dark:text-ink-400">
+                      {description}
+                    </span>
+                  </span>
+                </label>
+              );
+            })}
+          </div>
+        </fieldset>
 
         <label className="label" htmlFor="settings-message">
           {t.settings.messageLabel}

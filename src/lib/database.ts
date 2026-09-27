@@ -29,11 +29,14 @@ export interface Draw {
   created_at: string;
 }
 
+export type Delivery = "message" | "link";
+
 export interface EventSettings {
   eventName: string;
   budget: string;
   exchangeDate: string;
   messageTemplate: string | null;
+  delivery: Delivery;
 }
 
 export const DEFAULT_EVENT_SETTINGS: EventSettings = {
@@ -41,6 +44,7 @@ export const DEFAULT_EVENT_SETTINGS: EventSettings = {
   budget: "",
   exchangeDate: "",
   messageTemplate: null,
+  delivery: "message",
 };
 
 export interface SetupSnapshot {
@@ -335,6 +339,7 @@ export function toEventSettings(value: unknown): EventSettings {
     exchangeDate: text(stored.exchangeDate),
     messageTemplate:
       typeof stored.messageTemplate === "string" ? stored.messageTemplate : null,
+    delivery: stored.delivery === "link" ? "link" : "message",
   };
 }
 

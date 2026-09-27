@@ -177,6 +177,8 @@ const fr = {
       }.`,
     resultInstructions:
       "Copiez le message de chaque personne et envoyez-le-lui, par SMS ou par e-mail. Il contient déjà le nom tiré : inutile de révéler les résultats.",
+    resultInstructionsLink:
+      "Copiez le message de chaque personne et envoyez-le-lui, par SMS ou par e-mail. Il contient un lien personnel qui ne révèle que son propre tirage.",
     staleTitle: "Ce tirage ne correspond plus",
     staleDescription:
       "Les participants ou les règles ont changé depuis. Relancez le tirage pour que tout le monde soit pris en compte.",
@@ -205,6 +207,13 @@ const fr = {
     budgetPlaceholder: "20 €",
     dateLabel: "Date de l'échange",
     messageTitle: "Le message",
+    deliveryLabel: "Chaque participant reçoit",
+    deliveryMessage: "Son résultat dans le message",
+    deliveryMessageDescription:
+      "Le nom de la personne tirée est écrit directement dans le message.",
+    deliveryLink: "Un lien personnel",
+    deliveryLinkDescription:
+      "Le message contient un lien qui ne révèle que son propre tirage, avec une petite animation. Les lignes qui citent la personne tirée sont retirées.",
     messageLabel: "Message envoyé à chaque participant",
     insertLabel: "Insérer :",
     insertTitle: (label: string) =>
@@ -212,6 +221,7 @@ const fr = {
     tokenLabels: {
       participant: "Participant",
       drawn: "Personne tirée",
+      link: "Lien personnel",
       event: "Événement",
       budget: "Budget",
       date: "Date",
@@ -219,6 +229,7 @@ const fr = {
     tokens: {
       participant: "participant",
       drawn: "personne_tirée",
+      link: "lien",
       event: "événement",
       budget: "budget",
       date: "date",
@@ -235,7 +246,7 @@ const fr = {
     previewDrawer: "Camille",
     previewDrawn: "Sacha",
     defaultTemplate:
-      "Bonjour {participant} !\n\nLe tirage au sort est fait : tu as tiré {personne_tirée}.\n\nÉvénement : {événement}\nBudget : {budget}\nÉchange prévu le {date}",
+      "Bonjour {participant} !\n\nLe tirage au sort est fait : tu as tiré {personne_tirée}.\nLe tirage au sort est fait ! Découvre qui tu as tiré ici : {lien}\n\nÉvénement : {événement}\nBudget : {budget}\nÉchange prévu le {date}",
     dataTitle: "Données",
     dataDescription:
       "Tout est enregistré sur cet appareil uniquement. Pour garder une copie, téléchargez d'abord la liste en CSV (étape 1, bouton « Partager »).",
@@ -243,6 +254,22 @@ const fr = {
     autosave: "Les modifications sont enregistrées automatiquement.",
     done: "Terminé",
     customize: "Personnaliser le message",
+  },
+
+  reveal: {
+    loading: "Ouverture de ton petit papier…",
+    greeting: (name: string) => `Bonjour ${name} !`,
+    intro: "Le tirage au sort est fait. Ton petit papier t'attend.",
+    introEvent: (eventName: string) =>
+      `Le tirage au sort « ${eventName} » est fait. Ton petit papier t'attend.`,
+    open: "Déplier mon petit papier",
+    youDrew: "Tu as tiré",
+    budget: (budget: string) => `Budget : ${budget}`,
+    exchange: (date: string) => `Échange prévu le ${date}`,
+    drawnOn: (date: string) => `Tirage fait le ${date}.`,
+    keepSecret:
+      "Ce lien n'affiche que ton tirage. Garde le secret ! Si le tirage est relancé, tu recevras un nouveau lien : fie-toi au plus récent.",
+    organize: "Organiser mon propre tirage",
   },
 
   toast: {
@@ -316,7 +343,7 @@ const fr = {
     resetDrawConfirm: "Recommencer",
     redrawTitle: "Relancer le tirage ?",
     redrawDescription:
-      "Le tirage actuel sera remplacé. Si des messages ont déjà été envoyés, ils ne seront plus valables.",
+      "Le tirage actuel sera remplacé. Les messages et les liens personnels déjà envoyés ne seront plus valables.",
     redrawConfirm: "Relancer",
     clearAllTitle: "Tout effacer ?",
     clearAllDescription:
@@ -507,6 +534,8 @@ const en: Translation = {
       `Draw complete — ${count} assignment${count > 1 ? "s" : ""} generated.`,
     resultInstructions:
       "Copy each person's message and send it to them by text or email. It already contains the name they drew: no need to reveal the results.",
+    resultInstructionsLink:
+      "Copy each person's message and send it to them by text or email. It contains a personal link that reveals only their own draw.",
     staleTitle: "This draw is out of date",
     staleDescription:
       "Participants or rules have changed since. Run the draw again so everyone is taken into account.",
@@ -535,12 +564,20 @@ const en: Translation = {
     budgetPlaceholder: "$20",
     dateLabel: "Exchange date",
     messageTitle: "The message",
+    deliveryLabel: "Each participant receives",
+    deliveryMessage: "Their result in the message",
+    deliveryMessageDescription:
+      "The name of the person drawn is written straight into the message.",
+    deliveryLink: "A personal link",
+    deliveryLinkDescription:
+      "The message holds a link that reveals only their own draw, with a small animation. Lines naming the person drawn are left out.",
     messageLabel: "Message sent to each participant",
     insertLabel: "Insert:",
     insertTitle: (label: string) => `Insert “${label}” at the cursor`,
     tokenLabels: {
       participant: "Participant",
       drawn: "Person drawn",
+      link: "Personal link",
       event: "Event",
       budget: "Budget",
       date: "Date",
@@ -548,6 +585,7 @@ const en: Translation = {
     tokens: {
       participant: "participant",
       drawn: "drawn_person",
+      link: "link",
       event: "event",
       budget: "budget",
       date: "date",
@@ -564,7 +602,7 @@ const en: Translation = {
     previewDrawer: "Alex",
     previewDrawn: "Robin",
     defaultTemplate:
-      "Hi {participant}!\n\nThe draw is done: you drew {drawn_person}.\n\nEvent: {event}\nBudget: {budget}\nExchange on {date}",
+      "Hi {participant}!\n\nThe draw is done: you drew {drawn_person}.\nThe draw is done! Find out who you drew here: {link}\n\nEvent: {event}\nBudget: {budget}\nExchange on {date}",
     dataTitle: "Data",
     dataDescription:
       "Everything is saved on this device only. To keep a copy, first download the list as CSV (step 1, “Share” button).",
@@ -572,6 +610,22 @@ const en: Translation = {
     autosave: "Changes are saved automatically.",
     done: "Done",
     customize: "Customise the message",
+  },
+
+  reveal: {
+    loading: "Opening your paper slip…",
+    greeting: (name: string) => `Hi ${name}!`,
+    intro: "The draw is done. Your paper slip is waiting for you.",
+    introEvent: (eventName: string) =>
+      `The “${eventName}” draw is done. Your paper slip is waiting for you.`,
+    open: "Unfold my paper slip",
+    youDrew: "You drew",
+    budget: (budget: string) => `Budget: ${budget}`,
+    exchange: (date: string) => `Exchange on ${date}`,
+    drawnOn: (date: string) => `Drawn on ${date}.`,
+    keepSecret:
+      "This link only shows your own draw. Keep it secret! If the draw is run again, you'll get a new link: trust the most recent one.",
+    organize: "Organise my own draw",
   },
 
   toast: {
@@ -645,7 +699,7 @@ const en: Translation = {
     resetDrawConfirm: "Start over",
     redrawTitle: "Run the draw again?",
     redrawDescription:
-      "The current draw will be replaced. Any messages already sent will no longer be valid.",
+      "The current draw will be replaced. Messages and personal links already sent will no longer be valid.",
     redrawConfirm: "Run again",
     clearAllTitle: "Erase everything?",
     clearAllDescription:
