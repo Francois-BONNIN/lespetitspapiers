@@ -18,8 +18,6 @@ const fr = {
 
   header: {
     tagline: "Tirage au sort",
-    drawDone: "Tirage effectué",
-    drawStale: "Tirage à refaire",
   },
 
   share: {
@@ -377,8 +375,6 @@ const en: Translation = {
 
   header: {
     tagline: "Random draw",
-    drawDone: "Draw complete",
-    drawStale: "Draw out of date",
   },
 
   share: {
