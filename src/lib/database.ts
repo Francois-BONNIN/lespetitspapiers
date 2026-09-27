@@ -43,6 +43,17 @@ export const DEFAULT_EVENT_SETTINGS: EventSettings = {
   messageTemplate: null,
 };
 
+export interface SetupSnapshot {
+  participants: Array<Pick<Participant, "name" | "family">>;
+  exclusions: Array<[number, number]>;
+  inclusions: Array<[number, number]>;
+  draws: Array<[number, number]>;
+  drawDate: string | null;
+  excludeSameFamily: boolean;
+  avoidReciprocal: boolean;
+  eventSettings: EventSettings | null;
+}
+
 const STORAGE_KEYS = {
   PARTICIPANTS: "petits_papiers_participants",
   EXCLUSIONS: "petits_papiers_exclusions",
@@ -226,14 +237,9 @@ export function clearDraws(): void {
   write(STORAGE_KEYS.DRAWS, []);
 }
 
-export function replaceAllData(
-  entries: Array<Pick<Participant, "name" | "family">>,
-  exclusionPairs: Array<[number, number]>,
-  inclusionPairs: Array<[number, number]>,
-  excludeSameFamily: boolean
-): void {
+export function replaceAllData(snapshot: SetupSnapshot): void {
   const now = new Date().toISOString();
-  const participants: Participant[] = entries.map((entry) => ({
+  const participants: Participant[] = snapshot.participants.map((entry) => ({
     id: generateId(),
     name: entry.name,
     family: entry.family,
@@ -244,7 +250,7 @@ export function replaceAllData(
   write(STORAGE_KEYS.PARTICIPANTS, participants);
   write(
     STORAGE_KEYS.EXCLUSIONS,
-    exclusionPairs.map(([from, to]): Exclusion => ({
+    snapshot.exclusions.map(([from, to]): Exclusion => ({
       id: generateId(),
       participant_id: idAt(from),
       excluded_participant_id: idAt(to),
@@ -253,15 +259,26 @@ export function replaceAllData(
   );
   write(
     STORAGE_KEYS.INCLUSIONS,
-    inclusionPairs.map(([from, to]): Inclusion => ({
+    snapshot.inclusions.map(([from, to]): Inclusion => ({
       id: generateId(),
       participant_id: idAt(from),
       included_participant_id: idAt(to),
       created_at: now,
     }))
   );
-  write(STORAGE_KEYS.DRAWS, []);
-  setExcludeSameFamilySetting(excludeSameFamily);
+  write(
+    STORAGE_KEYS.DRAWS,
+    snapshot.draws.map(([from, to]): Draw => ({
+      id: generateId(),
+      drawer_id: idAt(from),
+      drawn_id: idAt(to),
+      draw_date: snapshot.drawDate ?? now,
+      created_at: now,
+    }))
+  );
+  setExcludeSameFamilySetting(snapshot.excludeSameFamily);
+  setAvoidReciprocalSetting(snapshot.avoidReciprocal);
+  if (snapshot.eventSettings) saveEventSettings(snapshot.eventSettings);
 }
 
 export function getExcludeSameFamilySetting(): boolean {
@@ -307,25 +324,24 @@ export function clearAllData(): boolean {
   }
 }
 
+export function toEventSettings(value: unknown): EventSettings {
+  if (typeof value !== "object" || value === null) return DEFAULT_EVENT_SETTINGS;
+
+  const stored = value as Record<string, unknown>;
+  const text = (field: unknown) => (typeof field === "string" ? field : "");
+  return {
+    eventName: text(stored.eventName),
+    budget: text(stored.budget),
+    exchangeDate: text(stored.exchangeDate),
+    messageTemplate:
+      typeof stored.messageTemplate === "string" ? stored.messageTemplate : null,
+  };
+}
+
 export function getEventSettings(): EventSettings {
   try {
     const data = readRaw(STORAGE_KEYS.EVENT_SETTINGS);
-    const parsed: unknown = data ? JSON.parse(data) : null;
-    if (typeof parsed !== "object" || parsed === null) {
-      return DEFAULT_EVENT_SETTINGS;
-    }
-
-    const stored = parsed as Record<string, unknown>;
-    const text = (value: unknown) => (typeof value === "string" ? value : "");
-    return {
-      eventName: text(stored.eventName),
-      budget: text(stored.budget),
-      exchangeDate: text(stored.exchangeDate),
-      messageTemplate:
-        typeof stored.messageTemplate === "string"
-          ? stored.messageTemplate
-          : null,
-    };
+    return toEventSettings(data ? JSON.parse(data) : null);
   } catch (error) {
     console.error("Lecture impossible des paramètres de l'événement.", error);
     return DEFAULT_EVENT_SETTINGS;

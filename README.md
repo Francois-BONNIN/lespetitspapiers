@@ -62,7 +62,8 @@ tout simplement pas de base de données à l'autre bout.
 Ce qu'il faut savoir en échange :
 
 - Le tirage vit **sur l'appareil où vous l'avez fait**. Ouvrir le site sur votre
-  téléphone ne vous montrera pas la liste créée sur votre ordinateur.
+  téléphone ne vous montrera pas la liste créée sur votre ordinateur. Pour la
+  transférer, utilisez un lien de partage (voir plus bas).
 - Vider les données de navigation efface le tirage. Pour le conserver ou le
   transmettre, utilisez l'export CSV.
 - Pour repartir de zéro, le bouton « Tout effacer » des paramètres supprime
@@ -71,7 +72,20 @@ Ce qu'il faut savoir en échange :
   Dans ce cas, un bandeau vous prévient dès l'ouverture, avant que vous ayez
   saisi quoi que ce soit.
 
-## Import et export
+## Partage, import et export
+
+Le bouton « Partager » propose deux liens, sans passer par aucun serveur : tout
+tient dans l'adresse elle-même.
+
+- **Le lien de partage** contient les participants, les règles et les
+  paramètres, jamais les résultats. Vous pouvez l'envoyer à qui organise avec
+  vous.
+- **Le lien complet** ajoute le résultat du tirage, pour passer sur un autre
+  appareil. Attention à qui vous l'envoyez : toute personne qui l'ouvre peut
+  voir qui a tiré qui.
+
+Un lien reflète l'état au moment où vous le copiez : après une modification,
+copiez-en un nouveau.
 
 Une longue liste à saisir ? Importez un fichier CSV : noms, groupes,
 exclusions et tirages imposés sont repris en une fois.

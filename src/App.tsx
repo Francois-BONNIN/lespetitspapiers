@@ -402,16 +402,26 @@ function App() {
     }
   };
 
-  const handleShareLink = async () => {
+  const copyShareLink = async (includeDraws: boolean) => {
     try {
       const url = await buildShareUrl(
-        participants,
-        exclusions,
-        inclusions,
-        excludeSameFamily
+        {
+          participants,
+          exclusions,
+          inclusions,
+          draws,
+          excludeSameFamily,
+          avoidReciprocal,
+          eventSettings,
+        },
+        includeDraws
       );
       await navigator.clipboard.writeText(url);
-      toast.success(t.toast.shareCopied, t.toast.shareCopiedDescription);
+      if (includeDraws) {
+        toast.success(t.toast.fullLinkCopied, t.toast.fullLinkCopiedDescription);
+      } else {
+        toast.success(t.toast.shareCopied, t.toast.shareCopiedDescription);
+      }
     } catch (error) {
       toast.error(t.toast.shareFailed, t.toast.copyFailedDescription);
       console.error(error);
@@ -430,27 +440,31 @@ function App() {
       getParticipants().length > 0 || getDraws().length > 0;
 
     if (hasLocalData) {
+      const ruleCount = setup.exclusions.length + setup.inclusions.length;
       const confirmed = await confirm({
         title: t.confirm.openSharedTitle,
-        description: t.confirm.openSharedDescription(
-          setup.participants.length,
-          setup.exclusions.length + setup.inclusions.length
-        ),
+        description:
+          setup.draws.length > 0
+            ? t.confirm.openSharedWithDrawDescription(
+                setup.participants.length,
+                ruleCount
+              )
+            : t.confirm.openSharedDescription(
+                setup.participants.length,
+                ruleCount
+              ),
         confirmLabel: t.confirm.openSharedConfirm,
       });
       if (!confirmed) return;
     }
 
-    replaceAllData(
-      setup.participants,
-      setup.exclusions,
-      setup.inclusions,
-      setup.excludeSameFamily
-    );
+    replaceAllData(setup);
     loadData();
     toast.success(
       t.toast.sharedLoaded,
-      t.toast.sharedLoadedDescription(setup.participants.length)
+      setup.draws.length > 0
+        ? t.toast.sharedLoadedWithDrawDescription(setup.participants.length)
+        : t.toast.sharedLoadedDescription(setup.participants.length)
     );
   };
 
@@ -531,7 +545,9 @@ function App() {
             onDeleteParticipant={handleDeleteParticipant}
             onExportData={handleExportData}
             onImportData={handleImportData}
-            onShareLink={handleShareLink}
+            hasDraws={draws.length > 0}
+            onShareLink={() => copyShareLink(false)}
+            onShareFullLink={() => copyShareLink(true)}
           />
 
           <RulesManager

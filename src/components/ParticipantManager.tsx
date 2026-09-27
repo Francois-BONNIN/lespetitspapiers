@@ -5,6 +5,7 @@ import {
   Link2,
   Search,
   Share2,
+  Smartphone,
   Trash2,
   Upload,
   UserPlus,
@@ -23,11 +24,13 @@ import { useI18n } from "./ui/language-context";
 interface ParticipantManagerProps {
   participants: Participant[];
   excludeSameFamily: boolean;
+  hasDraws: boolean;
   onAddParticipant: (name: string, family: string) => void;
   onDeleteParticipant: (id: string) => void;
   onExportData: () => void;
   onImportData: (file: File) => void;
   onShareLink: () => void;
+  onShareFullLink: () => void;
 }
 
 const UNGROUPED = "";
@@ -35,11 +38,13 @@ const UNGROUPED = "";
 export function ParticipantManager({
   participants,
   excludeSameFamily,
+  hasDraws,
   onAddParticipant,
   onDeleteParticipant,
   onExportData,
   onImportData,
   onShareLink,
+  onShareFullLink,
 }: ParticipantManagerProps) {
   const { t } = useI18n();
   const locale = t.meta.locale;
@@ -144,6 +149,16 @@ export function ParticipantManager({
                 label: t.participants.shareLinkAction,
                 description: t.participants.shareLinkDescription,
                 onSelect: onShareLink,
+              },
+              {
+                id: "full-link",
+                icon: Smartphone,
+                label: t.participants.fullLinkAction,
+                description: hasDraws
+                  ? t.participants.fullLinkDescription
+                  : t.participants.fullLinkUnavailable,
+                disabled: !hasDraws,
+                onSelect: onShareFullLink,
               },
               {
                 id: "export-csv",

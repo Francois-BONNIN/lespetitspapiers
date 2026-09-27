@@ -62,7 +62,11 @@ const fr = {
     shareAction: "Partager",
     shareLinkAction: "Copier un lien de partage",
     shareLinkDescription:
-      "Les participants et les règles, sans les résultats : à envoyer à qui organise avec vous.",
+      "Les participants, les règles et les paramètres, sans les résultats : à envoyer à qui organise avec vous.",
+    fullLinkAction: "Copier un lien complet",
+    fullLinkDescription:
+      "Avec les résultats, pour passer sur un autre appareil. Toute personne qui l'ouvre peut voir qui a tiré qui.",
+    fullLinkUnavailable: "Disponible une fois le tirage lancé.",
     exportAction: "Télécharger en CSV",
     exportDescription:
       "Un fichier à garder, à retoucher dans un tableur ou à réimporter l'an prochain.",
@@ -282,11 +286,16 @@ const fr = {
       `${count} message(s) sont dans votre presse-papiers.`,
     shareCopied: "Lien de partage copié",
     shareCopiedDescription:
-      "Il contient les participants et les règles, mais pas les résultats du tirage. Rien n'est envoyé à un serveur.",
+      "Participants, règles et paramètres, sans les résultats. Si vous modifiez quelque chose, copiez un nouveau lien.",
+    fullLinkCopied: "Lien complet copié",
+    fullLinkCopiedDescription:
+      "Il contient les résultats : ne l'envoyez qu'à qui organise avec vous. Après une modification, copiez-en un nouveau.",
     shareFailed: "Création du lien impossible",
     sharedLoaded: "Tirage partagé chargé",
     sharedLoadedDescription: (count: number) =>
       `${count} participant(s) récupéré(s) depuis le lien.`,
+    sharedLoadedWithDrawDescription: (count: number) =>
+      `${count} participant(s) et le résultat du tirage récupérés. Les résultats restent masqués.`,
     sharedInvalid: "Lien de partage invalide",
     sharedInvalidDescription:
       "Le lien est incomplet ou abîmé : demandez-en un nouveau.",
@@ -315,7 +324,9 @@ const fr = {
     clearAllConfirm: "Tout effacer",
     openSharedTitle: "Ouvrir le tirage partagé ?",
     openSharedDescription: (participants: number, rules: number) =>
-      `Ce lien contient ${participants} participant(s) et ${rules} règle(s). Ils remplaceront vos participants, vos règles et votre tirage actuels.`,
+      `Ce lien contient ${participants} participant(s) et ${rules} règle(s). Ils remplaceront vos participants, vos règles, vos paramètres et votre tirage actuels.`,
+    openSharedWithDrawDescription: (participants: number, rules: number) =>
+      `Ce lien contient ${participants} participant(s), ${rules} règle(s) et le résultat du tirage. Ils remplaceront vos participants, vos règles, vos paramètres et votre tirage actuels.`,
     openSharedConfirm: "Remplacer",
   },
 
@@ -386,7 +397,11 @@ const en: Translation = {
     shareAction: "Share",
     shareLinkAction: "Copy a share link",
     shareLinkDescription:
-      "The participants and the rules, without the results: send it to whoever is organising with you.",
+      "The participants, the rules and the settings, without the results: send it to whoever is organising with you.",
+    fullLinkAction: "Copy a full link",
+    fullLinkDescription:
+      "With the results, to move to another device. Anyone who opens it can see who drew whom.",
+    fullLinkUnavailable: "Available once the draw has been run.",
     exportAction: "Download as CSV",
     exportDescription:
       "A file to keep, edit in a spreadsheet or re-import next year.",
@@ -600,11 +615,16 @@ const en: Translation = {
       `${count} message(s) are in your clipboard.`,
     shareCopied: "Share link copied",
     shareCopiedDescription:
-      "It contains the participants and the rules, but not the draw results. Nothing is sent to a server.",
+      "Participants, rules and settings, without the results. If you change anything, copy a new link.",
+    fullLinkCopied: "Full link copied",
+    fullLinkCopiedDescription:
+      "It contains the results: only send it to whoever is organising with you. After any change, copy a new one.",
     shareFailed: "Could not create the link",
     sharedLoaded: "Shared draw loaded",
     sharedLoadedDescription: (count: number) =>
       `${count} participant(s) loaded from the link.`,
+    sharedLoadedWithDrawDescription: (count: number) =>
+      `${count} participant(s) and the draw result loaded. The results stay hidden.`,
     sharedInvalid: "Invalid share link",
     sharedInvalidDescription:
       "The link is incomplete or damaged: ask for a new one.",
@@ -633,7 +653,9 @@ const en: Translation = {
     clearAllConfirm: "Erase everything",
     openSharedTitle: "Open the shared draw?",
     openSharedDescription: (participants: number, rules: number) =>
-      `This link contains ${participants} participant(s) and ${rules} rule(s). They will replace your current participants, rules and draw.`,
+      `This link contains ${participants} participant(s) and ${rules} rule(s). They will replace your current participants, rules, settings and draw.`,
+    openSharedWithDrawDescription: (participants: number, rules: number) =>
+      `This link contains ${participants} participant(s), ${rules} rule(s) and the draw result. They will replace your current participants, rules, settings and draw.`,
     openSharedConfirm: "Replace",
   },
 

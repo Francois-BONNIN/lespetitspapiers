@@ -1,19 +1,17 @@
-import type { Exclusion, Inclusion, Participant } from "./database";
+import {
+  toEventSettings,
+  type Draw,
+  type EventSettings,
+  type Exclusion,
+  type Inclusion,
+  type Participant,
+  type SetupSnapshot,
+} from "./database";
 
-const SHARE_HASH_PREFIX = "#share=";
+const SETUP_HASH_PREFIX = "#share=";
 const SHARE_FORMAT_VERSION = 1;
 
 type IndexPair = [number, number];
-
-export interface SharedSetup {
-  participants: Array<{
-    name: string;
-    family: string | null;
-  }>;
-  exclusions: IndexPair[];
-  inclusions: IndexPair[];
-  excludeSameFamily: boolean;
-}
 
 interface SharePayload {
   v: number;
@@ -21,6 +19,20 @@ interface SharePayload {
   x: IndexPair[];
   i: IndexPair[];
   s: 0 | 1;
+  a: 0 | 1;
+  m: EventSettings;
+  r?: IndexPair[];
+  w?: string;
+}
+
+export interface ShareSource {
+  participants: Participant[];
+  exclusions: Exclusion[];
+  inclusions: Inclusion[];
+  draws: Draw[];
+  excludeSameFamily: boolean;
+  avoidReciprocal: boolean;
+  eventSettings: EventSettings;
 }
 
 function bytesToBase64Url(bytes: Uint8Array): string {
@@ -45,13 +57,29 @@ async function pipeBytes(
   return new Uint8Array(await new Response(stream).arrayBuffer());
 }
 
-function toPayload(
-  participants: Participant[],
-  exclusions: Exclusion[],
-  inclusions: Inclusion[],
-  excludeSameFamily: boolean
-): SharePayload {
-  const indexById = new Map(participants.map((p, index) => [p.id, index]));
+async function encodeJson(value: unknown): Promise<string> {
+  const compressed = await pipeBytes(
+    new TextEncoder().encode(JSON.stringify(value)),
+    new CompressionStream("deflate-raw")
+  );
+  return bytesToBase64Url(compressed);
+}
+
+async function decodeJson(encoded: string): Promise<unknown> {
+  const bytes = await pipeBytes(
+    base64UrlToBytes(encoded),
+    new DecompressionStream("deflate-raw")
+  );
+  return JSON.parse(new TextDecoder().decode(bytes));
+}
+
+function currentPageLink(hash: string): string {
+  const { origin, pathname, search } = window.location;
+  return `${origin}${pathname}${search}${hash}`;
+}
+
+function toPayload(source: ShareSource, includeDraws: boolean): SharePayload {
+  const indexById = new Map(source.participants.map((p, index) => [p.id, index]));
   const toPairs = (links: Array<[string, string]>) =>
     links.flatMap(([from, to]): IndexPair[] => {
       const fromIndex = indexById.get(from);
@@ -61,19 +89,28 @@ function toPayload(
         : [[fromIndex, toIndex]];
     });
 
-  return {
+  const payload: SharePayload = {
     v: SHARE_FORMAT_VERSION,
-    p: participants.map((p) =>
+    p: source.participants.map((p) =>
       p.family ? [p.name, p.family] : [p.name]
     ),
     x: toPairs(
-      exclusions.map((e) => [e.participant_id, e.excluded_participant_id])
+      source.exclusions.map((e) => [e.participant_id, e.excluded_participant_id])
     ),
     i: toPairs(
-      inclusions.map((i) => [i.participant_id, i.included_participant_id])
+      source.inclusions.map((i) => [i.participant_id, i.included_participant_id])
     ),
-    s: excludeSameFamily ? 1 : 0,
+    s: source.excludeSameFamily ? 1 : 0,
+    a: source.avoidReciprocal ? 1 : 0,
+    m: source.eventSettings,
   };
+
+  if (includeDraws && source.draws.length > 0) {
+    payload.r = toPairs(source.draws.map((d) => [d.drawer_id, d.drawn_id]));
+    payload.w = source.draws[0].draw_date;
+  }
+
+  return payload;
 }
 
 function isIndexPair(value: unknown, size: number): value is IndexPair {
@@ -91,7 +128,7 @@ function optionalText(value: unknown): string | null {
   return typeof value === "string" && value.trim() ? value.trim() : null;
 }
 
-function fromPayload(raw: unknown): SharedSetup | null {
+function fromPayload(raw: unknown): SetupSnapshot | null {
   if (typeof raw !== "object" || raw === null) return null;
   const payload = raw as Partial<SharePayload>;
   if (payload.v !== SHARE_FORMAT_VERSION || !Array.isArray(payload.p)) {
@@ -117,43 +154,34 @@ function fromPayload(raw: unknown): SharedSetup | null {
     participants,
     exclusions: pairs(payload.x),
     inclusions: pairs(payload.i),
+    draws: pairs(payload.r),
+    drawDate: optionalText(payload.w),
     excludeSameFamily: payload.s !== 0,
+    avoidReciprocal: payload.a === 1,
+    eventSettings: payload.m === undefined ? null : toEventSettings(payload.m),
   };
 }
 
 export async function buildShareUrl(
-  participants: Participant[],
-  exclusions: Exclusion[],
-  inclusions: Inclusion[],
-  excludeSameFamily: boolean
+  source: ShareSource,
+  includeDraws: boolean
 ): Promise<string> {
-  const json = JSON.stringify(
-    toPayload(participants, exclusions, inclusions, excludeSameFamily)
-  );
-  const compressed = await pipeBytes(
-    new TextEncoder().encode(json),
-    new CompressionStream("deflate-raw")
-  );
-  const { origin, pathname, search } = window.location;
-  return `${origin}${pathname}${search}${SHARE_HASH_PREFIX}${bytesToBase64Url(compressed)}`;
+  const encoded = await encodeJson(toPayload(source, includeDraws));
+  return currentPageLink(`${SETUP_HASH_PREFIX}${encoded}`);
 }
 
 export function takeSharePayloadFromUrl(): string | null {
   const { hash, pathname, search } = window.location;
-  if (!hash.startsWith(SHARE_HASH_PREFIX)) return null;
+  if (!hash.startsWith(SETUP_HASH_PREFIX)) return null;
   window.history.replaceState(null, "", `${pathname}${search}`);
-  return hash.slice(SHARE_HASH_PREFIX.length);
+  return hash.slice(SETUP_HASH_PREFIX.length);
 }
 
 export async function decodeSharePayload(
   encoded: string
-): Promise<SharedSetup | null> {
+): Promise<SetupSnapshot | null> {
   try {
-    const bytes = await pipeBytes(
-      base64UrlToBytes(encoded),
-      new DecompressionStream("deflate-raw")
-    );
-    return fromPayload(JSON.parse(new TextDecoder().decode(bytes)));
+    return fromPayload(await decodeJson(encoded));
   } catch (error) {
     console.error("Lien de partage illisible.", error);
     return null;

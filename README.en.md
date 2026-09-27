@@ -59,7 +59,8 @@ results are never sent anywhere — there simply is no database at the other end
 What that means in practice:
 
 - The draw lives **on the device where you made it**. Opening the site on your
-  phone will not show you the list you created on your computer.
+  phone will not show you the list you created on your computer. To move it, use a
+  share link (see below).
 - Clearing your browsing data erases the draw. To keep it or pass it on, use the
   CSV export.
 - To start from scratch, the "Erase everything" button in the settings deletes
@@ -67,7 +68,18 @@ What that means in practice:
 - In private browsing, saving is sometimes blocked by the browser. If so, a
   banner warns you as soon as you open the page, before you have typed anything.
 
-## Import and export
+## Sharing, import and export
+
+The "Share" button offers two links, with no server involved: everything fits in
+the address itself.
+
+- **The share link** holds the participants, the rules and the settings, never
+  the results. You can send it to whoever is organising with you.
+- **The full link** adds the draw result, to move to another device. Be careful
+  who you send it to: anyone who opens it can see who drew whom.
+
+A link reflects things as they are when you copy it: after any change, copy a new
+one.
 
 Got a long list to type in? Import a CSV file: names, groups, exclusions
 and forced draws all come across in one go.
