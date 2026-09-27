@@ -29,11 +29,7 @@ import {
   isStorageAvailable,
   replaceAllData,
 } from "./lib/database";
-import {
-  DrawRules,
-  isDrawConsistent,
-  performDraw,
-} from "./lib/drawAlgorithm";
+import { DrawRules, isDrawConsistent, performDraw } from "./lib/drawAlgorithm";
 import {
   exportParticipantsToCSV,
   downloadCSV,
@@ -68,7 +64,7 @@ function App() {
   const [excludeSameFamily, setExcludeSameFamilyState] = useState(true);
   const [avoidReciprocal, setAvoidReciprocalState] = useState(false);
   const [eventSettings, setEventSettings] = useState<EventSettings>(
-    DEFAULT_EVENT_SETTINGS
+    DEFAULT_EVENT_SETTINGS,
   );
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [storageAvailable] = useState(isStorageAvailable);
@@ -129,18 +125,17 @@ function App() {
 
   const drawRules = useMemo<DrawRules>(
     () => ({ exclusions, inclusions, excludeSameFamily, avoidReciprocal }),
-    [exclusions, inclusions, excludeSameFamily, avoidReciprocal]
+    [exclusions, inclusions, excludeSameFamily, avoidReciprocal],
   );
 
   const drawIsStale = useMemo(
-    () =>
-      draws.length > 0 && !isDrawConsistent(draws, participants, drawRules),
-    [draws, participants, drawRules]
+    () => draws.length > 0 && !isDrawConsistent(draws, participants, drawRules),
+    [draws, participants, drawRules],
   );
 
   const handleAddParticipant = (name: string, family: string) => {
     const duplicate = participants.some(
-      (p) => p.name.toLowerCase() === name.toLowerCase()
+      (p) => p.name.toLowerCase() === name.toLowerCase(),
     );
 
     try {
@@ -149,16 +144,13 @@ function App() {
       if (duplicate) {
         toast.warning(
           t.toast.participantAdded(name),
-          t.toast.participantDuplicate
+          t.toast.participantDuplicate,
         );
       } else {
         toast.success(t.toast.participantAdded(name));
       }
     } catch (error) {
-      toast.error(
-        t.toast.addFailed,
-        t.toast.participantAddFailedDescription
-      );
+      toast.error(t.toast.addFailed, t.toast.participantAddFailedDescription);
       console.error(error);
     }
   };
@@ -167,24 +159,25 @@ function App() {
     const participant = participants.find((p) => p.id === id);
     const linkedConstraints =
       exclusions.filter(
-        (e) => e.participant_id === id || e.excluded_participant_id === id
+        (e) => e.participant_id === id || e.excluded_participant_id === id,
       ).length +
       inclusions.filter(
-        (i) => i.participant_id === id || i.included_participant_id === id
+        (i) => i.participant_id === id || i.included_participant_id === id,
       ).length;
 
     const confirmed = await confirm({
       title: t.confirm.deleteParticipantTitle(
-        participant?.name ?? t.confirm.deleteParticipantFallback
+        participant?.name ?? t.confirm.deleteParticipantFallback,
       ),
-      description: [
-        linkedConstraints > 0
-          ? t.confirm.linkedConstraints(linkedConstraints)
-          : null,
-        draws.length > 0 ? t.confirm.drawInvalidated : null,
-      ]
-        .filter(Boolean)
-        .join(" ") || t.confirm.irreversible,
+      description:
+        [
+          linkedConstraints > 0
+            ? t.confirm.linkedConstraints(linkedConstraints)
+            : null,
+          draws.length > 0 ? t.confirm.drawInvalidated : null,
+        ]
+          .filter(Boolean)
+          .join(" ") || t.confirm.irreversible,
       confirmLabel: t.common.delete,
     });
 
@@ -204,7 +197,7 @@ function App() {
     const exists = exclusions.some(
       (e) =>
         e.participant_id === participantId &&
-        e.excluded_participant_id === excludedId
+        e.excluded_participant_id === excludedId,
     );
 
     if (exists) {
@@ -236,7 +229,7 @@ function App() {
     const exists = inclusions.some(
       (i) =>
         i.participant_id === participantId &&
-        i.included_participant_id === includedId
+        i.included_participant_id === includedId,
     );
 
     if (exists) {
@@ -282,12 +275,12 @@ function App() {
             results.map((r) => ({
               drawer_id: r.drawer_id,
               drawn_id: r.drawn_id,
-            }))
-          )
+            })),
+          ),
         );
         toast.success(
           t.toast.drawDone,
-          t.toast.drawDoneDescription(results.length)
+          t.toast.drawDoneDescription(results.length),
         );
       } catch (error) {
         toast.error(t.toast.drawSaveFailed, t.toast.drawSaveFailedDescription);
@@ -409,12 +402,12 @@ function App() {
       loadData();
       toast.success(
         t.toast.importDone,
-        t.toast.importDoneDescription(importResult.participants.length)
+        t.toast.importDoneDescription(importResult.participants.length),
       );
     } catch (error) {
       toast.error(
         t.toast.importReadFailed,
-        t.toast.importReadFailedDescription
+        t.toast.importReadFailedDescription,
       );
       console.error(error);
     }
@@ -432,11 +425,14 @@ function App() {
           avoidReciprocal,
           eventSettings,
         },
-        includeDraws
+        includeDraws,
       );
       await navigator.clipboard.writeText(url);
       if (includeDraws) {
-        toast.success(t.toast.fullLinkCopied, t.toast.fullLinkCopiedDescription);
+        toast.success(
+          t.toast.fullLinkCopied,
+          t.toast.fullLinkCopiedDescription,
+        );
       } else {
         toast.success(t.toast.shareCopied, t.toast.shareCopiedDescription);
       }
@@ -454,8 +450,7 @@ function App() {
       return;
     }
 
-    const hasLocalData =
-      getParticipants().length > 0 || getDraws().length > 0;
+    const hasLocalData = getParticipants().length > 0 || getDraws().length > 0;
 
     if (hasLocalData) {
       const ruleCount = setup.exclusions.length + setup.inclusions.length;
@@ -465,11 +460,11 @@ function App() {
           setup.draws.length > 0
             ? t.confirm.openSharedWithDrawDescription(
                 setup.participants.length,
-                ruleCount
+                ruleCount,
               )
             : t.confirm.openSharedDescription(
                 setup.participants.length,
-                ruleCount
+                ruleCount,
               ),
         confirmLabel: t.confirm.openSharedConfirm,
       });
@@ -482,7 +477,7 @@ function App() {
       t.toast.sharedLoaded,
       setup.draws.length > 0
         ? t.toast.sharedLoadedWithDrawDescription(setup.participants.length)
-        : t.toast.sharedLoadedDescription(setup.participants.length)
+        : t.toast.sharedLoadedDescription(setup.participants.length),
     );
   };
 
