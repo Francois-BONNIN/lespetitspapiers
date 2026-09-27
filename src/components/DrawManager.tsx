@@ -19,7 +19,7 @@ import { exportDrawsToCSV, downloadCSV } from "../lib/csvExport";
 import { buildDrawMessage } from "../lib/message";
 import { buildRevealUrl, type PersonalDraw } from "../lib/shareLink";
 import { buildHomonymHints, labelWithHint } from "../lib/homonyms";
-import { getGroupColor } from "../lib/familyColors";
+import { assignGroupColors, getGroupColor } from "../lib/familyColors";
 import { SectionCard } from "./ui/SectionCard";
 import { ActionMenu } from "./ui/ActionMenu";
 import { EmptyState } from "./ui/EmptyState";
@@ -74,10 +74,13 @@ export function DrawManager({
   const getParticipantName = (id: string) =>
     participants.find((p) => p.id === id)?.name ?? t.common.unknown;
 
+  const groupColors = useMemo(
+    () => assignGroupColors(participants),
+    [participants]
+  );
+
   const getGroupColorOf = (id: string) =>
-    getGroupColor(
-      participants.find((p) => p.id === id)?.family?.trim() ?? ""
-    );
+    getGroupColor(groupColors, participants.find((p) => p.id === id)?.family);
 
   const homonymHints = useMemo(
     () => buildHomonymHints(participants),

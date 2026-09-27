@@ -1,7 +1,7 @@
 import { useMemo, useRef, useState } from "react";
 import { Info, Search, Upload, UserPlus, Users, X } from "lucide-react";
 import { Participant } from "../lib/database";
-import { getGroupColor } from "../lib/familyColors";
+import { assignGroupColors, getGroupColor } from "../lib/familyColors";
 import { buildHomonymHints } from "../lib/homonyms";
 import { useRecentlyAdded } from "../lib/useRecentlyAdded";
 import { SectionCard } from "./ui/SectionCard";
@@ -37,6 +37,11 @@ export function ParticipantManager({
 
   const homonymHints = useMemo(
     () => buildHomonymHints(participants),
+    [participants]
+  );
+
+  const groupColors = useMemo(
+    () => assignGroupColors(participants),
     [participants]
   );
 
@@ -218,7 +223,7 @@ export function ParticipantManager({
       ) : (
         <div className="space-y-5">
           {groups.map(([groupName, members]) => {
-            const colors = getGroupColor(groupName);
+            const colors = getGroupColor(groupColors, groupName);
             const isUngrouped = groupName === UNGROUPED;
 
             return (
