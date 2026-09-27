@@ -3,7 +3,6 @@ import { v4 as uuidv4 } from "uuid";
 export interface Participant {
   id: string;
   name: string;
-  email: string | null;
   family: string | null;
   created_at: string;
 }
@@ -30,12 +29,43 @@ export interface Draw {
   created_at: string;
 }
 
+export type Delivery = "message" | "link";
+
+export interface EventSettings {
+  eventName: string;
+  budget: string;
+  exchangeDate: string;
+  messageTemplate: string | null;
+  delivery: Delivery;
+}
+
+export const DEFAULT_EVENT_SETTINGS: EventSettings = {
+  eventName: "",
+  budget: "",
+  exchangeDate: "",
+  messageTemplate: null,
+  delivery: "message",
+};
+
+export interface SetupSnapshot {
+  participants: Array<Pick<Participant, "name" | "family">>;
+  exclusions: Array<[number, number]>;
+  inclusions: Array<[number, number]>;
+  draws: Array<[number, number]>;
+  drawDate: string | null;
+  excludeSameFamily: boolean;
+  avoidReciprocal: boolean;
+  eventSettings: EventSettings | null;
+}
+
 const STORAGE_KEYS = {
   PARTICIPANTS: "petits_papiers_participants",
   EXCLUSIONS: "petits_papiers_exclusions",
   INCLUSIONS: "petits_papiers_inclusions",
   DRAWS: "petits_papiers_draws",
   EXCLUDE_SAME_FAMILY: "petits_papiers_exclude_same_group",
+  AVOID_RECIPROCAL: "petits_papiers_avoid_reciprocal",
+  EVENT_SETTINGS: "petits_papiers_event_settings",
 };
 
 const LEGACY_STORAGE_KEYS: Record<string, string> = {
@@ -105,14 +135,12 @@ export function getParticipants(): Participant[] {
 
 export function addParticipant(
   name: string,
-  email: string | null,
   family: string | null
 ): Participant {
   const participants = getParticipants();
   const newParticipant: Participant = {
     id: generateId(),
     name,
-    email,
     family,
     created_at: new Date().toISOString(),
   };
@@ -213,6 +241,50 @@ export function clearDraws(): void {
   write(STORAGE_KEYS.DRAWS, []);
 }
 
+export function replaceAllData(snapshot: SetupSnapshot): void {
+  const now = new Date().toISOString();
+  const participants: Participant[] = snapshot.participants.map((entry) => ({
+    id: generateId(),
+    name: entry.name,
+    family: entry.family,
+    created_at: now,
+  }));
+  const idAt = (index: number) => participants[index].id;
+
+  write(STORAGE_KEYS.PARTICIPANTS, participants);
+  write(
+    STORAGE_KEYS.EXCLUSIONS,
+    snapshot.exclusions.map(([from, to]): Exclusion => ({
+      id: generateId(),
+      participant_id: idAt(from),
+      excluded_participant_id: idAt(to),
+      created_at: now,
+    }))
+  );
+  write(
+    STORAGE_KEYS.INCLUSIONS,
+    snapshot.inclusions.map(([from, to]): Inclusion => ({
+      id: generateId(),
+      participant_id: idAt(from),
+      included_participant_id: idAt(to),
+      created_at: now,
+    }))
+  );
+  write(
+    STORAGE_KEYS.DRAWS,
+    snapshot.draws.map(([from, to]): Draw => ({
+      id: generateId(),
+      drawer_id: idAt(from),
+      drawn_id: idAt(to),
+      draw_date: snapshot.drawDate ?? now,
+      created_at: now,
+    }))
+  );
+  setExcludeSameFamilySetting(snapshot.excludeSameFamily);
+  setAvoidReciprocalSetting(snapshot.avoidReciprocal);
+  if (snapshot.eventSettings) saveEventSettings(snapshot.eventSettings);
+}
+
 export function getExcludeSameFamilySetting(): boolean {
   try {
     const data = readRaw(STORAGE_KEYS.EXCLUDE_SAME_FAMILY);
@@ -228,4 +300,59 @@ export function getExcludeSameFamilySetting(): boolean {
 
 export function setExcludeSameFamilySetting(value: boolean): void {
   write(STORAGE_KEYS.EXCLUDE_SAME_FAMILY, value);
+}
+
+export function getAvoidReciprocalSetting(): boolean {
+  try {
+    return JSON.parse(readRaw(STORAGE_KEYS.AVOID_RECIPROCAL) ?? "false") === true;
+  } catch (error) {
+    console.error("Lecture impossible du réglage des tirages réciproques.", error);
+    return false;
+  }
+}
+
+export function setAvoidReciprocalSetting(value: boolean): void {
+  write(STORAGE_KEYS.AVOID_RECIPROCAL, value);
+}
+
+export function clearAllData(): boolean {
+  try {
+    [
+      ...Object.values(STORAGE_KEYS),
+      ...Object.values(LEGACY_STORAGE_KEYS),
+    ].forEach((key) => localStorage.removeItem(key));
+    return true;
+  } catch (error) {
+    console.error("Effacement impossible des données.", error);
+    return false;
+  }
+}
+
+export function toEventSettings(value: unknown): EventSettings {
+  if (typeof value !== "object" || value === null) return DEFAULT_EVENT_SETTINGS;
+
+  const stored = value as Record<string, unknown>;
+  const text = (field: unknown) => (typeof field === "string" ? field : "");
+  return {
+    eventName: text(stored.eventName),
+    budget: text(stored.budget),
+    exchangeDate: text(stored.exchangeDate),
+    messageTemplate:
+      typeof stored.messageTemplate === "string" ? stored.messageTemplate : null,
+    delivery: stored.delivery === "link" ? "link" : "message",
+  };
+}
+
+export function getEventSettings(): EventSettings {
+  try {
+    const data = readRaw(STORAGE_KEYS.EVENT_SETTINGS);
+    return toEventSettings(data ? JSON.parse(data) : null);
+  } catch (error) {
+    console.error("Lecture impossible des paramètres de l'événement.", error);
+    return DEFAULT_EVENT_SETTINGS;
+  }
+}
+
+export function saveEventSettings(settings: EventSettings): void {
+  write(STORAGE_KEYS.EVENT_SETTINGS, settings);
 }

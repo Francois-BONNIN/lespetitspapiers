@@ -18,20 +18,24 @@ a present, and that it would be better to avoid it. So you start over again.
 
 Les Petits Papiers does exactly the same thing, except the hat knows the rules.
 
-## In four steps
+## In three steps
 
-**1. Add the participants.** A first name is enough. Email and group ("Morgan
-family", "Team A"…) are optional.
+**1. Add the participants.** A first name is enough. The group ("Morgan
+family", "Team A"…) is optional: its members won't draw each other, unless you
+turn that rule off.
 
-**2. Set your exclusions.** _Alex cannot draw Sam._ As many rules as you need.
-One checkbox covers the most common case in a single click: stop members of the
-same group from drawing each other.
+**2. Set your rules, if you need them.** Two kinds of rules, to combine as you
+like:
 
-**3. Add restricted draws, if you need them.** The opposite of an exclusion:
-_Robin can only be drawn by Alex or Jamie._ Handy when a gift is going in
-together, or when a child should land on an adult.
+- **exclusions**: _Alex won't draw Sam._ As many rules as you need. One
+  checkbox covers the most common case in a single click: stop members of the
+  same group from drawing each other. Another avoids reciprocal draws: if Alex
+  draws Sam, Sam won't draw Alex.
+- **forced draws**: _Alex or Jamie will draw Robin._ Nobody else can draw
+  Robin. Handy when a gift is going in together, or when a child should land on
+  an adult.
 
-**4. Run the draw.** The assignment satisfies every rule at once. If your
+**3. Run the draw.** The assignment satisfies every rule at once. If your
 constraints make a valid draw impossible, the app tells you so instead of
 handing you a half-broken result.
 
@@ -45,36 +49,56 @@ you need to. And for each participant, a button copies a ready-written message �
 recipient's name included — that you just paste into a text or an email. Everyone
 finds out who they drew without ever seeing the full list.
 
+Even more discreet: in the settings, choose to send **a personal link** instead of
+the name. The message then only holds a link. Opening it, each participant unfolds
+their paper slip and finds out who they drew, along with the budget and exchange
+date. The link contains only their own pair: even if forwarded, it reveals nothing
+about anyone else.
+
 ## Your data stays with you
 
 No account to create. No password. No server storing your guest lists.
 
-Everything is saved in your browser's local storage. Names, emails, rules and
+Everything is saved in your browser's local storage. Names, groups, rules and
 results are never sent anywhere — there simply is no database at the other end.
 
 What that means in practice:
 
 - The draw lives **on the device where you made it**. Opening the site on your
-  phone will not show you the list you created on your computer.
-- Clearing your browsing data erases the draw. To keep it or pass it on, use the
-  CSV export.
+  phone will not show you the list you created on your computer. To move it, use a
+  share link (see below).
+- Clearing your browsing data erases the draw. To keep it or pass it on, copy a
+  share link.
+- To start from scratch, the "Erase everything" button in the settings deletes
+  participants, rules, the draw and the settings in one go.
 - In private browsing, saving is sometimes blocked by the browser. If so, a
   banner warns you as soon as you open the page, before you have typed anything.
 
-## Import and export
+## Sharing, import and export
 
-Got a long list to type in? Import a CSV file: names, emails, groups, exclusions
-and restricted draws all come across in one go.
+The "Share" button offers two links, with no server involved: everything fits in
+the address itself.
 
-Going the other way, two exports are available: the participant list with all of
-their constraints (to replay the same draw next year), and the result of the
-draw itself.
+- **The share link** holds the participants, the rules and the settings, never
+  the results. You can send it to whoever is organising with you.
+- **The full link** adds the draw result, to move to another device. Be careful
+  who you send it to: anyone who opens it can see who drew whom.
 
-A file exported in French re-imports without trouble from the English interface,
-and the other way round.
+A link reflects things as they are when you copy it: after any change, copy a new
+one.
+
+Got a long list to type in? Import a CSV file: names, groups, exclusions
+and forced draws all come across in one go.
+
+Column headers are recognised in English as well as French ("Name" or "Nom",
+"Group" or "Groupe"…).
+
+Going the other way, the result of the draw can be downloaded as CSV.
 
 ## Also in the box
 
+- ✉️ A **customisable message** in the settings: event name, budget, exchange date
+  and the wording itself, with a live preview.
 - 🇫🇷 🇬🇧 **French and English**, switchable at any time. The starting language
   follows your browser's.
 - 🌙 **Light and dark themes**, matching your system preference by default.

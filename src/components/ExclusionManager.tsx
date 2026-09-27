@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
-import { ArrowRight, Ban, Plus, Trash2, Users } from "lucide-react";
+import { ArrowLeftRight, Ban, Plus, Trash2, Users } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 import { Participant, Exclusion } from "../lib/database";
 import { useRecentlyAdded } from "../lib/useRecentlyAdded";
 import { buildHomonymHints, labelWithHint } from "../lib/homonyms";
@@ -13,6 +14,44 @@ interface ExclusionManagerProps {
   onDeleteExclusion: (id: string) => void;
   excludeSameFamily: boolean;
   onToggleExcludeSameFamily: () => void;
+  avoidReciprocal: boolean;
+  onToggleAvoidReciprocal: () => void;
+}
+
+interface RuleToggleProps {
+  icon: LucideIcon;
+  label: string;
+  description: string;
+  checked: boolean;
+  onToggle: () => void;
+}
+
+function RuleToggle({
+  icon: Icon,
+  label,
+  description,
+  checked,
+  onToggle,
+}: RuleToggleProps) {
+  return (
+    <label className="card-inset flex cursor-pointer items-start gap-3 p-4 transition-colors hover:bg-ink-100/60 dark:hover:bg-white/[0.06]">
+      <input
+        type="checkbox"
+        checked={checked}
+        onChange={onToggle}
+        className="mt-0.5 h-5 w-5 shrink-0 cursor-pointer rounded border-ink-300 text-brand-600 focus:ring-2 focus:ring-brand-500/40 dark:border-white/20 dark:bg-white/10"
+      />
+      <span className="min-w-0">
+        <span className="flex items-center gap-2 text-sm font-semibold text-ink-900 dark:text-white">
+          <Icon size={15} className="text-ink-400" />
+          {label}
+        </span>
+        <span className="mt-1 block text-[13px] leading-relaxed text-ink-500 dark:text-ink-400">
+          {description}
+        </span>
+      </span>
+    </label>
+  );
 }
 
 export function ExclusionManager({
@@ -22,6 +61,8 @@ export function ExclusionManager({
   onDeleteExclusion,
   excludeSameFamily,
   onToggleExcludeSameFamily,
+  avoidReciprocal,
+  onToggleAvoidReciprocal,
 }: ExclusionManagerProps) {
   const { t } = useI18n();
   const [participantId, setParticipantId] = useState("");
@@ -54,23 +95,22 @@ export function ExclusionManager({
         {t.exclusions.description}
       </p>
 
-      <label className="card-inset mb-5 flex cursor-pointer items-start gap-3 p-4 transition-colors hover:bg-ink-100/60 dark:hover:bg-white/[0.06]">
-        <input
-          type="checkbox"
+      <div className="mb-5 space-y-2">
+        <RuleToggle
+          icon={Users}
+          label={t.exclusions.sameGroupLabel}
+          description={t.exclusions.sameGroupDescription}
           checked={excludeSameFamily}
-          onChange={onToggleExcludeSameFamily}
-          className="mt-0.5 h-5 w-5 shrink-0 cursor-pointer rounded border-ink-300 text-brand-600 focus:ring-2 focus:ring-brand-500/40 dark:border-white/20 dark:bg-white/10"
+          onToggle={onToggleExcludeSameFamily}
         />
-        <span className="min-w-0">
-          <span className="flex items-center gap-2 text-sm font-semibold text-ink-900 dark:text-white">
-            <Users size={15} className="text-ink-400" />
-            {t.exclusions.sameGroupLabel}
-          </span>
-          <span className="mt-1 block text-[13px] leading-relaxed text-ink-500 dark:text-ink-400">
-            {t.exclusions.sameGroupDescription}
-          </span>
-        </span>
-      </label>
+        <RuleToggle
+          icon={ArrowLeftRight}
+          label={t.exclusions.reciprocalLabel}
+          description={t.exclusions.reciprocalDescription}
+          checked={avoidReciprocal}
+          onToggle={onToggleAvoidReciprocal}
+        />
+      </div>
 
       {participants.length < 2 ? (
         <EmptyState
@@ -82,43 +122,52 @@ export function ExclusionManager({
       ) : (
         <>
           <form onSubmit={handleSubmit} className="card-inset mb-4 p-4">
-            <div className="grid items-center gap-2 sm:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)]">
-              <select
-                value={participantId}
-                onChange={(e) => setParticipantId(e.target.value)}
-                className="field w-full min-w-0"
-                aria-label={t.exclusions.drawerLabel}
-                required
-              >
-                <option value="">{t.common.select}</option>
-                {participants.map((p) => (
-                  <option key={p.id} value={p.id}>
-                    {getOptionLabel(p)}
-                  </option>
-                ))}
-              </select>
-
-              <span className="text-center text-xs font-semibold uppercase tracking-wider text-ink-500 dark:text-ink-400">
-                {t.exclusions.connector}
-              </span>
-
-              <select
-                value={excludedId}
-                onChange={(e) => setExcludedId(e.target.value)}
-                className="field w-full min-w-0"
-                aria-label={t.exclusions.excludedLabel}
-                required
-              >
-                <option value="">{t.common.select}</option>
-                {participants
-                  .filter((p) => p.id !== participantId)
-                  .map((p) => (
+            <div className="grid gap-2 sm:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] sm:items-end">
+              <div className="min-w-0">
+                <label className="label" htmlFor="exclusion-drawer">
+                  {t.rules.drawerLabel}
+                </label>
+                <select
+                  id="exclusion-drawer"
+                  value={participantId}
+                  onChange={(e) => setParticipantId(e.target.value)}
+                  className="field w-full min-w-0"
+                  required
+                >
+                  <option value="">{t.common.select}</option>
+                  {participants.map((p) => (
                     <option key={p.id} value={p.id}>
                       {getOptionLabel(p)}
                     </option>
                   ))}
-              </select>
+                </select>
+              </div>
 
+              <span className="text-center text-sm font-medium text-ink-500 dark:text-ink-400 sm:flex sm:h-11 sm:items-center">
+                {t.exclusions.connector}
+              </span>
+
+              <div className="min-w-0">
+                <label className="label" htmlFor="exclusion-drawn">
+                  {t.rules.drawnLabel}
+                </label>
+                <select
+                  id="exclusion-drawn"
+                  value={excludedId}
+                  onChange={(e) => setExcludedId(e.target.value)}
+                  className="field w-full min-w-0"
+                  required
+                >
+                  <option value="">{t.common.select}</option>
+                  {participants
+                    .filter((p) => p.id !== participantId)
+                    .map((p) => (
+                      <option key={p.id} value={p.id}>
+                        {getOptionLabel(p)}
+                      </option>
+                    ))}
+                </select>
+              </div>
             </div>
             <div className="mt-3 flex justify-end">
               <button
@@ -148,21 +197,24 @@ export function ExclusionManager({
                     recentlyAdded.has(exclusion.id) ? "item-added" : ""
                   }`}
                 >
-                  <div className="flex min-w-0 flex-1 items-center gap-2.5 text-sm">
-                    <span className="truncate font-semibold text-ink-900 dark:text-white">
-                      {getParticipantName(exclusion.participant_id)}
-                    </span>
-                    <span className="flex shrink-0 items-center gap-1 text-rose-600 dark:text-rose-400">
-                      <ArrowRight size={14} />
-                      <Ban size={14} />
-                    </span>
-                    <span className="truncate font-semibold text-ink-900 dark:text-white">
-                      {getParticipantName(exclusion.excluded_participant_id)}
-                    </span>
+                  <div className="flex min-w-0 flex-1 items-start gap-2.5">
+                    <Ban
+                      size={15}
+                      className="mt-0.5 shrink-0 text-rose-600 dark:text-rose-400"
+                    />
+                    <p className="min-w-0 break-words text-sm text-ink-600 dark:text-ink-300">
+                      <span className="font-semibold text-ink-900 dark:text-white">
+                        {getParticipantName(exclusion.participant_id)}
+                      </span>{" "}
+                      {t.exclusions.connector}{" "}
+                      <span className="font-semibold text-ink-900 dark:text-white">
+                        {getParticipantName(exclusion.excluded_participant_id)}
+                      </span>
+                    </p>
                   </div>
                   <button
                     onClick={() => onDeleteExclusion(exclusion.id)}
-                    className="btn btn-danger-ghost btn-icon shrink-0 transition-opacity sm:opacity-0 sm:focus-visible:opacity-100 sm:group-hover:opacity-100"
+                    className="reveal-on-hover btn btn-danger-ghost btn-icon shrink-0"
                     aria-label={t.exclusions.deleteLabel}
                   >
                     <Trash2 size={15} />

@@ -19,20 +19,23 @@ s'offrent déjà un cadeau, et qu'il vaudrait mieux éviter. On recommence encor
 Les Petits Papiers fait exactement la même chose, mais le chapeau connaît les
 règles.
 
-## En quatre étapes
+## En trois étapes
 
-**1. Ajoutez les participants.** Un prénom suffit. L'e-mail et le groupe
-(« Famille Durand », « Équipe A »…) sont facultatifs.
+**1. Ajoutez les participants.** Un prénom suffit. Le groupe (« Famille
+Durand », « Équipe A »…) est facultatif : ses membres ne se tireront pas entre
+eux, sauf si vous désactivez cette règle.
 
-**2. Posez vos exclusions.** _Camille ne peut pas tirer Léa._ Autant de règles
-que nécessaire. Une option coche d'un coup le cas le plus courant : empêcher les
-membres d'un même groupe de se tirer entre eux.
+**2. Posez vos règles, si besoin.** Deux sortes de règles, à combiner à volonté :
 
-**3. Ajoutez des tirages limités, si besoin.** L'inverse de l'exclusion :
-_Sacha ne peut être tiré que par Camille ou Tom._ Pratique quand un cadeau est
-prévu à plusieurs, ou quand un enfant doit tomber sur un adulte.
+- les **exclusions** : _Camille ne tirera pas Léa._ Autant de règles que
+  nécessaire. Une option coche d'un coup le cas le plus courant : empêcher les
+  membres d'un même groupe de se tirer entre eux. Une autre évite les tirages
+  réciproques : si Camille tire Léa, Léa ne tirera pas Camille.
+- les **tirages imposés** : _Camille ou Tom tirera Sacha._ Personne d'autre ne
+  pourra tirer Sacha. Pratique quand un cadeau est prévu à plusieurs, ou quand un
+  enfant doit tomber sur un adulte.
 
-**4. Lancez le tirage.** L'attribution respecte toutes les règles d'un coup. Si
+**3. Lancez le tirage.** L'attribution respecte toutes les règles d'un coup. Si
 vos contraintes rendent le tirage impossible, l'application vous le dit au lieu
 de vous donner un résultat bancal.
 
@@ -47,39 +50,61 @@ copie un message déjà rédigé — nom du destinataire inclus — que vous n'a
 qu'à coller dans un SMS ou un e-mail. Chacun découvre son tirage sans jamais voir
 la liste complète.
 
+Encore plus discret : dans les paramètres, choisissez d'envoyer **un lien
+personnel** plutôt que le nom. Le message ne contient alors qu'un lien. En
+l'ouvrant, chaque participant déplie son petit papier et découvre son tirage,
+avec le budget et la date de l'échange. Le lien ne contient que sa propre paire :
+même transféré, il ne révèle rien sur les autres.
+
 ## Vos données restent chez vous
 
 Pas de compte à créer. Pas de mot de passe. Pas de serveur qui stocke vos listes
 d'invités.
 
 Tout est enregistré dans la mémoire locale de votre navigateur. Les noms, les
-e-mails, les règles et les résultats ne sont jamais envoyés nulle part — il n'y a
+groupes, les règles et les résultats ne sont jamais envoyés nulle part — il n'y a
 tout simplement pas de base de données à l'autre bout.
 
 Ce qu'il faut savoir en échange :
 
 - Le tirage vit **sur l'appareil où vous l'avez fait**. Ouvrir le site sur votre
-  téléphone ne vous montrera pas la liste créée sur votre ordinateur.
+  téléphone ne vous montrera pas la liste créée sur votre ordinateur. Pour la
+  transférer, utilisez un lien de partage (voir plus bas).
 - Vider les données de navigation efface le tirage. Pour le conserver ou le
-  transmettre, utilisez l'export CSV.
+  transmettre, copiez un lien de partage.
+- Pour repartir de zéro, le bouton « Tout effacer » des paramètres supprime
+  participants, règles, tirage et paramètres en une fois.
 - En navigation privée, l'enregistrement est parfois bloqué par le navigateur.
   Dans ce cas, un bandeau vous prévient dès l'ouverture, avant que vous ayez
   saisi quoi que ce soit.
 
-## Import et export
+## Partage, import et export
 
-Une longue liste à saisir ? Importez un fichier CSV : noms, e-mails, groupes,
-exclusions et tirages limités sont repris en une fois.
+Le bouton « Partager » propose deux liens, sans passer par aucun serveur : tout
+tient dans l'adresse elle-même.
 
-Dans l'autre sens, deux exports sont disponibles : la liste des participants
-avec toutes leurs contraintes (pour rejouer le même tirage l'an prochain), et le
-résultat du tirage lui-même.
+- **Le lien de partage** contient les participants, les règles et les
+  paramètres, jamais les résultats. Vous pouvez l'envoyer à qui organise avec
+  vous.
+- **Le lien complet** ajoute le résultat du tirage, pour passer sur un autre
+  appareil. Attention à qui vous l'envoyez : toute personne qui l'ouvre peut
+  voir qui a tiré qui.
 
-Un fichier exporté en français se réimporte sans problème depuis l'interface
-anglaise, et inversement.
+Un lien reflète l'état au moment où vous le copiez : après une modification,
+copiez-en un nouveau.
+
+Une longue liste à saisir ? Importez un fichier CSV : noms, groupes,
+exclusions et tirages imposés sont repris en une fois.
+
+Les en-têtes de colonnes sont reconnus en français comme en anglais (« Nom » ou
+« Name », « Groupe » ou « Group »…).
+
+Dans l'autre sens, le résultat du tirage peut être téléchargé en CSV.
 
 ## Aussi dans la boîte
 
+- ✉️ Un **message personnalisable** dans les paramètres : nom de l'événement,
+  budget, date de l'échange et le texte lui-même, avec un aperçu en direct.
 - 🇫🇷 🇬🇧 **Français et anglais**, avec bascule à tout moment. La langue de
   départ suit celle de votre navigateur.
 - 🌙 **Thème clair et sombre**, calé par défaut sur les préférences de votre

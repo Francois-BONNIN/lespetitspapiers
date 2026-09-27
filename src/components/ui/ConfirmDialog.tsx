@@ -81,7 +81,7 @@ export function ConfirmProvider({ children }: { children: ReactNode }) {
             <div className="mt-6 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
               <button
                 onClick={() => close(false)}
-                className="btn btn-md btn-secondary"
+                className="btn btn-md btn-outline"
               >
                 {options.cancelLabel ?? t.common.cancel}
               </button>

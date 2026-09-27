@@ -1,22 +1,30 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   AlertTriangle,
-  Sparkles,
+  Link2,
+  Settings,
+  Share2,
+  Smartphone,
   Ticket,
-  Trophy,
-  Users,
 } from "lucide-react";
 import {
   Participant,
   Exclusion,
   Inclusion,
   Draw,
+  EventSettings,
+  DEFAULT_EVENT_SETTINGS,
+  getEventSettings,
+  saveEventSettings,
   getParticipants,
   getExclusions,
   getInclusions,
   getDraws,
   getExcludeSameFamilySetting,
   setExcludeSameFamilySetting,
+  getAvoidReciprocalSetting,
+  setAvoidReciprocalSetting,
+  clearAllData,
   addParticipant,
   deleteParticipant,
   addExclusion,
@@ -26,16 +34,25 @@ import {
   saveDraws,
   clearDraws as clearStoredDraws,
   isStorageAvailable,
+  replaceAllData,
 } from "./lib/database";
-import { performDraw } from "./lib/drawAlgorithm";
+import { DrawRules, isDrawConsistent, performDraw } from "./lib/drawAlgorithm";
+import { importParticipantsFromCSV } from "./lib/csvExport";
 import {
-  exportParticipantsToCSV,
-  downloadCSV,
-  importParticipantsFromCSV,
-} from "./lib/csvExport";
+  buildShareUrl,
+  clearLinkFromUrl,
+  decodeRevealPayload,
+  decodeSharePayload,
+  readRevealPayloadFromUrl,
+  takeSharePayloadFromUrl,
+  type PersonalDraw,
+} from "./lib/shareLink";
 import { ParticipantManager } from "./components/ParticipantManager";
+import { RevealPage } from "./components/RevealPage";
 import { RulesManager } from "./components/RulesManager";
 import { DrawManager } from "./components/DrawManager";
+import { SettingsManager } from "./components/SettingsManager";
+import { ActionMenu } from "./components/ui/ActionMenu";
 import { ThemeToggle } from "./components/ui/ThemeToggle";
 import { LanguageToggle } from "./components/ui/LanguageToggle";
 import { useToast } from "./components/ui/toast-context";
@@ -49,14 +66,47 @@ function App() {
   const [draws, setDraws] = useState<Draw[]>([]);
   const [isDrawing, setIsDrawing] = useState(false);
   const [excludeSameFamily, setExcludeSameFamilyState] = useState(true);
+  const [avoidReciprocal, setAvoidReciprocalState] = useState(false);
+  const [eventSettings, setEventSettings] = useState<EventSettings>(
+    DEFAULT_EVENT_SETTINGS,
+  );
+  const [settingsOpen, setSettingsOpen] = useState(false);
   const [storageAvailable] = useState(isStorageAvailable);
+  const [personalDraw, setPersonalDraw] = useState<
+    PersonalDraw | "loading" | null
+  >(() => (readRevealPayloadFromUrl() ? "loading" : null));
 
   const toast = useToast();
   const confirm = useConfirm();
   const { t } = useI18n();
+  const linkHandlersRef = useRef<{
+    openSetup: (payload: string) => Promise<void>;
+    openReveal: (payload: string) => Promise<void>;
+  }>();
+
+  useEffect(() => {
+    linkHandlersRef.current = {
+      openSetup: handleOpenSharedSetup,
+      openReveal: handleOpenReveal,
+    };
+  });
 
   useEffect(() => {
     loadData();
+
+    const openLinkFromUrl = () => {
+      const revealPayload = readRevealPayloadFromUrl();
+      if (revealPayload) {
+        void linkHandlersRef.current?.openReveal(revealPayload);
+        return;
+      }
+      const setupPayload = takeSharePayloadFromUrl();
+      if (setupPayload) void linkHandlersRef.current?.openSetup(setupPayload);
+    };
+
+    openLinkFromUrl();
+    window.addEventListener("hashchange", openLinkFromUrl);
+    return () => window.removeEventListener("hashchange", openLinkFromUrl);
   }, []);
 
   const loadData = () => {
@@ -65,47 +115,46 @@ function App() {
     setInclusions(getInclusions());
     setDraws(getDraws());
     setExcludeSameFamilyState(getExcludeSameFamilySetting());
+    setAvoidReciprocalState(getAvoidReciprocalSetting());
+    setEventSettings(getEventSettings());
   };
 
-  const groupCount = useMemo(
-    () =>
-      new Set(
-        participants
-          .map((p) => p.family?.trim())
-          .filter((group): group is string => Boolean(group))
-      ).size,
-    [participants]
+  const openSettings = useCallback(() => setSettingsOpen(true), []);
+  const closeSettings = useCallback(() => setSettingsOpen(false), []);
+
+  const handleChangeEventSettings = (settings: EventSettings) => {
+    setEventSettings(settings);
+    saveEventSettings(settings);
+  };
+
+  const drawRules = useMemo<DrawRules>(
+    () => ({ exclusions, inclusions, excludeSameFamily, avoidReciprocal }),
+    [exclusions, inclusions, excludeSameFamily, avoidReciprocal],
   );
 
-  const handleAddParticipant = (
-    name: string,
-    email: string,
-    family: string
-  ) => {
+  const drawIsStale = useMemo(
+    () => draws.length > 0 && !isDrawConsistent(draws, participants, drawRules),
+    [draws, participants, drawRules],
+  );
+
+  const handleAddParticipant = (name: string, family: string) => {
     const duplicate = participants.some(
-      (p) => p.name.toLowerCase() === name.toLowerCase()
+      (p) => p.name.toLowerCase() === name.toLowerCase(),
     );
 
     try {
-      const newParticipant = addParticipant(
-        name,
-        email || null,
-        family || null
-      );
+      const newParticipant = addParticipant(name, family || null);
       setParticipants([...participants, newParticipant]);
       if (duplicate) {
         toast.warning(
           t.toast.participantAdded(name),
-          t.toast.participantDuplicate
+          t.toast.participantDuplicate,
         );
       } else {
         toast.success(t.toast.participantAdded(name));
       }
     } catch (error) {
-      toast.error(
-        t.toast.addFailed,
-        t.toast.participantAddFailedDescription
-      );
+      toast.error(t.toast.addFailed, t.toast.participantAddFailedDescription);
       console.error(error);
     }
   };
@@ -114,24 +163,25 @@ function App() {
     const participant = participants.find((p) => p.id === id);
     const linkedConstraints =
       exclusions.filter(
-        (e) => e.participant_id === id || e.excluded_participant_id === id
+        (e) => e.participant_id === id || e.excluded_participant_id === id,
       ).length +
       inclusions.filter(
-        (i) => i.participant_id === id || i.included_participant_id === id
+        (i) => i.participant_id === id || i.included_participant_id === id,
       ).length;
 
     const confirmed = await confirm({
       title: t.confirm.deleteParticipantTitle(
-        participant?.name ?? t.confirm.deleteParticipantFallback
+        participant?.name ?? t.confirm.deleteParticipantFallback,
       ),
-      description: [
-        linkedConstraints > 0
-          ? t.confirm.linkedConstraints(linkedConstraints)
-          : null,
-        draws.length > 0 ? t.confirm.drawInvalidated : null,
-      ]
-        .filter(Boolean)
-        .join(" ") || t.confirm.irreversible,
+      description:
+        [
+          linkedConstraints > 0
+            ? t.confirm.linkedConstraints(linkedConstraints)
+            : null,
+          draws.length > 0 ? t.confirm.drawInvalidated : null,
+        ]
+          .filter(Boolean)
+          .join(" ") || t.confirm.irreversible,
       confirmLabel: t.common.delete,
     });
 
@@ -151,7 +201,7 @@ function App() {
     const exists = exclusions.some(
       (e) =>
         e.participant_id === participantId &&
-        e.excluded_participant_id === excludedId
+        e.excluded_participant_id === excludedId,
     );
 
     if (exists) {
@@ -183,7 +233,7 @@ function App() {
     const exists = inclusions.some(
       (i) =>
         i.participant_id === participantId &&
-        i.included_participant_id === includedId
+        i.included_participant_id === includedId,
     );
 
     if (exists) {
@@ -215,12 +265,7 @@ function App() {
     setIsDrawing(true);
 
     window.setTimeout(() => {
-      const results = performDraw(
-        participants,
-        exclusions,
-        inclusions,
-        excludeSameFamily
-      );
+      const results = performDraw(participants, drawRules);
 
       if (!results) {
         toast.error(t.toast.drawFailed, t.toast.drawFailedDescription);
@@ -234,12 +279,12 @@ function App() {
             results.map((r) => ({
               drawer_id: r.drawer_id,
               drawn_id: r.drawn_id,
-            }))
-          )
+            })),
+          ),
         );
         toast.success(
           t.toast.drawDone,
-          t.toast.drawDoneDescription(results.length)
+          t.toast.drawDoneDescription(results.length),
         );
       } catch (error) {
         toast.error(t.toast.drawSaveFailed, t.toast.drawSaveFailedDescription);
@@ -248,6 +293,16 @@ function App() {
 
       setIsDrawing(false);
     }, 700);
+  };
+
+  const handleRedraw = async () => {
+    const confirmed = await confirm({
+      title: t.confirm.redrawTitle,
+      description: t.confirm.redrawDescription,
+      confirmLabel: t.confirm.redrawConfirm,
+    });
+
+    if (confirmed) handlePerformDraw();
   };
 
   const handleClearDraws = async () => {
@@ -275,14 +330,29 @@ function App() {
     setExcludeSameFamilySetting(newValue);
   };
 
-  const handleExportData = () => {
-    downloadCSV(
-      exportParticipantsToCSV(participants, exclusions, inclusions, t),
-      `${t.csv.participantsFilename}-${
-        new Date().toISOString().split("T")[0]
-      }.csv`
-    );
-    toast.success(t.toast.exportStarted, t.toast.exportParticipantsDescription);
+  const handleToggleAvoidReciprocal = () => {
+    const newValue = !avoidReciprocal;
+    setAvoidReciprocalState(newValue);
+    setAvoidReciprocalSetting(newValue);
+  };
+
+  const handleClearAll = async () => {
+    closeSettings();
+
+    const confirmed = await confirm({
+      title: t.confirm.clearAllTitle,
+      description: t.confirm.clearAllDescription,
+      confirmLabel: t.confirm.clearAllConfirm,
+    });
+
+    if (!confirmed) return;
+
+    if (clearAllData()) {
+      loadData();
+      toast.success(t.toast.allCleared);
+    } else {
+      toast.error(t.toast.clearAllFailed);
+    }
   };
 
   const handleImportData = async (file: File) => {
@@ -296,7 +366,7 @@ function App() {
 
       const participantMap = new Map<string, string>();
       importResult.participants.forEach((p) => {
-        participantMap.set(p.name, addParticipant(p.name, p.email, p.family).id);
+        participantMap.set(p.name, addParticipant(p.name, p.family).id);
       });
 
       importResult.exclusions.forEach((e) => {
@@ -326,31 +396,112 @@ function App() {
       loadData();
       toast.success(
         t.toast.importDone,
-        t.toast.importDoneDescription(importResult.participants.length)
+        t.toast.importDoneDescription(importResult.participants.length),
       );
     } catch (error) {
       toast.error(
         t.toast.importReadFailed,
-        t.toast.importReadFailedDescription
+        t.toast.importReadFailedDescription,
       );
       console.error(error);
     }
   };
 
-  const stats = [
-    {
-      id: "participants",
-      icon: Users,
-      label: t.stats.participants,
-      value: participants.length,
-    },
-    {
-      id: "groups",
-      icon: Sparkles,
-      label: t.stats.groups,
-      value: groupCount,
-    },
-  ];
+  const copyShareLink = async (includeDraws: boolean) => {
+    try {
+      const url = await buildShareUrl(
+        {
+          participants,
+          exclusions,
+          inclusions,
+          draws,
+          excludeSameFamily,
+          avoidReciprocal,
+          eventSettings,
+        },
+        includeDraws,
+      );
+      await navigator.clipboard.writeText(url);
+      if (includeDraws) {
+        toast.success(
+          t.toast.fullLinkCopied,
+          t.toast.fullLinkCopiedDescription,
+        );
+      } else {
+        toast.success(t.toast.shareCopied, t.toast.shareCopiedDescription);
+      }
+    } catch (error) {
+      toast.error(t.toast.shareFailed, t.toast.copyFailedDescription);
+      console.error(error);
+    }
+  };
+
+  const handleOpenSharedSetup = async (payload: string) => {
+    const setup = await decodeSharePayload(payload);
+
+    if (!setup) {
+      toast.error(t.toast.sharedInvalid, t.toast.sharedInvalidDescription);
+      return;
+    }
+
+    const hasLocalData = getParticipants().length > 0 || getDraws().length > 0;
+
+    if (hasLocalData) {
+      const ruleCount = setup.exclusions.length + setup.inclusions.length;
+      const confirmed = await confirm({
+        title: t.confirm.openSharedTitle,
+        description:
+          setup.draws.length > 0
+            ? t.confirm.openSharedWithDrawDescription(
+                setup.participants.length,
+                ruleCount,
+              )
+            : t.confirm.openSharedDescription(
+                setup.participants.length,
+                ruleCount,
+              ),
+        confirmLabel: t.confirm.openSharedConfirm,
+      });
+      if (!confirmed) return;
+    }
+
+    replaceAllData(setup);
+    loadData();
+    toast.success(
+      t.toast.sharedLoaded,
+      setup.draws.length > 0
+        ? t.toast.sharedLoadedWithDrawDescription(setup.participants.length)
+        : t.toast.sharedLoadedDescription(setup.participants.length),
+    );
+  };
+
+  const handleOpenReveal = async (payload: string) => {
+    setPersonalDraw("loading");
+    const draw = await decodeRevealPayload(payload);
+
+    if (!draw) {
+      clearLinkFromUrl();
+      setPersonalDraw(null);
+      toast.error(t.toast.sharedInvalid, t.toast.sharedInvalidDescription);
+      return;
+    }
+
+    setPersonalDraw(draw);
+  };
+
+  const handleExitReveal = () => {
+    clearLinkFromUrl();
+    setPersonalDraw(null);
+  };
+
+  if (personalDraw !== null) {
+    return (
+      <RevealPage
+        draw={personalDraw === "loading" ? null : personalDraw}
+        onExit={handleExitReveal}
+      />
+    );
+  }
 
   return (
     <div className="aurora-bg min-h-screen">
@@ -371,12 +522,41 @@ function App() {
           </div>
 
           <div className="flex items-center gap-2">
-            {draws.length > 0 && (
-              <span className="chip hidden bg-emerald-100 text-emerald-700 dark:bg-emerald-500/15 dark:text-emerald-300 sm:inline-flex">
-                <Trophy size={13} />
-                {t.header.drawDone}
-              </span>
-            )}
+            <ActionMenu
+              icon={Share2}
+              label={t.share.action}
+              disabled={participants.length === 0}
+              variant="toolbar"
+              items={[
+                {
+                  id: "share-link",
+                  icon: Link2,
+                  label: t.share.linkAction,
+                  description: t.share.linkDescription,
+                  onSelect: () => copyShareLink(false),
+                },
+                {
+                  id: "full-link",
+                  icon: Smartphone,
+                  label: t.share.fullLinkAction,
+                  description:
+                    draws.length > 0
+                      ? t.share.fullLinkDescription
+                      : t.share.fullLinkUnavailable,
+                  disabled: draws.length === 0,
+                  onSelect: () => copyShareLink(true),
+                },
+              ]}
+            />
+            <button
+              onClick={openSettings}
+              className="btn btn-sm btn-outline rounded-full"
+              aria-label={t.settings.open}
+              title={t.settings.open}
+            >
+              <Settings size={15} />
+              <span className="hidden sm:inline">{t.settings.open}</span>
+            </button>
             <LanguageToggle />
             <ThemeToggle />
           </div>
@@ -406,56 +586,37 @@ function App() {
           </div>
         )}
 
-        <div className="mb-8 flex flex-col gap-3 sm:flex-row sm:items-stretch">
-          <div className="grid grid-cols-2 gap-3 sm:shrink-0">
-            {stats.map(({ id, icon: Icon, label, value }) => (
-              <div key={id} className="card flex items-center gap-3 p-3.5">
-                <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-ink-100 text-ink-500 dark:bg-white/[0.06] dark:text-ink-400">
-                  <Icon size={16} />
-                </span>
-                <div className="min-w-0">
-                  <p
-                    key={value}
-                    className="animate-pop font-display text-xl font-semibold leading-none text-ink-900 dark:text-white"
-                  >
-                    {value}
-                  </p>
-                  <p className="mt-1 truncate text-xs text-ink-500 dark:text-ink-400">
-                    {label}
-                  </p>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          <div className="min-w-0 flex-1">
-            <RulesManager
-              participants={participants}
-              exclusions={exclusions}
-              inclusions={inclusions}
-              onAddExclusion={handleAddExclusion}
-              onDeleteExclusion={handleDeleteExclusion}
-              onAddInclusion={handleAddInclusion}
-              onDeleteInclusion={handleDeleteInclusion}
-              excludeSameFamily={excludeSameFamily}
-              onToggleExcludeSameFamily={handleToggleExcludeSameFamily}
-            />
-          </div>
-        </div>
-
         <div className="space-y-5">
           <ParticipantManager
             participants={participants}
+            excludeSameFamily={excludeSameFamily}
             onAddParticipant={handleAddParticipant}
             onDeleteParticipant={handleDeleteParticipant}
-            onExportData={handleExportData}
             onImportData={handleImportData}
+          />
+
+          <RulesManager
+            participants={participants}
+            exclusions={exclusions}
+            inclusions={inclusions}
+            onAddExclusion={handleAddExclusion}
+            onDeleteExclusion={handleDeleteExclusion}
+            onAddInclusion={handleAddInclusion}
+            onDeleteInclusion={handleDeleteInclusion}
+            excludeSameFamily={excludeSameFamily}
+            onToggleExcludeSameFamily={handleToggleExcludeSameFamily}
+            avoidReciprocal={avoidReciprocal}
+            onToggleAvoidReciprocal={handleToggleAvoidReciprocal}
           />
 
           <DrawManager
             participants={participants}
             draws={draws}
+            eventSettings={eventSettings}
+            isStale={drawIsStale}
             onPerformDraw={handlePerformDraw}
+            onRedraw={handleRedraw}
+            onCustomizeMessage={openSettings}
             onClearDraws={handleClearDraws}
             isDrawing={isDrawing}
           />
@@ -465,6 +626,14 @@ function App() {
           {t.footer}
         </footer>
       </main>
+
+      <SettingsManager
+        open={settingsOpen}
+        onClose={closeSettings}
+        settings={eventSettings}
+        onChange={handleChangeEventSettings}
+        onClearAll={handleClearAll}
+      />
     </div>
   );
 }

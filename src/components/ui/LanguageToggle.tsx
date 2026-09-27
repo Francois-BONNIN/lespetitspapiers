@@ -9,7 +9,7 @@ export function LanguageToggle() {
   return (
     <button
       onClick={() => setLang(nextLang)}
-      className="btn btn-sm btn-secondary rounded-full"
+      className="btn btn-sm btn-outline rounded-full"
       aria-label={t.meta.switchLabel}
       title={t.meta.switchLabel}
     >

@@ -1,4 +1,4 @@
-import { Participant, Exclusion, Inclusion, Draw } from "./database";
+import { Participant, Draw } from "./database";
 import type { Translation } from "./i18n";
 import { buildHomonymHints, labelWithHint } from "./homonyms";
 
@@ -25,35 +25,6 @@ export function exportDrawsToCSV(
   return header + rows.join("\n");
 }
 
-export function exportParticipantsToCSV(
-  participants: Participant[],
-  exclusions: Exclusion[],
-  inclusions: Inclusion[],
-  t: Translation,
-): string {
-  const getParticipantName = (id: string) =>
-    participants.find((p) => p.id === id)?.name || "";
-
-  const header = `${t.csv.participantsHeader}\n`;
-  const rows = participants.map((participant) => {
-    const participantExclusions = exclusions
-      .filter((e) => e.participant_id === participant.id)
-      .map((e) => getParticipantName(e.excluded_participant_id))
-      .join(";");
-
-    const participantInclusions = inclusions
-      .filter((i) => i.participant_id === participant.id)
-      .map((i) => getParticipantName(i.included_participant_id))
-      .join(";");
-
-    return `"${participant.name}","${participant.email || ""}","${
-      participant.family || ""
-    }","${participantExclusions}","${participantInclusions}"`;
-  });
-
-  return header + rows.join("\n");
-}
-
 export function downloadCSV(content: string, filename: string): void {
   const blob = new Blob(["\ufeff" + content], {
     type: "text/csv;charset=utf-8;",
@@ -72,7 +43,6 @@ export function downloadCSV(content: string, filename: string): void {
 export interface ImportResult {
   participants: Array<{
     name: string;
-    email: string | null;
     family: string | null;
   }>;
   exclusions: Array<{
@@ -135,7 +105,6 @@ export function importParticipantsFromCSV(
       header.findIndex((h) => aliases.some((alias) => h.includes(alias)));
 
     const nameIndex = findColumn("nom", "name");
-    const emailIndex = findColumn("email", "e-mail", "mail");
     const familyIndex = findColumn("famille", "groupe", "group");
     const exclusionsIndex = findColumn("exclusion");
     const inclusionsIndex = findColumn("inclusion");
@@ -156,7 +125,6 @@ export function importParticipantsFromCSV(
 
       participants.push({
         name,
-        email: emailIndex !== -1 ? row[emailIndex]?.trim() || null : null,
         family: familyIndex !== -1 ? row[familyIndex]?.trim() || null : null,
       });
 
@@ -192,12 +160,4 @@ export function importParticipantsFromCSV(
     console.error("Erreur lors de l'import CSV:", error);
     return null;
   }
-}
-
-export function generateMessageForDraw(
-  drawerName: string,
-  drawnName: string,
-  t: Translation,
-): string {
-  return t.csv.message(drawerName, drawnName);
 }

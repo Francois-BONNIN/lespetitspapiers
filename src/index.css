@@ -99,8 +99,13 @@
   }
 
   .btn-secondary {
-    @apply border border-ink-200 bg-white text-ink-700 hover:border-ink-300 hover:bg-ink-50
-      dark:border-white/10 dark:bg-white/[0.06] dark:text-ink-200 dark:hover:bg-white/[0.12];
+    @apply bg-brand-100 text-brand-800 hover:bg-brand-200
+      dark:bg-brand-500/20 dark:text-brand-100 dark:hover:bg-brand-500/30;
+  }
+
+  .btn-outline {
+    @apply border border-ink-300 bg-transparent text-ink-700 hover:border-ink-400 hover:bg-ink-100/60 hover:text-ink-900
+      dark:border-white/20 dark:text-ink-200 dark:hover:border-white/30 dark:hover:bg-white/[0.06] dark:hover:text-white;
   }
 
   .btn-ghost {
@@ -169,12 +174,27 @@
     @apply inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold;
   }
 
+  .pill {
+    @apply inline-flex min-w-0 max-w-full items-center rounded-full border text-sm font-semibold;
+  }
+
   .section-title {
     @apply font-display text-xl font-semibold tracking-tight text-ink-900 dark:text-white sm:text-2xl;
   }
 
   .muted {
     @apply text-sm text-ink-500 dark:text-ink-400;
+  }
+
+  @media (hover: hover) {
+    .reveal-on-hover {
+      @apply opacity-0;
+    }
+
+    .group:hover .reveal-on-hover,
+    .reveal-on-hover:focus-visible {
+      @apply opacity-100;
+    }
   }
 
   .item-added {

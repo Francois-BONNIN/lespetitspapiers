@@ -1,27 +1,19 @@
 import { useMemo, useRef, useState } from "react";
-import {
-  Download,
-  Mail,
-  Search,
-  Trash2,
-  Upload,
-  UserPlus,
-  Users,
-} from "lucide-react";
+import { Info, Search, Upload, UserPlus, Users, X } from "lucide-react";
 import { Participant } from "../lib/database";
 import { getGroupColor } from "../lib/familyColors";
 import { buildHomonymHints } from "../lib/homonyms";
 import { useRecentlyAdded } from "../lib/useRecentlyAdded";
 import { SectionCard } from "./ui/SectionCard";
 import { EmptyState } from "./ui/EmptyState";
-import { ParticipantAvatar } from "./ui/ParticipantAvatar";
+import { ParticipantName } from "./ui/ParticipantName";
 import { useI18n } from "./ui/language-context";
 
 interface ParticipantManagerProps {
   participants: Participant[];
-  onAddParticipant: (name: string, email: string, family: string) => void;
+  excludeSameFamily: boolean;
+  onAddParticipant: (name: string, family: string) => void;
   onDeleteParticipant: (id: string) => void;
-  onExportData: () => void;
   onImportData: (file: File) => void;
 }
 
@@ -29,15 +21,14 @@ const UNGROUPED = "";
 
 export function ParticipantManager({
   participants,
+  excludeSameFamily,
   onAddParticipant,
   onDeleteParticipant,
-  onExportData,
   onImportData,
 }: ParticipantManagerProps) {
   const { t } = useI18n();
   const locale = t.meta.locale;
   const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
   const [family, setFamily] = useState("");
   const [query, setQuery] = useState("");
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -52,9 +43,8 @@ export function ParticipantManager({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!name.trim()) return;
-    onAddParticipant(name.trim(), email.trim(), family.trim());
+    onAddParticipant(name.trim(), family.trim());
     setName("");
-    setEmail("");
     nameInputRef.current?.focus();
   };
 
@@ -82,7 +72,7 @@ export function ParticipantManager({
     const q = query.trim().toLowerCase();
     if (!q) return participants;
     return participants.filter((p) =>
-      [p.name, p.email, p.family]
+      [p.name, p.family]
         .filter(Boolean)
         .some((value) => value!.toLowerCase().includes(q))
     );
@@ -108,10 +98,9 @@ export function ParticipantManager({
 
   return (
     <SectionCard
-      icon={Users}
+      step={1}
       title={t.participants.title}
       description={t.participants.description}
-      accent="brand"
       badge={
         participants.length > 0 ? (
           <span className="chip bg-brand-100 text-brand-700 dark:bg-brand-500/15 dark:text-brand-300">
@@ -122,25 +111,12 @@ export function ParticipantManager({
       actions={
         <>
           <button
-            onClick={onExportData}
-            className="btn btn-sm btn-secondary"
-            disabled={participants.length === 0}
-            title={t.participants.exportTitle}
-          >
-            <Download size={15} />
-            <span className="hidden sm:inline">
-              {t.participants.exportAction}
-            </span>
-          </button>
-          <button
             onClick={() => fileInputRef.current?.click()}
-            className="btn btn-sm btn-secondary"
+            className="btn btn-sm btn-outline"
             title={t.participants.importTitle}
           >
             <Upload size={15} />
-            <span className="hidden sm:inline">
-              {t.participants.importAction}
-            </span>
+            {t.participants.importAction}
           </button>
           <input
             ref={fileInputRef}
@@ -153,8 +129,8 @@ export function ParticipantManager({
       }
     >
       <form onSubmit={handleSubmit} className="card-inset mb-5 p-4">
-        <div className="grid gap-3 sm:grid-cols-2">
-          <div>
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-end">
+          <div className="flex-1">
             <label className="label" htmlFor="participant-name">
               {t.participants.nameLabel}
             </label>
@@ -169,24 +145,6 @@ export function ParticipantManager({
               required
             />
           </div>
-          <div>
-            <label className="label" htmlFor="participant-email">
-              {t.participants.emailLabel}{" "}
-              <span className="normal-case text-ink-400">
-                {t.common.optional}
-              </span>
-            </label>
-            <input
-              id="participant-email"
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder={t.participants.emailPlaceholder}
-              className="field"
-            />
-          </div>
-        </div>
-        <div className="mt-3 flex flex-col gap-3 sm:flex-row sm:items-end">
           <div className="flex-1">
             <label className="label" htmlFor="participant-group">
               {t.participants.groupLabel}{" "}
@@ -203,6 +161,7 @@ export function ParticipantManager({
               className="field"
               list="known-groups"
               autoComplete="off"
+              aria-describedby="participant-group-hint"
             />
             <datalist id="known-groups">
               {knownGroups.map((group) => (
@@ -215,6 +174,15 @@ export function ParticipantManager({
             {t.common.add}
           </button>
         </div>
+        <p
+          id="participant-group-hint"
+          className="mt-3 flex gap-2 text-xs leading-relaxed text-ink-500 dark:text-ink-400"
+        >
+          <Info size={14} className="mt-px shrink-0" />
+          {excludeSameFamily
+            ? t.participants.groupHintSameGroup
+            : t.participants.groupHintFree}
+        </p>
       </form>
 
       {participants.length > 3 && (
@@ -268,39 +236,26 @@ export function ParticipantManager({
                     </span>
                   </div>
                 )}
-                <ul className="grid gap-2 sm:grid-cols-2 xl:grid-cols-3">
+                <ul className="flex flex-wrap gap-2">
                   {members.map((participant) => (
                     <li
                       key={participant.id}
-                      className={`group flex items-center gap-3 rounded-xl border p-2.5 transition-all hover:shadow-card ${
+                      className={`pill gap-0.5 py-0.5 pl-3 pr-0.5 text-ink-900 dark:text-white ${
                         colors.surface
                       } ${recentlyAdded.has(participant.id) ? "item-added" : ""}`}
                     >
-                      <ParticipantAvatar
+                      <ParticipantName
                         name={participant.name}
-                        group={participant.family}
-                        index={homonymHints.get(participant.id)?.index}
+                        hint={homonymHints.get(participant.id)}
+                        withGroupLabel={false}
                       />
-                      <div className="min-w-0 flex-1">
-                        <p className="truncate text-sm font-semibold text-ink-900 dark:text-white">
-                          {participant.name}
-                        </p>
-                        {participant.email && (
-                          <p className="mt-0.5 flex items-center gap-1 truncate text-xs text-ink-500 dark:text-ink-400">
-                            <Mail size={11} className="shrink-0" />
-                            <span className="truncate">
-                              {participant.email}
-                            </span>
-                          </p>
-                        )}
-                      </div>
                       <button
                         onClick={() => onDeleteParticipant(participant.id)}
-                        className="btn btn-danger-ghost btn-icon opacity-0 transition-opacity focus-visible:opacity-100 group-hover:opacity-100"
+                        className="btn btn-danger-ghost h-7 w-7 shrink-0 rounded-full px-0"
                         aria-label={t.participants.deleteLabel(participant.name)}
                         title={t.participants.deleteLabel(participant.name)}
                       >
-                        <Trash2 size={15} />
+                        <X size={14} />
                       </button>
                     </li>
                   ))}
