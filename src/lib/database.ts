@@ -210,6 +210,44 @@ export function clearDraws(): void {
   write(STORAGE_KEYS.DRAWS, []);
 }
 
+export function replaceAllData(
+  entries: Array<Pick<Participant, "name" | "family">>,
+  exclusionPairs: Array<[number, number]>,
+  inclusionPairs: Array<[number, number]>,
+  excludeSameFamily: boolean
+): void {
+  const now = new Date().toISOString();
+  const participants: Participant[] = entries.map((entry) => ({
+    id: generateId(),
+    name: entry.name,
+    family: entry.family,
+    created_at: now,
+  }));
+  const idAt = (index: number) => participants[index].id;
+
+  write(STORAGE_KEYS.PARTICIPANTS, participants);
+  write(
+    STORAGE_KEYS.EXCLUSIONS,
+    exclusionPairs.map(([from, to]): Exclusion => ({
+      id: generateId(),
+      participant_id: idAt(from),
+      excluded_participant_id: idAt(to),
+      created_at: now,
+    }))
+  );
+  write(
+    STORAGE_KEYS.INCLUSIONS,
+    inclusionPairs.map(([from, to]): Inclusion => ({
+      id: generateId(),
+      participant_id: idAt(from),
+      included_participant_id: idAt(to),
+      created_at: now,
+    }))
+  );
+  write(STORAGE_KEYS.DRAWS, []);
+  setExcludeSameFamilySetting(excludeSameFamily);
+}
+
 export function getExcludeSameFamilySetting(): boolean {
   try {
     const data = readRaw(STORAGE_KEYS.EXCLUDE_SAME_FAMILY);

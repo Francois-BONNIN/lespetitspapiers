@@ -1,6 +1,7 @@
 import { useMemo, useRef, useState } from "react";
 import {
   Download,
+  Link2,
   Search,
   Trash2,
   Upload,
@@ -22,6 +23,7 @@ interface ParticipantManagerProps {
   onDeleteParticipant: (id: string) => void;
   onExportData: () => void;
   onImportData: (file: File) => void;
+  onShareLink: () => void;
 }
 
 const UNGROUPED = "";
@@ -32,6 +34,7 @@ export function ParticipantManager({
   onDeleteParticipant,
   onExportData,
   onImportData,
+  onShareLink,
 }: ParticipantManagerProps) {
   const { t } = useI18n();
   const locale = t.meta.locale;
@@ -118,6 +121,17 @@ export function ParticipantManager({
       }
       actions={
         <>
+          <button
+            onClick={onShareLink}
+            className="btn btn-sm btn-secondary"
+            disabled={participants.length === 0}
+            title={t.participants.shareTitle}
+          >
+            <Link2 size={15} />
+            <span className="hidden sm:inline">
+              {t.participants.shareAction}
+            </span>
+          </button>
           <button
             onClick={onExportData}
             className="btn btn-sm btn-secondary"

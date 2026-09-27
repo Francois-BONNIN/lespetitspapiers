@@ -67,6 +67,8 @@ const fr = {
     exportTitle: "Exporter les participants et leurs contraintes au format CSV",
     importAction: "Importer",
     importTitle: "Importer un fichier CSV de participants",
+    shareAction: "Partager",
+    shareTitle: "Copier un lien qui contient les participants et les règles",
     nameLabel: "Nom",
     namePlaceholder: "Camille Durand",
     groupLabel: "Groupe",
@@ -206,6 +208,16 @@ const fr = {
     messagesCopied: "Messages copiés",
     messagesCopiedDescription: (count: number) =>
       `${count} message(s) sont dans votre presse-papiers.`,
+    shareCopied: "Lien de partage copié",
+    shareCopiedDescription:
+      "Il contient les participants et les règles, mais pas les résultats du tirage. Rien n'est envoyé à un serveur.",
+    shareFailed: "Création du lien impossible",
+    sharedLoaded: "Tirage partagé chargé",
+    sharedLoadedDescription: (count: number) =>
+      `${count} participant(s) récupéré(s) depuis le lien.`,
+    sharedInvalid: "Lien de partage invalide",
+    sharedInvalidDescription:
+      "Le lien est incomplet ou abîmé : demandez-en un nouveau.",
   },
 
   confirm: {
@@ -219,6 +231,10 @@ const fr = {
     resetDrawDescription:
       "Les attributions actuelles seront effacées. Les participants et les règles sont conservés.",
     resetDrawConfirm: "Recommencer",
+    openSharedTitle: "Ouvrir le tirage partagé ?",
+    openSharedDescription: (participants: number, rules: number) =>
+      `Ce lien contient ${participants} participant(s) et ${rules} règle(s). Ils remplaceront vos participants, vos règles et votre tirage actuels.`,
+    openSharedConfirm: "Remplacer",
   },
 
   csv: {
@@ -294,6 +310,8 @@ const en: Translation = {
     exportTitle: "Export participants and their constraints as a CSV file",
     importAction: "Import",
     importTitle: "Import a CSV file of participants",
+    shareAction: "Share",
+    shareTitle: "Copy a link that contains the participants and the rules",
     nameLabel: "Name",
     namePlaceholder: "Alex Morgan",
     groupLabel: "Group",
@@ -428,6 +446,16 @@ const en: Translation = {
     messagesCopied: "Messages copied",
     messagesCopiedDescription: (count: number) =>
       `${count} message(s) are in your clipboard.`,
+    shareCopied: "Share link copied",
+    shareCopiedDescription:
+      "It contains the participants and the rules, but not the draw results. Nothing is sent to a server.",
+    shareFailed: "Could not create the link",
+    sharedLoaded: "Shared draw loaded",
+    sharedLoadedDescription: (count: number) =>
+      `${count} participant(s) loaded from the link.`,
+    sharedInvalid: "Invalid share link",
+    sharedInvalidDescription:
+      "The link is incomplete or damaged: ask for a new one.",
   },
 
   confirm: {
@@ -441,6 +469,10 @@ const en: Translation = {
     resetDrawDescription:
       "The current assignments will be erased. Participants and rules are kept.",
     resetDrawConfirm: "Start over",
+    openSharedTitle: "Open the shared draw?",
+    openSharedDescription: (participants: number, rules: number) =>
+      `This link contains ${participants} participant(s) and ${rules} rule(s). They will replace your current participants, rules and draw.`,
+    openSharedConfirm: "Replace",
   },
 
   csv: {

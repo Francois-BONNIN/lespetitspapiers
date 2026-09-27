@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   AlertTriangle,
   Sparkles,
@@ -26,6 +26,7 @@ import {
   saveDraws,
   clearDraws as clearStoredDraws,
   isStorageAvailable,
+  replaceAllData,
 } from "./lib/database";
 import { performDraw } from "./lib/drawAlgorithm";
 import {
@@ -33,6 +34,11 @@ import {
   downloadCSV,
   importParticipantsFromCSV,
 } from "./lib/csvExport";
+import {
+  buildShareUrl,
+  decodeSharePayload,
+  takeSharePayloadFromUrl,
+} from "./lib/shareLink";
 import { ParticipantManager } from "./components/ParticipantManager";
 import { RulesManager } from "./components/RulesManager";
 import { DrawManager } from "./components/DrawManager";
@@ -54,9 +60,24 @@ function App() {
   const toast = useToast();
   const confirm = useConfirm();
   const { t } = useI18n();
+  const openSharedSetupRef = useRef<(payload: string) => Promise<void>>();
+
+  useEffect(() => {
+    openSharedSetupRef.current = handleOpenSharedSetup;
+  });
 
   useEffect(() => {
     loadData();
+
+    const openSharedLinkFromUrl = () => {
+      const payload = takeSharePayloadFromUrl();
+      if (payload) void openSharedSetupRef.current?.(payload);
+    };
+
+    openSharedLinkFromUrl();
+    window.addEventListener("hashchange", openSharedLinkFromUrl);
+    return () =>
+      window.removeEventListener("hashchange", openSharedLinkFromUrl);
   }, []);
 
   const loadData = () => {
@@ -329,6 +350,58 @@ function App() {
     }
   };
 
+  const handleShareLink = async () => {
+    try {
+      const url = await buildShareUrl(
+        participants,
+        exclusions,
+        inclusions,
+        excludeSameFamily
+      );
+      await navigator.clipboard.writeText(url);
+      toast.success(t.toast.shareCopied, t.toast.shareCopiedDescription);
+    } catch (error) {
+      toast.error(t.toast.shareFailed, t.toast.copyFailedDescription);
+      console.error(error);
+    }
+  };
+
+  const handleOpenSharedSetup = async (payload: string) => {
+    const setup = await decodeSharePayload(payload);
+
+    if (!setup) {
+      toast.error(t.toast.sharedInvalid, t.toast.sharedInvalidDescription);
+      return;
+    }
+
+    const hasLocalData =
+      getParticipants().length > 0 || getDraws().length > 0;
+
+    if (hasLocalData) {
+      const confirmed = await confirm({
+        title: t.confirm.openSharedTitle,
+        description: t.confirm.openSharedDescription(
+          setup.participants.length,
+          setup.exclusions.length + setup.inclusions.length
+        ),
+        confirmLabel: t.confirm.openSharedConfirm,
+      });
+      if (!confirmed) return;
+    }
+
+    replaceAllData(
+      setup.participants,
+      setup.exclusions,
+      setup.inclusions,
+      setup.excludeSameFamily
+    );
+    loadData();
+    toast.success(
+      t.toast.sharedLoaded,
+      t.toast.sharedLoadedDescription(setup.participants.length)
+    );
+  };
+
   const stats = [
     {
       id: "participants",
@@ -442,6 +515,7 @@ function App() {
             onDeleteParticipant={handleDeleteParticipant}
             onExportData={handleExportData}
             onImportData={handleImportData}
+            onShareLink={handleShareLink}
           />
 
           <DrawManager
